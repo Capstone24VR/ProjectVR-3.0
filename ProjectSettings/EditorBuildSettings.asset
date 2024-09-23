@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/BasicScene.unity
     guid: bc761d9a86b33554f85fd11bb1f87ba3
+  - enabled: 1
+    path: Assets/Scenes/Card Game Test.unity
+    guid: f702fddfff1d58d48acc770760050fb7
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 5e27e6878ae89b144bcbcc03c0c03220,
       type: 2}
