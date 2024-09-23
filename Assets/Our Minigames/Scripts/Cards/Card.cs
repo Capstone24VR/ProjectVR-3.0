@@ -5,9 +5,9 @@ using UnityEngine.UIElements;
 
 public class Card : MonoBehaviour
 {
-    public enum Suit { None, Heart, Diamond, Club, Spade }
-    public enum Value { Red, Green, Blue,
-        Ace = 1,
+    public enum Suit { Heart, Diamond, Club, Spades }
+    public enum Value {
+        A = 1,
         Two = 2,
         Three = 3,
         Four = 4,
@@ -17,15 +17,15 @@ public class Card : MonoBehaviour
         Eight = 8,
         Nine = 9,
         Ten = 10,
-        Jack = 11,
-        Queen = 12,
-        King = 13
+        J = 11,
+        Q = 12,
+        K = 13
     }
 
 
 
     public Suit suit;
-    public Value val;
+    public Value value;
 
     [SerializeField] protected Vector3 _position = Vector3.zero;
     [SerializeField] protected Vector3 _localScale = Vector3.zero;

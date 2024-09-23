@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using static Card;
 using static XRMultiplayer.MiniGames.MiniGameBase;
 
 namespace XRMultiplayer.MiniGames
@@ -59,7 +60,7 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        public enum game { Colors };
+        public enum game { Colors, Crazy_Eights};
 
         public GameObject card;
         public bool allStartingHandsDrawn = false;
@@ -68,7 +69,7 @@ namespace XRMultiplayer.MiniGames
         public GameObject playPileObj;
 
         public int numCards = 12;
-        public int startingHand = 1;
+        public int startingHand = 3;
 
         [SerializeField] protected List<GameObject> deck = new List<GameObject>();
 
@@ -83,7 +84,9 @@ namespace XRMultiplayer.MiniGames
             base.SetupGame();
             hand1.maxCards = 9999;
             hand2.maxCards = 9999;
-            CreateDeck();
+            CreateDeckBasic();
+            ShuffleDeck(deck);
+            InstatiateDrawPile();
         }
 
         public override void StartGame()
@@ -123,34 +126,53 @@ namespace XRMultiplayer.MiniGames
             RemoveGeneratedCards();
         }
 
-
-        protected void CreateDeck()
+        protected void CreateDeckBasic()
         {
-            for(int i =- 0; i < numCards; i++)
+            Debug.Log("Creating Deck . . .");
+            foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
-                GameObject newCard = Instantiate(card, drawPileObj.transform, false);
-                newCard.name = "Card: " + i;
-                newCard.SetActive(false);
-                int color = UnityEngine.Random.Range(0, 3);
-
-                switch (color)
+                foreach (Value value in Enum.GetValues(typeof(Value)))
                 {
-                    case 0:
-                        newCard.GetComponent<Card>().val = Card.Value.Red;
-                        newCard.GetComponent<Renderer>().material.color = Color.red;
-                        break;
-                    case 1:
-                        newCard.GetComponent<Card>().val = Card.Value.Green;
-                        newCard.GetComponent<Renderer>().material.color = Color.green;
-                        break;
-                    case 2:
-                        newCard.GetComponent<Card>().val = Card.Value.Blue;
-                        newCard.GetComponent<Renderer>().material.color = Color.blue;
-                        break;
+                    UnityEngine.Object pPrefab  = ((int)value > 1 && (int)value < 11) ? Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)value + suit) : Resources.Load("Free_Playing_Cards/PlayingCards_" + value + suit);
+
+                    GameObject newCard = Instantiate(card, drawPileObj.transform, false);
+                    newCard.transform.localPosition  = Vector3.zero;
+                    GameObject model = (GameObject)Instantiate(pPrefab, newCard.transform, false);
+                    model.transform.rotation = Quaternion.identity;
+                    model.transform.localPosition = Vector3.zero;
+                    newCard.GetComponent<Card>().suit = suit;
+                    newCard.GetComponent<Card>().value = value;
+                    newCard.name = "Card: " + suit + " " + value;
+                    newCard.SetActive(false);
+                    deck.Add(newCard);
                 }
-                deck.Add(newCard);
-                _drawPile.Push(newCard);
             }
+            Debug.Log("Deck created.");
+            numCards = deck.Count;
+        }
+
+        protected void ShuffleDeck(List<GameObject> deck)
+        {
+            Debug.Log("Shuffling Deck . . .");
+            System.Random r = new System.Random();
+            for (int n = deck.Count - 1; n > 0; --n)
+            {
+                int k = r.Next(n + 1);
+                GameObject temp = deck[n];
+                deck[n] = deck[k];
+                deck[k] = temp;
+            }
+            Debug.Log("Deck Shuffled.");
+        }
+
+        protected void InstatiateDrawPile()
+        {
+            Debug.Log("Creating Draw Pile . . .");
+            foreach (GameObject card in deck)
+            {
+                _drawPile.Push(card);
+            }
+            Debug.Log("Draw Pile created.");
         }
 
 
@@ -170,7 +192,7 @@ namespace XRMultiplayer.MiniGames
 
         public void PlayCard(GameObject card)
         {
-            Debug.Log("Card: " + card.name + "\tCard Suit: " + card.GetComponent<Card>().suit + "\tCard Value: " + card.GetComponent<Card>().val);
+            Debug.Log(card.name);
             card.SetActive(false);
             hand1.heldCards.Remove(card);
             hand1.ConfigureChildPositions();
@@ -204,6 +226,7 @@ namespace XRMultiplayer.MiniGames
             {
                 Destroy(card);
             }
+            numCards = 0;
             deck.Clear();
         }
 
