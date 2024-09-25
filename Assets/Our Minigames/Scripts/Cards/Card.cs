@@ -27,6 +27,8 @@ public class Card : MonoBehaviour
     public Suit suit;
     public Value value;
 
+    public bool played = false;
+
     [SerializeField] protected Vector3 _position = Vector3.zero;
     [SerializeField] protected Vector3 _localScale = Vector3.zero;
 
@@ -34,7 +36,6 @@ public class Card : MonoBehaviour
     {
         _localScale = transform.localScale;
     }
-
 
     public void SetPosition(Vector3 position)
     {
