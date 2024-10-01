@@ -5,8 +5,13 @@ using UnityEngine.UIElements;
 
 public class Card : MonoBehaviour
 {
+
+
     public enum Suit { Heart, Diamond, Club, Spades }
-    public enum Value {
+
+    public bool inHand = false;
+    public enum Value
+    {
         A = 1,
         Two = 2,
         Three = 3,
@@ -57,5 +62,20 @@ public class Card : MonoBehaviour
     {
         transform.localScale = _localScale;
     }
+    // Method to set the card owner ID
 
+    // Method to set the card as "in hand"
+    public void SetInHand(bool isInHand)
+    {
+        inHand = isInHand;
+        if (inHand)
+        {
+            Debug.Log($"Card {suit} {value} is now in hand.");
+
+        }
+        else
+        {
+            Debug.Log($"Card {suit} {value} is no longer in hand.");
+        }
+    }
 }
