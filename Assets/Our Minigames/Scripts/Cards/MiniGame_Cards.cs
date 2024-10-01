@@ -1,4 +1,4 @@
-using SerializableCallback;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,6 +49,11 @@ namespace XRMultiplayer.MiniGames
                 currCards = heldCards.Count;
                 SendCardData();
                 ConfigureChildPositions();
+                Card cardComponent = card.GetComponent<Card>();
+                if (cardComponent != null)
+                {
+                    cardComponent.SetInHand(true);
+                }
             }
 
             public void ManDrawCard(GameObject card)
@@ -58,6 +63,11 @@ namespace XRMultiplayer.MiniGames
                 currCards = heldCards.Count;
                 SendCardData();
                 ConfigureChildPositions();
+                Card cardComponent = card.GetComponent<Card>();
+                if (cardComponent != null)
+                {
+                    cardComponent.SetInHand(true);
+                }
             }
 
             public void Clear()
@@ -122,6 +132,20 @@ namespace XRMultiplayer.MiniGames
             hand1.SendCardData();
             hand2.SendCardData();
             CheckForPlayerWin();
+<<<<<<< HEAD
+=======
+
+        }
+
+        public void CheckForPlayerWin()
+        {
+            //Debug.Log("Am checking: " + hand1.currCards + "\t" + hand1.isEmpty());
+
+            if (hand1.isEmpty()) {
+                Debug.Log("Hand is empty calling courotine");
+                StartCoroutine(PlayerWonRoutine());
+            }
+>>>>>>> Tony
         }
 
 
