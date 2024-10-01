@@ -9,9 +9,6 @@ public class PlayPile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.GetComponent<Card>().played)
-        {
-            mg_cards.PlayCard(other.gameObject);
-        }
+        mg_cards.PlayCard(other.gameObject);
     }
 }

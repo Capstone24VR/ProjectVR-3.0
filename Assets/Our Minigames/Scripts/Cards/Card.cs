@@ -5,13 +5,8 @@ using UnityEngine.UIElements;
 
 public class Card : MonoBehaviour
 {
-
-
     public enum Suit { Heart, Diamond, Club, Spades }
-
-    public bool inHand = false;
-    public enum Value
-    {
+    public enum Value {
         A = 1,
         Two = 2,
         Three = 3,
@@ -32,8 +27,6 @@ public class Card : MonoBehaviour
     public Suit suit;
     public Value value;
 
-    public bool played = false;
-
     [SerializeField] protected Vector3 _position = Vector3.zero;
     [SerializeField] protected Vector3 _localScale = Vector3.zero;
 
@@ -41,6 +34,7 @@ public class Card : MonoBehaviour
     {
         _localScale = transform.localScale;
     }
+
 
     public void SetPosition(Vector3 position)
     {
@@ -63,20 +57,5 @@ public class Card : MonoBehaviour
     {
         transform.localScale = _localScale;
     }
-    // Method to set the card owner ID
 
-    // Method to set the card as "in hand"
-    public void SetInHand(bool isInHand)
-    {
-        inHand = isInHand;
-        if (inHand)
-        {
-            Debug.Log($"Card {suit} {value} is now in hand.");
-
-        }
-        else
-        {
-            Debug.Log($"Card {suit} {value} is no longer in hand.");
-        }
-    }
 }

@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
-
 namespace XRMultiplayer.MiniGames
 {
     /// <summary>
@@ -20,9 +19,6 @@ namespace XRMultiplayer.MiniGames
         /// Format for the time text
         /// </summary>
         private const string TIME_FORMAT = "mm':'ss'.'ff";
-
-        private long currentPlayerId =-10;
-
 
         /// <summary>
         /// Keeps track of the current game state
@@ -495,13 +491,6 @@ namespace XRMultiplayer.MiniGames
         [ServerRpc(RequireOwnership = false)]
         void StartGameServerRpc()
         {
-            Debug.Log("Game is starting. Current players in the game:");
-
-            foreach (ulong playerId in m_CurrentPlayers)
-            {
-                Debug.Log($"Player with ID: {playerId}");
-            }
-
             for (int i = 0; i < m_QueuedUpPlayers.Count; i++)
             {
                 m_CurrentPlayers.Add(m_QueuedUpPlayers[i]);
@@ -615,18 +604,8 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         public void AddLocalPlayer()
         {
-            // Get the local player ID from XRINetworkPlayer
-            currentPlayerId = (long)XRINetworkPlayer.LocalPlayer.OwnerClientId;
-            Debug.Log($"Local Player with ID {currentPlayerId} is joining the game.");
-
-            // Perform other necessary actions to add the player to the game
             m_DynamicButton.button.interactable = false;
-            AddPlayerServerRpc((ulong)currentPlayerId);;  // Send player ID to server
-        }
-
-        public long GetCurrentPlayerId()
-        {
-            return (long)currentPlayerId;
+            AddPlayerServerRpc(XRINetworkPlayer.LocalPlayer.OwnerClientId);
         }
 
         /// <summary>
@@ -641,7 +620,6 @@ namespace XRMultiplayer.MiniGames
         [ServerRpc(RequireOwnership = false)]
         void AddPlayerServerRpc(ulong clientId)
         {
-            Debug.Log($"Adding player with ID {clientId} to the game.");
             AddPlayerClientRpc(clientId);
             if (m_QueuedUpPlayers.Count < maxAllowedPlayers)
             {
@@ -987,17 +965,5 @@ namespace XRMultiplayer.MiniGames
                 slot.SetSlotOpen();
             }
         }
-
-        void PrintCurrentPlayerIds()
-        {
-            Debug.Log("Current players in the game:");
-
-            // Loop through each player ID in m_CurrentPlayers and print the ID
-            foreach (ulong playerId in m_CurrentPlayers)
-            {
-                Debug.Log($"Player with ID: {playerId}");
-            }
-        }
-
     }
 }

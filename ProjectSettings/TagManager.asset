@@ -10,15 +10,6 @@ TagManager:
   - PlayerHand
   - Destroyer
   - Card
-  - Cucumber
-  - Tomato
-  - Shovel
-  - Onion
-  - Unplanted
-  - Potato
-  - Basket
-  - Carrot
-  - Water
   layers:
   - Default
   - TransparentFX
@@ -29,7 +20,7 @@ TagManager:
   - Player
   - Mirror
   - Player Walls
-  - Bed
+  - 
   - 
   - 
   - 
