@@ -4744,6 +4744,31 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 4010458169
       objectReference: {fileID: 0}
+    - target: {fileID: 3636023743447873968, guid: aff56c08847ab8c498391ceeab6551d6,
+        type: 3}
+      propertyPath: m_InGameOffset.x
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636023743447873968, guid: aff56c08847ab8c498391ceeab6551d6,
+        type: 3}
+      propertyPath: m_InGameOffset.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636023743447873968, guid: aff56c08847ab8c498391ceeab6551d6,
+        type: 3}
+      propertyPath: m_InGameOffset.z
+      value: 2.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636023743447873968, guid: aff56c08847ab8c498391ceeab6551d6,
+        type: 3}
+      propertyPath: m_PreGameOffset.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636023743447873968, guid: aff56c08847ab8c498391ceeab6551d6,
+        type: 3}
+      propertyPath: m_PreGameOffset.z
+      value: 1.25
+      objectReference: {fileID: 0}
     - target: {fileID: 4732150570065860466, guid: aff56c08847ab8c498391ceeab6551d6,
         type: 3}
       propertyPath: GlobalObjectIdHash

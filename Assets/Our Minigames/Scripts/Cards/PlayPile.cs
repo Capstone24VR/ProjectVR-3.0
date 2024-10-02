@@ -7,7 +7,7 @@ public class PlayPile : MonoBehaviour
 {
     [SerializeField] protected MiniGame_Cards mg_cards;
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other) 
     {
         if (!other.GetComponent<Card>().played)
         {

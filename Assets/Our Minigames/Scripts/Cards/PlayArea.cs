@@ -10,7 +10,6 @@ public class PlayArea : MonoBehaviour
     [SerializeField] public List<GameObject> cardData = new List<GameObject>();
 
     public void ConfigureChildrenPositions() {
-        Debug.Log(cardData.Count);
         float startingPos = -cardData.Count / 2;
 
         if (cardData.Count == 1) { startingPos = 0;}

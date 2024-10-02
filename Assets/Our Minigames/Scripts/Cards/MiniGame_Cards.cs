@@ -23,6 +23,7 @@ namespace XRMultiplayer.MiniGames
         [System.Serializable]
         public class Hand
         {
+            public ulong playedId;
             public GameObject playArea;
             public int currCards = 0;
             public int maxCards = 0;
@@ -86,10 +87,13 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] protected Hand hand1;
         [SerializeField] protected Hand hand2;
 
+        [SerializeField] protected int currentHandIndex;
+
         [SerializeField] protected List<Hand> activeHands =new List<Hand>();
 
         public override void SetupGame()
         {
+            
             base.SetupGame();
 
             if (hand1.active) { activeHands.Add(hand1); } else { hand1.playArea.SetActive(false); }
@@ -113,14 +117,19 @@ namespace XRMultiplayer.MiniGames
                     if (hand.canDraw()) { hand.AutoDrawCard(_drawPile.Pop()); }
                 }
             }
+            currentHandIndex = 0;
+            StartCrazyEights();
             _drawPile.Peek().SetActive(true);
+            
         }
 
         public override void UpdateGame(float deltaTime)
         {
             base.UpdateGame(deltaTime);
-            hand1.SendCardData();
-            hand2.SendCardData();
+            foreach(Hand hand in activeHands)
+            {
+                hand.SendCardData();
+            }
             CheckForPlayerWin();
         }
 
@@ -180,7 +189,6 @@ namespace XRMultiplayer.MiniGames
             Debug.Log("Draw Pile created.");
         }
 
-
         public void ManualDrawCard(GameObject card)
         {
             if(_drawPile.Count > 0)
@@ -188,22 +196,36 @@ namespace XRMultiplayer.MiniGames
                 var topCard = _drawPile.Peek();
                 if (card == topCard)
                 {
-                    hand1.ManDrawCard(topCard);
+                    activeHands[currentHandIndex].ManDrawCard(topCard);
                     _drawPile.Pop();
                     if (_drawPile.Count > 0) { _drawPile.Peek().SetActive(true); }
                 }
             }
+
+            UpdateCurrentIndex();
         }
 
         public void PlayCard(GameObject card)
         {
             Debug.Log(card.name);
+
+            if (!activeHands[currentHandIndex].heldCards.Contains(card)) 
+            {
+                Debug.Log("Wrong player!");
+                return; 
+            }
+
+            //if (!IsValidPlayCrazyEights(card))
+            //{
+            //    return;
+            //}
+
             card.SetActive(false);
             card.GetComponent<Card>().played = true;
             card.GetComponent<XRGrabInteractable>().enabled = false;
-            
-            hand1.heldCards.Remove(card);
-            hand1.ConfigureChildPositions();
+
+            activeHands[currentHandIndex].heldCards.Remove(card);
+            activeHands[currentHandIndex].ConfigureChildPositions();
             
             card.transform.parent = playPileObj.transform;
             card.transform.localPosition = Vector3.zero;
@@ -213,6 +235,48 @@ namespace XRMultiplayer.MiniGames
             _playPile.Push(card);
             _playPile.Peek().SetActive(true);
 
+            UpdateCurrentIndex();
+        }
+
+        protected void StartCrazyEights()
+        {
+            GameObject firstCard = _drawPile.Pop();
+            Debug.Log("Drawing First card(" + firstCard.name + ") for Crazy Eights . . . ");
+            AddToPlayPile(firstCard);
+
+            if (_playPile.TryPeek(out GameObject topCard))
+            {
+                topCard.SetActive(true);
+            }
+
+            Debug.Log("First card drawn.");
+        }
+
+        protected bool IsValidPlayCrazyEights(GameObject card)
+        {
+            if (_playPile.TryPeek(out GameObject topCard))
+            {
+                if (topCard.GetComponent<Card>().suit == card.GetComponent<Card>().suit)
+                {
+                    Debug.Log("Cards share the same suit: " + card.GetComponent<Card>().suit);
+                    return true;
+                }
+                else if (topCard.GetComponent<Card>().value == card.GetComponent<Card>().value)
+                {
+                    Debug.Log("Cards share the same value: " + card.GetComponent<Card>().value);
+                    return true;
+                }
+            }
+            Debug.Log("Card setup failed or Card is not valid");
+            return false;
+        }
+
+        public void UpdateCurrentIndex()
+        {
+            if (currentHandIndex == activeHands.Count - 1) { currentHandIndex = 0; }
+            else { currentHandIndex++; }
+
+            Debug.Log("Setting current hand to " + activeHands[currentHandIndex].playArea.name);
         }
 
         public void CheckForPlayerWin()
@@ -225,7 +289,6 @@ namespace XRMultiplayer.MiniGames
                 }
             }
         }
-
 
         IEnumerator PlayerWonRoutine(GameObject winner)
         {
@@ -240,6 +303,22 @@ namespace XRMultiplayer.MiniGames
             FinishGame();
 
             yield return null;
+        }
+
+        private void AddToPlayPile(GameObject card)
+        {
+            card.transform.parent = playPileObj.transform;
+            card.transform.localPosition = Vector3.zero;
+            card.transform.localRotation = Quaternion.identity;
+            _playPile.Push(card);
+        }
+
+        private void AddToDrawPile(GameObject card)
+        {
+            card.transform.parent = drawPileObj.transform;
+            card.transform.localPosition = Vector3.zero;
+            card.transform.localRotation = Quaternion.identity;
+            _drawPile.Push(card);
         }
 
         private void RemoveGeneratedCards()
