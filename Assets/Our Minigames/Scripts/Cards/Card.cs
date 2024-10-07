@@ -27,6 +27,7 @@ public class Card : MonoBehaviour
     public Suit suit;
     public Value value;
 
+    public bool inHand = false;
     public bool played = false;
 
     [SerializeField] protected Vector3 _position = Vector3.zero;
@@ -59,4 +60,10 @@ public class Card : MonoBehaviour
         transform.localScale = _localScale;
     }
 
+    public void SetInHand(bool isInHand)
+    {
+        inHand = isInHand;
+        if (inHand) {  Debug.Log($"Card {suit} {value} is now in hand."); }
+        else { Debug.Log($"Card {suit} {value} is no longer in hand."); }
+    }
 }
