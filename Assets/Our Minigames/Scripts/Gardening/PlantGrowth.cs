@@ -39,7 +39,7 @@ public class PlantGrowth : MonoBehaviour
         if (currentStage > 0)
         {
             stageTimer += Time.deltaTime;
-            Debug.Log($"Update: Stage {currentStage} timer updated to {stageTimer}.");
+            //Debug.Log($"Update: Stage {currentStage} timer updated to {stageTimer}.");
         }
 
         if (currentStage > 0 && currentStage < 3)
@@ -135,7 +135,7 @@ public class PlantGrowth : MonoBehaviour
     void UpdateWateringSlider()
     {
         wateringSlider.value = wateringTime / wateringTimeRequired;
-        Debug.Log($"UpdateWateringSlider: Watering slider updated to {wateringSlider.value}.");
+        // Debug.Log($"UpdateWateringSlider: Watering slider updated to {wateringSlider.value}.");
     }
 
     void OnCollisionEnter(Collision collision)
@@ -145,7 +145,7 @@ public class PlantGrowth : MonoBehaviour
             Debug.Log("OnCollisionEnter: Shovel detected, harvesting plant.");
             Harvest();
         }
-        else
+        else if (collision.gameObject.tag == "Shovel")
         {
             if (plantBed != null)
             {
@@ -161,7 +161,7 @@ public class PlantGrowth : MonoBehaviour
         if (other.tag == "Water" && currentStage < 3)
         {
             wateringTime += Time.deltaTime;
-            Debug.Log($"OnParticleCollision: Plant being watered, total watering time {wateringTime}.");
+            // Debug.Log($"OnParticleCollision: Plant being watered, total watering time {wateringTime}.");
         }
     }
 

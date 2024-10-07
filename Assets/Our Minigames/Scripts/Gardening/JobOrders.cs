@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using XRMultiplayer.MiniGames;
 
 public class JobOrders : MonoBehaviour
 {
@@ -17,11 +18,20 @@ public class JobOrders : MonoBehaviour
     private Dictionary<string, int> itemsInBasket = new Dictionary<string, int>(); // Items currently in the basket
     private List<GameObject> basketContents = new List<GameObject>(); // List to keep track of GameObjects in the basket
 
+    [Header("MiniGame")]
+    public MiniGame_Gardening gardeningGame;
+
     public PlantBedManager pbm;
 
 
     void Start()
     {
+        gardeningGame = FindObjectOfType<MiniGame_Gardening>(); // Find the MiniGame_Gardening script in the scene
+        if (gardeningGame == null)
+        {
+            Debug.LogError("Failed to find the MiniGame_Gardening script.");
+            return; // Optionally return to prevent further execution
+        }
         CreateNewJob();
     }
 
@@ -115,8 +125,16 @@ public class JobOrders : MonoBehaviour
         {
             if (!itemsInBasket.ContainsKey(requirement.Key) || itemsInBasket[requirement.Key] < requirement.Value)
                 return; // Job not completed if requirements not met
+            
         }
-
+        if (gardeningGame != null)
+        {
+            gardeningGame.LocalPlayerCompletedJob(10); // Safely call the method if gardeningGame is not null
+        }
+        else
+        {
+            Debug.LogWarning("Gardening game script reference is not set.");
+        }
         StartCoroutine(CompleteJobRoutine());
     }
 
@@ -125,7 +143,7 @@ public class JobOrders : MonoBehaviour
         jobOrderText.text = "Job Complete!";
         yield return new WaitForSeconds(3); // Wait for 3 seconds
         CreateNewJob(); // Refresh the job order
-        Debug.Log("Attempting to unlock next plantbed");
+        Debug.Log("Job complete. Attempting to unlock next plantbed");
         pbm.OnJobCompleted(); // Unlock the next plant bed
     }
 }
