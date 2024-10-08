@@ -66,4 +66,9 @@ public class Card : MonoBehaviour
         if (inHand) {  Debug.Log($"Card {suit} {value} is now in hand."); }
         else { Debug.Log($"Card {suit} {value} is no longer in hand."); }
     }
+
+    public string GetCardId()
+    {
+        return suit.ToString() + value.ToString();
+    }
 }
