@@ -349,6 +349,7 @@ namespace XRMultiplayer.MiniGames
             card.transform.localPosition = Vector3.zero;
             card.transform.localRotation = Quaternion.identity;
             card.GetComponent<Card>().played = true;
+            card.GetComponent<XRGrabInteractable>().enabled = false;
             _playPile.Push(card);
         }
 
