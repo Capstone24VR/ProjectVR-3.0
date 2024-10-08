@@ -50,7 +50,7 @@ namespace XRMultiplayer
         }
 
         // Method to retrieve the current player ID
-        public long GetCurrentPlayerId()
+        public long GetLocalPlayerId()
         {
             return localPlayerID;
         }

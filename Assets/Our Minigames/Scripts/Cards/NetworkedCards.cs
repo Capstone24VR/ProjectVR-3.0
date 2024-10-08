@@ -348,6 +348,7 @@ namespace XRMultiplayer.MiniGames
             card.transform.parent = playPileObj.transform;
             card.transform.localPosition = Vector3.zero;
             card.transform.localRotation = Quaternion.identity;
+            card.GetComponent<Card>().played = true;
             _playPile.Push(card);
         }
 

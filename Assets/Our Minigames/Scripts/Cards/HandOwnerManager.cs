@@ -36,7 +36,7 @@ public class HandOwnerManager : MonoBehaviour
         // Check if there is a player in the SubTrigger
         if (seatHandler != null && seatHandler.IsPlayerInTrigger())
         {
-            long playerId = seatHandler.GetCurrentPlayerId();
+            long playerId = seatHandler.GetLocalPlayerId();
 
             // Update HandOwnerId only if the current player is different
             if (HandOwnerId != playerId)
