@@ -148,11 +148,17 @@ namespace XRMultiplayer.MiniGames
                     UnityEngine.Object pPrefab = ((int)value > 1 && (int)value < 11) ? 
                         Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)value + suit) : // If One..Ten, parse into integer
                         Resources.Load("Free_Playing_Cards/PlayingCards_" + value + suit);      //  If J,Q,K
-                    
-                    GameObject newCard = Instantiate(card, drawPileObj.transform, false); // Create card
-                    newCard.transform.localPosition = Vector3.zero; // set pos to 0
 
+                    if (pPrefab == null)
+                    {
+                        Debug.LogError("Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + value + suit);
+                        continue;
+                    }
+
+
+                    GameObject newCard = Instantiate(card, drawPileObj.transform, false); // Create card
                     var netWorkObject = newCard.GetComponent<NetworkObject>(); // get network object for server spawning
+
                     if(netWorkObject != null)
                     {
                         netWorkObject.Spawn();
@@ -160,15 +166,21 @@ namespace XRMultiplayer.MiniGames
 
                     // Visual Model Creation
                     GameObject model = (GameObject)Instantiate(pPrefab, newCard.transform, false);
+                    if (model == null)
+                    {
+                        Debug.LogError("Model instantiation failed.");
+                        continue;
+                    }
+
                     model.transform.rotation = Quaternion.identity;
                     model.transform.localPosition = Vector3.zero;
 
-                    // Setting Card Values and name
+                    // Setting Card Value, Suite and name
                     newCard.GetComponent<Card>().suit = suit;
                     newCard.GetComponent<Card>().value = value;
                     newCard.name = "Card: " + suit + " " + value;
                     newCard.SetActive(false); // hiding card
-                    deck.Add(newCard); 
+                    AddToDrawPile(newCard);
                 }
             }
             Debug.Log("Deck created.");
