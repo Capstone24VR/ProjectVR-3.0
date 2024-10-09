@@ -618,13 +618,17 @@ namespace XRMultiplayer.MiniGames
                     hand.Clear();  // Clear the server-side hands
                 }
 
+                // Clear the piles
                 _playPile.Clear();
                 _drawPile.Clear();
                 deckObject.Clear();
 
-                foreach (GameObject card in deck)
+                foreach (NetworkObjectReference cardRef in deck)
                 {
-                    Destroy(card);  // Destroy server-side cards
+                    if (cardRef.TryGet(out NetworkObject networkCard) && networkCard.IsSpawned)
+                    {
+                        networkCard.Despawn(true); // Despawn the card across the network
+                    }
                 }
                 deck.Clear();
             }
