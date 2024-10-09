@@ -45,7 +45,7 @@ public class NetworkedHand : NetworkBehaviour
     {
         heldCards = new NetworkList<NetworkObjectReference>();
     }
-
+    
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -58,10 +58,10 @@ public class NetworkedHand : NetworkBehaviour
         switch (changeEvent.Type)
         {
             case NetworkListEvent<NetworkObjectReference>.EventType.Add:
-                Debug.Log($"Card added: {changeEvent.Value}");
+                //Debug.Log($"Card added: {changeEvent.Value}");
                 break;
             case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
-                Debug.Log($"Card removed: {changeEvent.Value}");
+                //Debug.Log($"Card removed: {changeEvent.Value}");
                 break;
         }
     }
@@ -105,7 +105,8 @@ public class NetworkedHand : NetworkBehaviour
         // Only update the visuals on the client side
         if (cardReference.TryGet(out NetworkObject card))
         {
-            card.transform.SetParent(transform, false);
+            card.transform.SetParent(transform, true);
+            card.transform.localRotation = Quaternion.identity;
             card.transform.localPosition = Vector3.zero;
             card.gameObject.SetActive(true);
             ConfigureChildPositions();  // Update positions of cards
@@ -120,7 +121,8 @@ public class NetworkedHand : NetworkBehaviour
             heldCards.Add(cardReference);
             ConfigureChildPositions();  // Re-arrange cards in hand
 
-            card.transform.SetParent(transform, false);
+            card.transform.SetParent(transform, true);
+            card.transform.localRotation = Quaternion.identity;
             card.transform.localPosition = Vector3.zero;
             card.gameObject.SetActive(true);
 

@@ -16,7 +16,7 @@ public class HandOwnerManager : MonoBehaviour
         set
         {
             _handOwnerId = value; // Setter updates the owner ID
-            Debug.Log($"Hand owner ID changed to {HandOwnerId}");
+            //Debug.Log($"Hand owner ID changed to {HandOwnerId}");
         }
     }
 
@@ -27,7 +27,7 @@ public class HandOwnerManager : MonoBehaviour
         // Ensure the SubTrigger reference is assigned
         if (seatHandler == null)
         {
-            Debug.LogError("SubTrigger not assigned to HandOwnerManager!");
+            //Debug.LogError("SubTrigger not assigned to HandOwnerManager!");
         }
     }
 
@@ -42,7 +42,7 @@ public class HandOwnerManager : MonoBehaviour
             if (HandOwnerId != playerId)
             {
                 HandOwnerId = playerId;
-                Debug.Log($"HandOwnerManager: Hand owner ID set to {HandOwnerId}.");
+                //Debug.Log($"HandOwnerManager: Hand owner ID set to {HandOwnerId}.");
             }
         }
         else
@@ -51,7 +51,7 @@ public class HandOwnerManager : MonoBehaviour
             if (HandOwnerId != -2)
             {
                 HandOwnerId = -2; // Reset to default or unassigned state
-                Debug.Log("HandOwnerManager: No player in SubTrigger, Hand owner ID reset.");
+                //Debug.Log("HandOwnerManager: No player in SubTrigger, Hand owner ID reset.");
             }
         }
     }

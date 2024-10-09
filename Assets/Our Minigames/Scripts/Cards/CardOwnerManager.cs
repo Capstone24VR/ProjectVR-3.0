@@ -18,7 +18,7 @@ namespace XRMultiplayer
             private set
             {
                 _cardOwnerId = value;
-                Debug.Log($"Card owner ID changed to {CardOwnerId}");
+                //Debug.Log($"Card owner ID changed to {CardOwnerId}");
             }
         }
 
@@ -39,7 +39,7 @@ namespace XRMultiplayer
             card = GetComponent<Card>();
             if (card == null)
             {
-                Debug.LogError("Card component not found on this object.");
+                //Debug.LogError("Card component not found on this object.");
             }
 
             // Add event listener for when the card is grabbed
@@ -75,7 +75,7 @@ namespace XRMultiplayer
                     }
                     else
                     {
-                        Debug.LogError("HandOwnerManager not found on parent.");
+                        //Debug.LogError("HandOwnerManager not found on parent.");
                     }
                 }
                 else
@@ -98,7 +98,7 @@ namespace XRMultiplayer
         public void SetCardOwnerId(long newOwnerId)
         {
             CardOwnerId = newOwnerId;
-            Debug.Log($"CardOwnerManager: Card owner ID set to {CardOwnerId}");
+            //Debug.Log($"CardOwnerManager: Card owner ID set to {CardOwnerId}");
         }
 
         // This method is triggered when the card is grabbed
@@ -107,16 +107,16 @@ namespace XRMultiplayer
             if (miniGameManager != null)
             {
                 long interactingPlayerId = miniGameManager.GetLocalPlayerID();
-                Debug.Log($"Player with ID {interactingPlayerId} is interacting with the card.");
+                //Debug.Log($"Player with ID {interactingPlayerId} is interacting with the card.");
 
                 // Check if the player is allowed to interact with the card
                 if (IsOwner(interactingPlayerId) || CardOwnerId == -1)
                 {
-                    Debug.Log($"Player with ID {interactingPlayerId} is the owner and can interact with the card.");
+                    //Debug.Log($"Player with ID {interactingPlayerId} is the owner and can interact with the card.");
                 }
                 else
                 {
-                    Debug.Log($"Player with ID {interactingPlayerId} is NOT the owner and cannot interact with the card.");
+                    //Debug.Log($"Player with ID {interactingPlayerId} is NOT the owner and cannot interact with the card.");
                     DisableInteraction();
                 }
             }
@@ -125,7 +125,7 @@ namespace XRMultiplayer
         // This method is triggered when the card is released
         private void OnCardReleased(SelectExitEventArgs args)
         {
-            Debug.Log("Card released.");
+            //Debug.Log("Card released.");
         }
 
         // Method to check if the player interacting is the owner of the card
@@ -136,7 +136,7 @@ namespace XRMultiplayer
 
         private void DisableInteraction()
         {
-            Debug.Log("Interaction disabled for non-owner.");
+            //Debug.Log("Interaction disabled for non-owner.");
 
             // You can forcefully release the card or disable the grab functionality.
             if (grabInteractable.isSelected)

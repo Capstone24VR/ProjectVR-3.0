@@ -117,7 +117,6 @@ namespace XRMultiplayer.MiniGames
             ShuffleDeckServer();
             InstantiateDrawPileServer();
 
-            Debug.Log(startingHand);
             for (int i = 0; i < startingHand; i++)
             {
                 foreach (NetworkedHand hand in activeHands)
@@ -220,6 +219,10 @@ namespace XRMultiplayer.MiniGames
                         continue; // Skip if the model could not be instantiated
                     }
 
+                    // FOR DEBUG PURPOSES ONLY
+                    model.name = model.name + "(SERVER)";
+                    //
+
                     model.transform.rotation = Quaternion.identity;
                     model.transform.localPosition = Vector3.zero;
 
@@ -230,7 +233,7 @@ namespace XRMultiplayer.MiniGames
                         cardComponent.suit = suit;
                         cardComponent.value = value;
                         newCard.name = $"Card: {suit} {value}";
-                        newCard.SetActive(false); // Hide the card until needed
+                        newCard.SetActive(true); // Hide the card until needed
 
                         // Add card data to lists for client notification
                         suits.Add((int)suit);
@@ -239,6 +242,8 @@ namespace XRMultiplayer.MiniGames
 
                         // Add card to deck (NetworkList)
                         deck.Add(new NetworkObjectReference(networkObject));
+
+                        model.SetActive(false); // Setting Server model invisible
                     }
                     else
                     {
@@ -290,20 +295,31 @@ namespace XRMultiplayer.MiniGames
                 NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
                 if (cardNetworkObject != null)
                 {
+                    // Ensuring Card value and name is set correctly
+                    cardNetworkObject.gameObject.name = $"Card: {suit} {value}";
+                    cardNetworkObject.gameObject.GetComponent<Card>().suit = suit;
+                    cardNetworkObject.gameObject.GetComponent<Card>().value = value;
                     cardNetworkObject.TrySetParent(drawPileObj, false);
+
+                    // Ensuring Card position is set correctly
+                    cardNetworkObject.transform.localPosition = Vector3.zero;
+                    cardNetworkObject.transform.localRotation = Quaternion.identity;
+
                     // Instantiate model on the client
-                    GameObject model = (GameObject)Instantiate(pPrefab, cardNetworkObject.transform, false);
+                    GameObject model = (GameObject)Instantiate(pPrefab, cardNetworkObject.transform, false) ;
+
                     if (model == null)
                     {
                         Debug.LogError("Model instantiation failed.");
                         continue;
                     }
 
-                    model.transform.rotation = Quaternion.identity;
-                    model.transform.localPosition = Vector3.zero;
+                    // FOR DEBUG PURPOSES ONLY
+                    model.name = model.name + "(CLIENT)";
+                    //
 
-                    // Optionally, you can deactivate the card model or set it to a specific state
-                    model.SetActive(false); // or however you want to handle visibility
+                    model.transform.localRotation = Quaternion.identity;
+                    model.transform.localPosition = Vector3.zero;
                 }
             }
 
@@ -347,8 +363,9 @@ namespace XRMultiplayer.MiniGames
                 // Copy shuffled deck into the draw pile
                 foreach (var cardReference in deck)
                 {
-                    deck.Add(cardReference);
+                    AddToDrawPile(cardReference);
                 }
+
 
                 Debug.Log("Draw Pile created.");
             }
@@ -555,7 +572,7 @@ namespace XRMultiplayer.MiniGames
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
-                    Debug.Log($"Card added to Deck: {changeEvent.Value}");
+                    // Debug.Log($"Card added to Deck: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noA))
                     {
                         deckObject.Add(noA.gameObject);
@@ -564,7 +581,7 @@ namespace XRMultiplayer.MiniGames
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
-                    Debug.Log($"Card removed from Deck: {changeEvent.Value}");
+                    // Debug.Log($"Card removed from Deck: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noR))
                     {
                         deckObject.Remove(noR.gameObject);
@@ -578,12 +595,12 @@ namespace XRMultiplayer.MiniGames
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
-                    Debug.Log($"Card added to draw pile: {changeEvent.Value}");
+                    //Debug.Log($"Card added to draw pile: {changeEvent.Value}");
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
-                    Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
+                    //Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
                     break;
             }
         }
@@ -593,12 +610,12 @@ namespace XRMultiplayer.MiniGames
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
-                    Debug.Log($"Card added to play pile: {changeEvent.Value}");
+                    //Debug.Log($"Card added to play pile: {changeEvent.Value}");
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
-                    Debug.Log($"Card removed from play pile: {changeEvent.Value}");
+                    //Debug.Log($"Card removed from play pile: {changeEvent.Value}");
                     break;
             }
         }
@@ -614,6 +631,7 @@ namespace XRMultiplayer.MiniGames
             {
                 NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
                 pile.Add(cardReference);
+                card.SetActive(false);
             }
             else
             {
@@ -629,6 +647,14 @@ namespace XRMultiplayer.MiniGames
         private void AddToDrawPile(GameObject card)
         {
             AddToPile(card, drawPileObj.transform, _drawPile);
+        }
+
+        private void AddToDrawPile(NetworkObjectReference cardReference)
+        {
+            if (cardReference.TryGet(out NetworkObject networkObject))
+            {
+                AddToPile(networkObject.gameObject, drawPileObj.transform, _drawPile);
+            }
         }
 
 

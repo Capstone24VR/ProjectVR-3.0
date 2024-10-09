@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Card : NetworkBehaviour
+public class Card : MonoBehaviour
 {
     public enum Suit { Heart, Diamond, Club, Spades }
     public enum Value {
@@ -47,6 +47,8 @@ public class Card : NetworkBehaviour
 
     public void ResetPosition()
     {
+        Debug.Log($"I am resetting the cards position to {_position}");
+        GetComponent<Rigidbody>().isKinematic = true;
         transform.localPosition = _position;
         transform.localRotation = Quaternion.identity;
     }
@@ -64,8 +66,10 @@ public class Card : NetworkBehaviour
     public void SetInHand(bool isInHand)
     {
         inHand = isInHand;
-        if (inHand) {  Debug.Log($"Card {suit} {value} is now in hand."); }
-        else { Debug.Log($"Card {suit} {value} is no longer in hand."); }
+        if (inHand) {  //Debug.Log($"Card {suit} {value} is now in hand.");
+                       }
+        else { //Debug.Log($"Card {suit} {value} is no longer in hand.");
+               }
     }
 
     public string GetCardId()
