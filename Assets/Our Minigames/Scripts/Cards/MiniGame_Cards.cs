@@ -28,7 +28,11 @@ namespace XRMultiplayer.MiniGames
         public override void StartGame()
         {
             base.StartGame();
-            m_NetworkedGameplay.StartGame();
+
+            if ((m_NetworkedGameplay.IsServer))
+            {
+                m_NetworkedGameplay.StartGame();
+            }
         }
 
         public override void UpdateGame(float deltaTime)

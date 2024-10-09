@@ -51,6 +51,7 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         [SerializeField] int startingHand = 5;
 
+
         [SerializeField] protected NetworkList<NetworkObjectReference> deck = new NetworkList<NetworkObjectReference>();
         [SerializeField] protected List<GameObject> deckObject = new List<GameObject>();
 
