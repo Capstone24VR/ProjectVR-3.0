@@ -80,9 +80,13 @@ namespace XRMultiplayer.MiniGames
         }
 
 
-        public void ResetGame()
+        public IEnumerator ResetGame()
         {
             StopAllCoroutines();
+            RemoveGeneratedCardsServer();
+
+            yield return new WaitForSeconds(0.5f); // Give time to remove all cards
+
             activeHands.Clear();
 
             foreach(NetworkedHand hand in m_hands)
@@ -90,23 +94,15 @@ namespace XRMultiplayer.MiniGames
                 if(hand.active) { activeHands.Add(hand); }
             }
 
-
-        }
-
-        public IEnumerator StartGame()
-        {
-            RemoveGeneratedCardsServer();
-            yield return new WaitForSeconds(0.5f); // Give time to remove all cards
+            yield return new WaitForSeconds(0.5f); // Give time for clients to catch up
 
             CreateDeckServer();
             ShuffleDeckServer();
             InstantiateDrawPileServer();
+        }
 
-            yield return new WaitForSeconds(0.5f); // Give time for clients to catch up
-
-            NotifyDeckReadyClientRpc();
-
-
+        public void StartGame()
+        {
             Debug.Log(startingHand);
             for (int i = 0; i < startingHand; i++)
             {
