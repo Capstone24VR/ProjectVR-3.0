@@ -131,7 +131,7 @@ namespace XRMultiplayer.MiniGames
                             {
                                 networkCard.Spawn();
                             }
-                            hand.AutoDrawCardServerRpc(topCard);
+                            hand.DrawCardServerRpc(topCard);
                         }
                         else
                         {
@@ -386,49 +386,87 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-
-        public void ManualDrawCard(GameObject card)
+        public void ManDrawCard()
         {
-            if (_drawPile.Count > 0)
+        // 
+        }
+
+        [ServerRpc]
+        public void ManualDrawCardServerRpc(NetworkObjectReference cardReference)
+        {
+            if (IsServer)
             {
-                long playerId = miniManager.GetLocalPlayerID();
-                Debug.Log(activeHands[currentHandIndex].ownerManager.HandOwnerId);
-
-                NetworkObjectReference cardReference = _drawPile[_drawPile.Count - 1];
-                if(cardReference.TryGet(out NetworkObject networkObject))
+                if (_drawPile.Count > 0)
                 {
-                    GameObject topCard = networkObject.gameObject;
-                    if (card == topCard)
-                    {
-                        activeHands[currentHandIndex].ManDrawCard(topCard);
-                        _drawPile.Remove(cardReference);
+                    long playerId = miniManager.GetLocalPlayerID();
+                    Debug.Log(activeHands[currentHandIndex].ownerManager.HandOwnerId);
 
-                        if (_drawPile.Count > 0) {
-                            NetworkObjectReference newCardReference = _drawPile[_drawPile.Count - 1];
-                            if (newCardReference.TryGet(out NetworkObject newNetworkObject))
-                            {
-                                GameObject newTopCard = newNetworkObject.gameObject;
-                                newTopCard.SetActive(true);
-                            }
-                            else
-                            {
-                                Debug.Log("Error: cannot get new top card object");
-                                return;
-                            }
-                        }
-                        if (!IsValidPlayCrazyEights(card)) // Checking if newly drawn card is valid
+                    if (cardReference.TryGet(out NetworkObject networkObject))
+                    {
+                        GameObject topCard = networkObject.gameObject;
+                        if (_drawPile.Count > 0)
                         {
-                            UpdateCurrentIndex(); // If not valid pass your turn
+                            topCard = _drawPile[_drawPile.Count - 1];
+                            activeHands[currentHandIndex].DrawCardServerRpc(topCard);
+                            _drawPile.Remove(cardReference);
+
+                            if (_drawPile.Count > 0)
+                            {
+                                NetworkObjectReference newCardReference = _drawPile[_drawPile.Count - 1];
+                                if (newCardReference.TryGet(out NetworkObject newNetworkObject))
+                                {
+                                    GameObject newTopCard = newNetworkObject.gameObject;
+                                    newTopCard.SetActive(true);
+                                }
+                                else
+                                {
+                                    Debug.Log("Error: cannot get new top card object");
+                                    return;
+                                }
+                            }
+
+                            if (!IsValidPlayCrazyEights(topCard)) // Check if newly drawn card is valid
+                            {
+                                UpdateCurrentIndex(); // If not valid, pass your turn
+                            }
+
+                            // Notify all clients about the card drawn
+                            ManualDrawCardClientRpc(cardReference);
                         }
                     }
-                }
-                else
-                {
-                    Debug.Log("Error: cannot get card for manual drawing");
-                    return;
+                    else
+                    {
+                        Debug.Log("Error: cannot get card for manual drawing");
+                        return;
+                    }
                 }
             }
         }
+
+        [ClientRpc]
+        private void ManualDrawCardClientRpc(NetworkObjectReference cardReference)
+        {
+            // This method is called on all clients to reflect the drawn card
+            if (cardReference.TryGet(out NetworkObject networkObject))
+            {
+                GameObject drawnCard = networkObject.gameObject;
+
+                // Update the client-side representation of the drawn card
+                activeHands[currentHandIndex].DrawCardServerRpc(drawnCard); // Assuming this method handles the visual representation
+
+                // If you want to update the visibility of the new top card
+                if (_drawPile.Count > 0)
+                {
+                    NetworkObjectReference newCardReference = _drawPile[_drawPile.Count - 1];
+                    if (newCardReference.TryGet(out NetworkObject newNetworkObject))
+                    {
+                        GameObject newTopCard = newNetworkObject.gameObject;
+                        newTopCard.SetActive(true);
+                    }
+                }
+            }
+        }
+
 
         public void PlayCard(GameObject card)
         {

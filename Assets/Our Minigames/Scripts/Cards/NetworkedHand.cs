@@ -89,18 +89,18 @@ public class NetworkedHand : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void AutoDrawCardServerRpc(NetworkObjectReference cardReference)
+    public void DrawCardServerRpc(NetworkObjectReference cardReference)
     {
         if (NetworkManager.Singleton.IsServer)
         {
             // Draw the card on the server and update all clients
-            AutoDrawCard(cardReference);
-            AutoDrawCardClientRpc(cardReference);  // Notify clients to update visuals
+            DrawCard(cardReference);
+            DrawCardClientRpc(cardReference);  // Notify clients to update visuals
         }
     }
 
     [ClientRpc]
-    private void AutoDrawCardClientRpc(NetworkObjectReference cardReference)
+    private void DrawCardClientRpc(NetworkObjectReference cardReference)
     {
         // Only update the visuals on the client side
         if (cardReference.TryGet(out NetworkObject card))
@@ -113,7 +113,7 @@ public class NetworkedHand : NetworkBehaviour
         }
     }
 
-    private void AutoDrawCard(NetworkObjectReference cardReference)
+    private void DrawCard(NetworkObjectReference cardReference)
     {
         if (cardReference.TryGet(out NetworkObject card))
         {
@@ -132,18 +132,6 @@ public class NetworkedHand : NetworkBehaviour
             {
                 cardComponent.SetInHand(true);
             }
-        }
-    }
-
-    public void ManDrawCard(GameObject card)
-    {
-        card.transform.SetParent(transform, false);
-        heldCards.Add(card);
-        ConfigureChildPositions();
-        Card cardComponent = card.GetComponent<Card>();
-        if (cardComponent != null)
-        {
-            cardComponent.SetInHand(true);
         }
     }
 
