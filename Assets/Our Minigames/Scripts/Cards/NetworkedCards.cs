@@ -89,20 +89,20 @@ namespace XRMultiplayer.MiniGames
 
             activeHands.Clear();
 
-            foreach(NetworkedHand hand in m_hands)
+            yield return new WaitForSeconds(0.5f); // Give time for clients to catch u
+
+            if (IsServer)
             {
-                if(hand.active) { activeHands.Add(hand); }
+                NotifyDeckReadyClientRpc();
             }
-
-            yield return new WaitForSeconds(0.5f); // Give time for clients to catch up
-
-            CreateDeckServer();
-            ShuffleDeckServer();
-            InstantiateDrawPileServer();
         }
 
         public void StartGame()
         {
+            CreateDeckServer();
+            ShuffleDeckServer();
+            InstantiateDrawPileServer();
+
             Debug.Log(startingHand);
             for (int i = 0; i < startingHand; i++)
             {

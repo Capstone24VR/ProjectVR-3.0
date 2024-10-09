@@ -231,6 +231,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 95679560}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &109482057 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2372202408546462665, guid: 1168545f41604bf438a112291fd57ce0,
+    type: 3}
+  m_PrefabInstance: {fileID: 3033602598113946715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da77994876d07ef4c867d97686cd9603, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &166435526 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5289182684458692540, guid: e5db301629853dd4a99835fa70099d79,
@@ -4150,6 +4162,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ResetTransform: {fileID: 1519829579}
+--- !u!114 &2005783563 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6208097378541615985, guid: 1168545f41604bf438a112291fd57ce0,
+    type: 3}
+  m_PrefabInstance: {fileID: 3033602598113946715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da77994876d07ef4c867d97686cd9603, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2008523592 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5087823492143518475, guid: 3967f87296c892e40b57e37bc8601550,
@@ -4485,6 +4509,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3529856017834294217, guid: 5aaebc66c9d92b64f8888218db5db503,
         type: 3}
+    - target: {fileID: 1648893421885694404, guid: 1168545f41604bf438a112291fd57ce0,
+        type: 3}
+      propertyPath: activeHands.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1648893421885694404, guid: 1168545f41604bf438a112291fd57ce0,
+        type: 3}
+      propertyPath: activeHands.Array.data[0]
+      value: 
+      objectReference: {fileID: 109482057}
+    - target: {fileID: 1648893421885694404, guid: 1168545f41604bf438a112291fd57ce0,
+        type: 3}
+      propertyPath: activeHands.Array.data[1]
+      value: 
+      objectReference: {fileID: 2005783563}
     - target: {fileID: 3141148003358560530, guid: 1168545f41604bf438a112291fd57ce0,
         type: 3}
       propertyPath: m_SizeDelta.y
