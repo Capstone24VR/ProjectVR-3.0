@@ -577,7 +577,7 @@ namespace XRMultiplayer.MiniGames
             AddToPile(card, drawPileObj.transform, _drawPile);
         }
 
-        [ServerRpc]
+
         private void RemoveGeneratedCardsServer()
         {
             if (IsServer)
