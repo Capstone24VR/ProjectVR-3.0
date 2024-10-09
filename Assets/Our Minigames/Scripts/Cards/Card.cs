@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Card : MonoBehaviour
+public class Card : NetworkBehaviour
 {
     public enum Suit { Heart, Diamond, Club, Spades }
     public enum Value {

@@ -7,6 +7,7 @@ using static Card;
 using Unity.Netcode;
 using UnityEngine.XR.Content.Interaction;
 using System.Linq;
+using UnityEngine.XR;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -52,8 +53,8 @@ namespace XRMultiplayer.MiniGames
 
         [SerializeField] protected List<GameObject> deck = new List<GameObject>();
 
-        [SerializeField] protected Stack<GameObject> _drawPile = new Stack<GameObject>();
-        [SerializeField] protected Stack<GameObject> _playPile = new Stack<GameObject>();
+        [SerializeField] protected NetworkList<NetworkObjectReference> _drawPile = new NetworkList<NetworkObjectReference>();
+        [SerializeField] protected NetworkList<NetworkObjectReference> _playPile = new NetworkList<NetworkObjectReference>();
 
         [SerializeField] protected int currentHandIndex;
 
@@ -64,6 +65,8 @@ namespace XRMultiplayer.MiniGames
         void Start()
         {
             TryGetComponent(out m_MiniGame);
+            _drawPile.OnListChanged += OnDrawPileChanged;
+            _playPile.OnListChanged += OnPlayPileChanged;
         }
 
         public void ResetGame()
@@ -90,22 +93,35 @@ namespace XRMultiplayer.MiniGames
                 foreach (NetworkedHand hand in activeHands)
                 {
                     if (hand.canDraw()) {
-                        GameObject topCard = _drawPile.Pop();
-                        NetworkObject networkCard = topCard.GetComponent<NetworkObject>();
+                        NetworkObjectReference topCard = _drawPile[_drawPile.Count-1];
 
-                        if (!networkCard.IsSpawned)
-                        {
-                            networkCard.Spawn();
+                        if (topCard.TryGet(out NetworkObject networkCard)){
+                            _drawPile.Remove(topCard);
+
+                            if (!networkCard.IsSpawned)
+                            {
+                                networkCard.Spawn();
+                            }
+                            hand.AutoDrawCardServerRpc(topCard);
                         }
-
-                        NetworkObjectReference cardReference = new NetworkObjectReference(networkCard);
-                        hand.AutoDrawCardServerRpc(cardReference); 
+                        else
+                        {
+                            Debug.Log("FATAL ERROR: Card not found at start");
+                        }
                     }
                 }
             }
+
             currentHandIndex = 0;
             StartCrazyEights();
-            _drawPile.Peek().SetActive(true);
+
+            if(_drawPile.Count > 0) {
+                if(_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject networkCard))
+                {
+                    networkCard.gameObject.SetActive(true);
+                }
+            }
+
         }
 
         public void EndGame()
@@ -125,22 +141,13 @@ namespace XRMultiplayer.MiniGames
         public void CreateDeckServer()
         {
             if (IsServer)
-                CreateDeckClientRpc();
-        }
-
-        /// <summary>
-        /// Creates deck on the clients.
-        /// </summary>
-        [ClientRpc]
-        public void CreateDeckClientRpc()
-        {
-            StartCoroutine(CreateDeck());
+                StartCoroutine(CreateDeckOnServer());
         }
 
 
-        IEnumerator CreateDeck()
+        IEnumerator CreateDeckOnServer()
         {
-            Debug.Log("Creating Deck . . .");
+            Debug.Log("Creating Deck ServerSide . . .");
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
                 foreach (Value value in Enum.GetValues(typeof(Value)))
@@ -183,9 +190,59 @@ namespace XRMultiplayer.MiniGames
                     AddToDrawPile(newCard);
                 }
             }
-            Debug.Log("Deck created.");
+            Debug.Log("Deck created SeverSide. Notifying Clients . . .");
+            yield return new WaitForSeconds(0.5f);
+
+            CreateDeckClientRpc();
+        }
+
+
+        /// <summary>
+        /// Creates deck on the clients.
+        /// </summary>
+        [ClientRpc]
+        public void CreateDeckClientRpc()
+        {
+            StartCoroutine(CreateDeckOnClient());
+        }
+
+        IEnumerator CreateDeckOnClient()
+        {
+            Debug.Log("Client received deck creation. Waiting for server to finish...");
+
+            yield return new WaitForSeconds(1.0f); // Ensure enough delay for server to fully spawn cards
+
+            Debug.Log("Creating Deck on Client...");
+            foreach (NetworkObjectReference cardReference in _drawPile)  // Assuming `drawPile` is synchronized on the client
+            {
+                var cardComponent = card.GetComponent<Card>();
+
+                UnityEngine.Object pPrefab = ((int)cardComponent.value > 1 && (int)cardComponent.value < 11) ?
+                    Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)cardComponent.value + cardComponent.suit) :
+                    Resources.Load("Free_Playing_Cards/PlayingCards_" + cardComponent.value + cardComponent.suit);
+
+                if (pPrefab == null)
+                {
+                    Debug.LogError("Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + cardComponent.value + cardComponent.suit);
+                    continue;
+                }
+
+                // Instantiate model on the client
+                GameObject model = (GameObject)Instantiate(pPrefab, card.transform, false);
+                if (model == null)
+                {
+                    Debug.LogError("Model instantiation failed.");
+                    continue;
+                }
+
+                model.transform.rotation = Quaternion.identity;
+                model.transform.localPosition = Vector3.zero;
+            }
+
+            Debug.Log("Client deck created.");
             yield return null;
         }
+
 
         /// <summary>
         /// Shuffles deck on the server.
@@ -254,7 +311,9 @@ namespace XRMultiplayer.MiniGames
             Debug.Log("Creating Draw Pile . . .");
             foreach (GameObject card in deck)
             {
-                _drawPile.Push(card);
+                NetworkObject networkObject = card.GetComponent<NetworkObject>();
+                NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
+                _drawPile.Add(cardReference);
             }
             Debug.Log("Draw Pile created.");
         }
@@ -267,16 +326,38 @@ namespace XRMultiplayer.MiniGames
                 long playerId = miniManager.GetLocalPlayerID();
                 Debug.Log(activeHands[currentHandIndex].ownerManager.HandOwnerId);
 
-                var topCard = _drawPile.Peek();
-                if (card == topCard)
+                NetworkObjectReference cardReference = _drawPile[_drawPile.Count - 1];
+                if(cardReference.TryGet(out NetworkObject networkObject))
                 {
-                    activeHands[currentHandIndex].ManDrawCard(topCard);
-                    _drawPile.Pop();
-                    if (_drawPile.Count > 0) { _drawPile.Peek().SetActive(true); }
-                    if (!IsValidPlayCrazyEights(card)) // Checking if newly drawn card is valid
+                    GameObject topCard = networkObject.gameObject;
+                    if (card == topCard)
                     {
-                        UpdateCurrentIndex(); // If not valid pass your turn
+                        activeHands[currentHandIndex].ManDrawCard(topCard);
+                        _drawPile.Remove(cardReference);
+
+                        if (_drawPile.Count > 0) {
+                            NetworkObjectReference newCardReference = _drawPile[_drawPile.Count - 1];
+                            if (newCardReference.TryGet(out NetworkObject newNetworkObject))
+                            {
+                                GameObject newTopCard = newNetworkObject.gameObject;
+                                newTopCard.SetActive(true);
+                            }
+                            else
+                            {
+                                Debug.Log("Error: cannot get new top card object");
+                                return;
+                            }
+                        }
+                        if (!IsValidPlayCrazyEights(card)) // Checking if newly drawn card is valid
+                        {
+                            UpdateCurrentIndex(); // If not valid pass your turn
+                        }
                     }
+                }
+                else
+                {
+                    Debug.Log("Error: cannot get card for manual drawing");
+                    return;
                 }
             }
         }
@@ -284,6 +365,8 @@ namespace XRMultiplayer.MiniGames
         public void PlayCard(GameObject card)
         {
             Debug.Log(card.name);
+
+            
 
             if (!activeHands[currentHandIndex].heldCards.Contains(card)) // Card from wrong hand do not accept
             {
@@ -305,22 +388,63 @@ namespace XRMultiplayer.MiniGames
 
             AddToPlayPile(card);
 
-            if (_playPile.Count > 0) { _playPile.Peek().SetActive(false); }
-            _playPile.Push(card);
-            _playPile.Peek().SetActive(true);
+            if (_playPile.Count > 0) {
+                NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
+                if(oldTopCardReference.TryGet(out NetworkObject oldNetworkObject))
+                {
+                    GameObject oldTopCard = oldNetworkObject.gameObject;
+                    oldTopCard.SetActive(false);
+                }
+            }
+
+            NetworkObject newNetworkObject = card.GetComponent<NetworkObject>();
+            NetworkObjectReference newCardReference = new NetworkObjectReference(newNetworkObject);
+            _playPile.Add(newCardReference);
+
+            if (_playPile.Count > 0)
+            {
+                NetworkObjectReference topCardReference = _playPile[_playPile.Count - 1];
+                if (topCardReference.TryGet(out NetworkObject NetworkObject))
+                {
+                    GameObject topCard = NetworkObject.gameObject;
+                    topCard.SetActive(false);
+                }
+            }
 
             UpdateCurrentIndex();
         }
 
         protected void StartCrazyEights()
         {
-            GameObject firstCard = _drawPile.Pop();
-            Debug.Log("Drawing First card(" + firstCard.name + ") for Crazy Eights . . . ");
-            AddToPlayPile(firstCard);
-
-            if (_playPile.TryPeek(out GameObject topCard))
+            NetworkObjectReference firstReference = _drawPile[_drawPile.Count - 1];
+            if (firstReference.TryGet(out NetworkObject networkCardDraw))
             {
-                topCard.SetActive(true);
+                _drawPile.Remove(firstReference);
+                GameObject firstCard = networkCardDraw.gameObject;
+                Debug.Log("Drawing First card(" + firstCard.name + ") for Crazy Eights . . . ");
+                AddToPlayPile(firstCard);
+            }
+            else
+            {
+                Debug.Log("FATAL ERROR: Card not found at drawPiile(STARTCRZY8s)");
+                return;
+            }
+
+
+
+            if (_playPile.Count > 0)
+            {
+                NetworkObjectReference cardReference = _playPile[_playPile.Count - 1];
+                if (cardReference.TryGet(out NetworkObject networkCardPlay))
+                {
+                    GameObject topCard = networkCardPlay.gameObject;
+                    topCard.SetActive(true);
+                }
+                else
+                {
+                    Debug.Log("FATAL ERROR: Card not found at playPile(STARTCRZY8s)");
+                    return;
+                }
             }
 
             Debug.Log("First card drawn.");
@@ -328,17 +452,26 @@ namespace XRMultiplayer.MiniGames
 
         protected bool IsValidPlayCrazyEights(GameObject card)
         {
-            if (_playPile.TryPeek(out GameObject topCard))
+            if (_playPile.Count > 0)
             {
-                if (topCard.GetComponent<Card>().suit == card.GetComponent<Card>().suit)
+                NetworkObjectReference cardReference = _playPile[_playPile.Count - 1];
+                if (cardReference.TryGet(out NetworkObject networkCard))
                 {
-                    Debug.Log("Cards share the same suit: " + card.GetComponent<Card>().suit);
-                    return true;
+                    Card topCard = networkCard.gameObject.GetComponent<Card>();
+                    if (topCard.suit == card.GetComponent<Card>().suit)
+                    {
+                        Debug.Log("Cards share the same suit: " + card.GetComponent<Card>().suit);
+                        return true;
+                    }
+                    else if (topCard.value == card.GetComponent<Card>().value)
+                    {
+                        Debug.Log("Cards share the same value: " + card.GetComponent<Card>().value);
+                        return true;
+                    }
                 }
-                else if (topCard.GetComponent<Card>().value == card.GetComponent<Card>().value)
+                else
                 {
-                    Debug.Log("Cards share the same value: " + card.GetComponent<Card>().value);
-                    return true;
+                    Debug.Log("FATAL ERROR: Card not found at playPile(ISVALIDPLAY)");
                 }
             }
             Debug.Log("Card setup failed or Card is not valid");
@@ -365,22 +498,63 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        private void AddToPlayPile(GameObject card)
+        private void OnDrawPileChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
         {
-            card.transform.parent = playPileObj.transform;
+            switch (changeEvent.Type)
+            {
+                case NetworkListEvent<NetworkObjectReference>.EventType.Add:
+                    // A new card was added to the draw pile
+                    Debug.Log($"Card added to draw pile: {changeEvent.Value}");
+                    break;
+
+                case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
+                    // A card was removed from the draw pile
+                    Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
+                    break;
+            }
+        }
+        private void OnPlayPileChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
+        {
+            switch (changeEvent.Type)
+            {
+                case NetworkListEvent<NetworkObjectReference>.EventType.Add:
+                    // A new card was added to the draw pile
+                    Debug.Log($"Card added to play pile: {changeEvent.Value}");
+                    break;
+
+                case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
+                    // A card was removed from the draw pile
+                    Debug.Log($"Card removed from play pile: {changeEvent.Value}");
+                    break;
+            }
+        }
+
+        private void AddToPile(GameObject card, Transform pileObj, NetworkList<NetworkObjectReference> pile)
+        {
+            card.transform.parent = pileObj;
             card.transform.localPosition = Vector3.zero;
             card.transform.localRotation = Quaternion.identity;
-            card.GetComponent<Card>().played = true;
-            card.GetComponent<XRGrabInteractable>().enabled = false;
-            _playPile.Push(card);
+
+            NetworkObject networkObject = card.GetComponent<NetworkObject>();
+            if (networkObject != null && networkObject.IsSpawned)
+            {
+                NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
+                pile.Add(cardReference);
+            }
+            else
+            {
+                Debug.Log($"Catastrophic Error: Could not add {card.name} to pile");
+            }
+        }
+
+        private void AddToPlayPile(GameObject card)
+        {
+            AddToPile(card, drawPileObj.transform, _playPile);
         }
 
         private void AddToDrawPile(GameObject card)
         {
-            card.transform.parent = drawPileObj.transform;
-            card.transform.localPosition = Vector3.zero;
-            card.transform.localRotation = Quaternion.identity;
-            _drawPile.Push(card);
+            AddToPile(card, drawPileObj.transform, _drawPile);
         }
 
         private void RemoveGeneratedCards()

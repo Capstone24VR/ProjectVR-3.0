@@ -142,7 +142,6 @@ public class NetworkedHand : NetworkBehaviour
 
     public void ConfigureChildrenPositions(List<GameObject> cards)
     {
-        Debug.Log(cards.Count);
         float startingPos = -cards.Count / 2;
 
         if (cards.Count == 1) { startingPos = 0; }
