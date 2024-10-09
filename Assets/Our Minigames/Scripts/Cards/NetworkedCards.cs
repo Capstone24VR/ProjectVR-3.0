@@ -146,10 +146,8 @@ namespace XRMultiplayer.MiniGames
             StartCrazyEights();
 
             if(_drawPile.Count > 0) {
-                if(_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject networkCard))
-                {
-                    networkCard.gameObject.SetActive(true);
-                }
+                NetworkObjectReference topCard = _drawPile[_drawPile.Count - 1];
+                SetCardActiveClientRpc(topCard);
             }
 
         }
@@ -183,23 +181,26 @@ namespace XRMultiplayer.MiniGames
             List<int> values = new List<int>();
             List<ulong> networkObjectIds = new List<ulong>();
 
+            // Iterate through suits and values to create a full deck
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
                 foreach (Value value in Enum.GetValues(typeof(Value)))
                 {
-                    UnityEngine.Object pPrefab = ((int)value > 1 && (int)value < 11)
-                        ? Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)value + suit) // If One..Ten, parse into integer
-                        : Resources.Load("Free_Playing_Cards/PlayingCards_" + value + suit);      //  If J,Q,K
+                    // Load the card prefab based on its value and suit
+                    string resourcePath = ((int)value > 1 && (int)value < 11)
+                        ? $"Free_Playing_Cards/PlayingCards_{(int)value}{suit}"
+                        : $"Free_Playing_Cards/PlayingCards_{value}{suit}";
 
+                    UnityEngine.Object pPrefab = Resources.Load(resourcePath);
                     if (pPrefab == null)
                     {
-                        Debug.LogError("(Server)Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + value + suit);
-                        continue;
+                        Debug.LogError($"(Server)Prefab not found: {resourcePath}");
+                        continue; // Skip to the next value if prefab not found
                     }
 
-                    // Create the card object and get its NetworkObject component
+                    // Create the card GameObject and get its NetworkObject component
                     GameObject newCard = Instantiate(card, drawPileObj.transform, false); // Create card
-                    var networkObject = newCard.GetComponent<NetworkObject>(); // get network object for server spawning
+                    var networkObject = newCard.GetComponent<NetworkObject>(); // Get NetworkObject for server spawning
 
                     if (networkObject != null)
                     {
@@ -216,35 +217,43 @@ namespace XRMultiplayer.MiniGames
                     if (model == null)
                     {
                         Debug.LogError("Model instantiation failed.");
-                        continue;
+                        continue; // Skip if the model could not be instantiated
                     }
 
                     model.transform.rotation = Quaternion.identity;
                     model.transform.localPosition = Vector3.zero;
 
-                    // Setting Card Value, Suite and name
+                    // Ensure Card component exists before assigning values
                     Card cardComponent = newCard.GetComponent<Card>();
-                    cardComponent.suit = suit;
-                    cardComponent.value = value;
-                    newCard.name = "Card: " + suit + " " + value;
-                    newCard.SetActive(false); // hiding card
+                    if (cardComponent != null)
+                    {
+                        cardComponent.suit = suit;
+                        cardComponent.value = value;
+                        newCard.name = $"Card: {suit} {value}";
+                        newCard.SetActive(false); // Hide the card until needed
 
-                    // Add card data to lists
-                    suits.Add((int)suit);
-                    values.Add((int)value);
-                    networkObjectIds.Add(networkObject.NetworkObjectId);
+                        // Add card data to lists for client notification
+                        suits.Add((int)suit);
+                        values.Add((int)value);
+                        networkObjectIds.Add(networkObject.NetworkObjectId);
 
-                    // Add card to deck (NetworkList)
-                    deck.Add(new NetworkObjectReference(networkObject));
+                        // Add card to deck (NetworkList)
+                        deck.Add(new NetworkObjectReference(networkObject));
+                    }
+                    else
+                    {
+                        Debug.LogError("Card component is missing on the new card prefab.");
+                    }
                 }
             }
 
-            Debug.Log("Deck created SeverSide. Notifying Clients . . .");
-            yield return new WaitForSeconds(0.5f);
+            Debug.Log("Deck created ServerSide. Notifying Clients . . .");
+            yield return new WaitForSeconds(0.5f); // Optional delay for synchronization
 
             // Notify clients with card data
             CreateDeckClientRpc(suits.ToArray(), values.ToArray(), networkObjectIds.ToArray());
         }
+
 
         // ClientRpc method with simple data types instead of custom struct
         [ClientRpc]
@@ -281,6 +290,7 @@ namespace XRMultiplayer.MiniGames
                 NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
                 if (cardNetworkObject != null)
                 {
+                    cardNetworkObject.TrySetParent(drawPileObj, false);
                     // Instantiate model on the client
                     GameObject model = (GameObject)Instantiate(pPrefab, cardNetworkObject.transform, false);
                     if (model == null)
@@ -337,12 +347,28 @@ namespace XRMultiplayer.MiniGames
                 // Copy shuffled deck into the draw pile
                 foreach (var cardReference in deck)
                 {
-                    _drawPile.Add(cardReference);
+                    deck.Add(cardReference);
                 }
 
                 Debug.Log("Draw Pile created.");
             }
         }
+
+        [ClientRpc]
+        void SetCardActiveClientRpc(NetworkObjectReference cardReference)
+        {
+            if (cardReference.TryGet(out NetworkObject networkCard))
+            {
+                GameObject card = networkCard.gameObject;
+                card.SetActive(true);  // Clients handle making the card visible
+                Debug.Log("Card set active on client: " + card.name);
+            }
+            else
+            {
+                Debug.LogError("FATAL ERROR: Card not found on client.");
+            }
+        }
+
 
         public void ManualDrawCard(GameObject card)
         {
@@ -597,7 +623,7 @@ namespace XRMultiplayer.MiniGames
 
         private void AddToPlayPile(GameObject card)
         {
-            AddToPile(card, drawPileObj.transform, _playPile);
+            AddToPile(card, playPileObj.transform, _playPile);
         }
 
         private void AddToDrawPile(GameObject card)

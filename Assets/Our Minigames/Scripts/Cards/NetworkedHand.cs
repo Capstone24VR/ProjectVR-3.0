@@ -119,6 +119,7 @@ public class NetworkedHand : NetworkBehaviour
             // The server adds the card to the heldCards list
             heldCards.Add(cardReference);
             ConfigureChildPositions();  // Re-arrange cards in hand
+
             card.transform.SetParent(transform, false);
             card.transform.localPosition = Vector3.zero;
             card.gameObject.SetActive(true);
