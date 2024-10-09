@@ -73,12 +73,25 @@ namespace XRMultiplayer.MiniGames
         }
 
 
+        IEnumerator WaitForClientConnection()
+        {
+            while (!NetworkManager.Singleton.IsClient || !NetworkManager.Singleton.IsConnectedClient)
+            {
+                Debug.Log("Waiting for client connection...");
+                yield return new WaitForSeconds(0.5f); // Wait until the client is connected
+            }
+
+            Debug.Log("Client is now connected.");
+            NotifyDeckReadyClientRpc(); // Notify clients once they are connected
+        }
+
+
         [ClientRpc]
         private void NotifyDeckReadyClientRpc()
         {
-            Debug.Log("Deck and draw pile ready for interaction.");
-            // Now the client can start rendering or interacting with the cards
+            Debug.Log("Deck is ready for interaction.");
         }
+
 
 
         public IEnumerator ResetGame()
@@ -94,7 +107,7 @@ namespace XRMultiplayer.MiniGames
 
             if (IsServer)
             {
-                NotifyDeckReadyClientRpc();
+                StartCoroutine(WaitForClientConnection());
             }
         }
 
