@@ -74,7 +74,7 @@ namespace XRMultiplayer.MiniGames
         public void ResetGame()
         {
             StopAllCoroutines();
-            RemoveGeneratedCards();
+            RemoveGeneratedCardsServer();
             activeHands.Clear();
 
             foreach(NetworkedHand hand in m_hands)
@@ -129,7 +129,7 @@ namespace XRMultiplayer.MiniGames
         public void EndGame()
         {
             StopAllCoroutines();
-            RemoveGeneratedCards();
+            RemoveGeneratedCardsServer();
         }
 
         public void UpdateGame(float deltaTime)
@@ -577,21 +577,26 @@ namespace XRMultiplayer.MiniGames
             AddToPile(card, drawPileObj.transform, _drawPile);
         }
 
-        private void RemoveGeneratedCards()
+        [ServerRpc]
+        private void RemoveGeneratedCardsServer()
         {
-            foreach (NetworkedHand hand in activeHands)
+            if (IsServer)
             {
-                hand.Clear();
-            }
+                foreach (NetworkedHand hand in activeHands)
+                {
+                    hand.Clear();
+                }
 
-            _playPile.Clear();
-            _drawPile.Clear();
+                _playPile.Clear();
+                _drawPile.Clear();
 
-            foreach (GameObject card in deck)
-            {
-                Destroy(card);
+                foreach (GameObject card in deck)
+                {
+                    Destroy(card);
+                }
+                deck.Clear();
+
             }
-            deck.Clear();
         }
     }
 }
