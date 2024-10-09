@@ -80,13 +80,9 @@ namespace XRMultiplayer.MiniGames
         }
 
 
-        public IEnumerator ResetGame()
+        public void ResetGame()
         {
             StopAllCoroutines();
-            RemoveGeneratedCardsServer();
-
-            yield return new WaitForSeconds(0.5f); // Give time to remove all cards
-
             activeHands.Clear();
 
             foreach(NetworkedHand hand in m_hands)
@@ -94,17 +90,23 @@ namespace XRMultiplayer.MiniGames
                 if(hand.active) { activeHands.Add(hand); }
             }
 
-            yield return new WaitForSeconds(0.5f); // Give time for clients to catch up
+
+        }
+
+        public IEnumerator StartGame()
+        {
+            RemoveGeneratedCardsServer();
+            yield return new WaitForSeconds(0.5f); // Give time to remove all cards
 
             CreateDeckServer();
             ShuffleDeckServer();
             InstantiateDrawPileServer();
 
-            NotifyDeckReadyClientRpc();
-        }
+            yield return new WaitForSeconds(0.5f); // Give time for clients to catch up
 
-        public void StartGame()
-        {
+            NotifyDeckReadyClientRpc();
+
+
             Debug.Log(startingHand);
             for (int i = 0; i < startingHand; i++)
             {
@@ -518,15 +520,19 @@ namespace XRMultiplayer.MiniGames
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
                     Debug.Log($"Card added to Deck: {changeEvent.Value}");
-                    changeEvent.Value.TryGet(out NetworkObject noA);
-                    deckObject.Add(noA.gameObject);
+                    if (changeEvent.Value.TryGet(out NetworkObject noA))
+                    {
+                        deckObject.Add(noA.gameObject);
+                    }
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
                     Debug.Log($"Card removed from Deck: {changeEvent.Value}");
-                    changeEvent.Value.TryGet(out NetworkObject noR);
-                    deckObject.Remove(noR.gameObject);
+                    if (changeEvent.Value.TryGet(out NetworkObject noR))
+                    {
+                        deckObject.Remove(noR.gameObject);
+                    }
                     break;
             }
         }
@@ -606,9 +612,8 @@ namespace XRMultiplayer.MiniGames
                 _drawPile.Clear();
                 deckObject.Clear();
 
-                foreach (NetworkObjectReference cardReference in deck)
+                foreach (GameObject card in deck)
                 {
-                    cardReference.TryGet(out NetworkObject card);
                     Destroy(card);  // Destroy server-side cards
                 }
                 deck.Clear();
