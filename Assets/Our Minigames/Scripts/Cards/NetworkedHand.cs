@@ -93,26 +93,37 @@ public class NetworkedHand : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            // Draw the card on the server and update all clients
             AutoDrawCard(cardReference);
-            AutoDrawCardClientRpc(cardReference);
+            AutoDrawCardClientRpc(cardReference);  // Notify clients to update visuals
         }
     }
 
     [ClientRpc]
     private void AutoDrawCardClientRpc(NetworkObjectReference cardReference)
     {
-        AutoDrawCard(cardReference);
+        // Only update the visuals on the client side
+        if (cardReference.TryGet(out NetworkObject card))
+        {
+            card.transform.SetParent(transform, false);
+            card.transform.localPosition = Vector3.zero;
+            card.gameObject.SetActive(true);
+            ConfigureChildPositions();  // Update positions of cards
+        }
     }
 
     private void AutoDrawCard(NetworkObjectReference cardReference)
     {
         if (cardReference.TryGet(out NetworkObject card))
         {
+            // The server adds the card to the heldCards list
+            heldCards.Add(cardReference);
+            ConfigureChildPositions();  // Re-arrange cards in hand
             card.transform.SetParent(transform, false);
             card.transform.localPosition = Vector3.zero;
             card.gameObject.SetActive(true);
-            heldCards.Add(cardReference);
-            ConfigureChildPositions();
+
+            // Update the card's status (optional)
             Card cardComponent = card.GetComponent<Card>();
             if (cardComponent != null)
             {

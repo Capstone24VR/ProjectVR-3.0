@@ -51,7 +51,8 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         [SerializeField] int startingHand = 5;
 
-        [SerializeField] protected List<GameObject> deck = new List<GameObject>();
+        [SerializeField] protected NetworkList<NetworkObjectReference> deck = new NetworkList<NetworkObjectReference>();
+        [SerializeField] protected List<GameObject> deckObject = new List<GameObject>();
 
         [SerializeField] protected NetworkList<NetworkObjectReference> _drawPile = new NetworkList<NetworkObjectReference>();
         [SerializeField] protected NetworkList<NetworkObjectReference> _playPile = new NetworkList<NetworkObjectReference>();
@@ -65,6 +66,7 @@ namespace XRMultiplayer.MiniGames
         void Start()
         {
             TryGetComponent(out m_MiniGame);
+            deck.OnListChanged += OnDeckChanged;
             _drawPile.OnListChanged += OnDrawPileChanged;
             _playPile.OnListChanged += OnPlayPileChanged;
         }
@@ -82,7 +84,7 @@ namespace XRMultiplayer.MiniGames
 
             CreateDeckServer();
             ShuffleDeckServer();
-            InstatiateDrawPileServer();
+            InstantiateDrawPileServer();
         }
 
         public void StartGame()
@@ -135,6 +137,7 @@ namespace XRMultiplayer.MiniGames
             CheckForPlayerWin();
         }
 
+
         /// <summary>
         /// Creates deck on the server.
         /// </summary>
@@ -144,31 +147,40 @@ namespace XRMultiplayer.MiniGames
                 StartCoroutine(CreateDeckOnServer());
         }
 
-
         IEnumerator CreateDeckOnServer()
         {
             Debug.Log("Creating Deck ServerSide . . .");
+
+            List<int> suits = new List<int>();
+            List<int> values = new List<int>();
+            List<ulong> networkObjectIds = new List<ulong>();
+
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
                 foreach (Value value in Enum.GetValues(typeof(Value)))
                 {
-                    UnityEngine.Object pPrefab = ((int)value > 1 && (int)value < 11) ? 
-                        Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)value + suit) : // If One..Ten, parse into integer
-                        Resources.Load("Free_Playing_Cards/PlayingCards_" + value + suit);      //  If J,Q,K
+                    UnityEngine.Object pPrefab = ((int)value > 1 && (int)value < 11)
+                        ? Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)value + suit) // If One..Ten, parse into integer
+                        : Resources.Load("Free_Playing_Cards/PlayingCards_" + value + suit);      //  If J,Q,K
 
                     if (pPrefab == null)
                     {
-                        Debug.LogError("Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + value + suit);
+                        Debug.LogError("(Server)Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + value + suit);
                         continue;
                     }
 
-
+                    // Create the card object and get its NetworkObject component
                     GameObject newCard = Instantiate(card, drawPileObj.transform, false); // Create card
-                    var netWorkObject = newCard.GetComponent<NetworkObject>(); // get network object for server spawning
+                    var networkObject = newCard.GetComponent<NetworkObject>(); // get network object for server spawning
 
-                    if(netWorkObject != null)
+                    if (networkObject != null)
                     {
-                        netWorkObject.Spawn();
+                        networkObject.Spawn();
+                    }
+                    else
+                    {
+                        Debug.LogError("NetworkObject component is missing on the card prefab.");
+                        continue; // Skip to the next iteration if no NetworkObject is found
                     }
 
                     // Visual Model Creation
@@ -183,66 +195,83 @@ namespace XRMultiplayer.MiniGames
                     model.transform.localPosition = Vector3.zero;
 
                     // Setting Card Value, Suite and name
-                    newCard.GetComponent<Card>().suit = suit;
-                    newCard.GetComponent<Card>().value = value;
+                    Card cardComponent = newCard.GetComponent<Card>();
+                    cardComponent.suit = suit;
+                    cardComponent.value = value;
                     newCard.name = "Card: " + suit + " " + value;
                     newCard.SetActive(false); // hiding card
-                    AddToDrawPile(newCard);
+
+                    // Add card data to lists
+                    suits.Add((int)suit);
+                    values.Add((int)value);
+                    networkObjectIds.Add(networkObject.NetworkObjectId);
+
+                    // Add card to deck (NetworkList)
+                    deck.Add(new NetworkObjectReference(networkObject));
                 }
             }
+
             Debug.Log("Deck created SeverSide. Notifying Clients . . .");
             yield return new WaitForSeconds(0.5f);
 
-            CreateDeckClientRpc();
+            // Notify clients with card data
+            CreateDeckClientRpc(suits.ToArray(), values.ToArray(), networkObjectIds.ToArray());
         }
 
-
-        /// <summary>
-        /// Creates deck on the clients.
-        /// </summary>
+        // ClientRpc method with simple data types instead of custom struct
         [ClientRpc]
-        public void CreateDeckClientRpc()
+        public void CreateDeckClientRpc(int[] suits, int[] values, ulong[] networkObjectIds)
         {
-            StartCoroutine(CreateDeckOnClient());
+            StartCoroutine(CreateDeckOnClient(suits, values, networkObjectIds));
         }
 
-        IEnumerator CreateDeckOnClient()
+        IEnumerator CreateDeckOnClient(int[] suits, int[] values, ulong[] networkObjectIds)
         {
             Debug.Log("Client received deck creation. Waiting for server to finish...");
 
             yield return new WaitForSeconds(1.0f); // Ensure enough delay for server to fully spawn cards
 
             Debug.Log("Creating Deck on Client...");
-            foreach (NetworkObjectReference cardReference in _drawPile)  // Assuming `drawPile` is synchronized on the client
-            {
-                var cardComponent = card.GetComponent<Card>();
 
-                UnityEngine.Object pPrefab = ((int)cardComponent.value > 1 && (int)cardComponent.value < 11) ?
-                    Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)cardComponent.value + cardComponent.suit) :
-                    Resources.Load("Free_Playing_Cards/PlayingCards_" + cardComponent.value + cardComponent.suit);
+            for (int i = 0; i < suits.Length; i++)
+            {
+                Suit suit = (Suit)suits[i];
+                Value value = (Value)values[i];
+
+                // Load the appropriate prefab based on suit and value
+                UnityEngine.Object pPrefab = ((int)value > 1 && (int)value < 11) ?
+                    Resources.Load("Free_Playing_Cards/PlayingCards_" + (int)value + suit) :
+                    Resources.Load("Free_Playing_Cards/PlayingCards_" + value + suit);
 
                 if (pPrefab == null)
                 {
-                    Debug.LogError("Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + cardComponent.value + cardComponent.suit);
+                    Debug.LogError("(Client)Prefab not found: " + "Free_Playing_Cards/PlayingCards_" + value + suit);
                     continue;
                 }
 
-                // Instantiate model on the client
-                GameObject model = (GameObject)Instantiate(pPrefab, card.transform, false);
-                if (model == null)
+                // Find the card by NetworkObjectId and use its existing reference
+                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
+                if (cardNetworkObject != null)
                 {
-                    Debug.LogError("Model instantiation failed.");
-                    continue;
-                }
+                    // Instantiate model on the client
+                    GameObject model = (GameObject)Instantiate(pPrefab, cardNetworkObject.transform, false);
+                    if (model == null)
+                    {
+                        Debug.LogError("Model instantiation failed.");
+                        continue;
+                    }
 
-                model.transform.rotation = Quaternion.identity;
-                model.transform.localPosition = Vector3.zero;
+                    model.transform.rotation = Quaternion.identity;
+                    model.transform.localPosition = Vector3.zero;
+
+                    // Optionally, you can deactivate the card model or set it to a specific state
+                    model.SetActive(false); // or however you want to handle visibility
+                }
             }
 
             Debug.Log("Client deck created.");
             yield return null;
         }
-
 
         /// <summary>
         /// Shuffles deck on the server.
@@ -251,73 +280,41 @@ namespace XRMultiplayer.MiniGames
         {
             if (IsServer)
             {
-                List<int> shuffledIndices = ShuffleDeckIndices(deck.Count);
-                ShuffleDeckClientRpc(shuffledIndices.ToArray());
-            }
-        }
+                Debug.Log("Shuffling deck on the server...");
 
-        /// <summary>
-        /// Shuffles deck on the clients.
-        /// </summary>
-        [ClientRpc]
-        public void ShuffleDeckClientRpc(int[] shuffledIndices)
-        {
-            Debug.Log("Shuffling Deck . . .");
-            List<GameObject> shuffledDeck = new List<GameObject>(shuffledIndices.Length);
-            foreach(int index in shuffledIndices)
-            {
-                shuffledDeck.Add(deck[index]);
-            }
-            deck = shuffledDeck;
-            Debug.Log("Deck Shuffled.");
-        }
+                // Shuffle deck on the server
+                for (int i = 0; i < deck.Count; i++)
+                {
+                    int randomIndex = UnityEngine.Random.Range(0, deck.Count);
+                    var temp = deck[i];
+                    deck[i] = deck[randomIndex];
+                    deck[randomIndex] = temp;
+                }
 
-        /// <summary>
-        /// Shuffles the indexes of the deck
-        /// </summary>
-        /// <param name="count">size of deck</param>
-        /// <returns></returns>
-        private List<int> ShuffleDeckIndices(int count)
-        {
-            List<int> indices = Enumerable.Range(0,count).ToList();
-            System.Random r = new System.Random();
-
-            Debug.Log(count);
-            for (int n = count - 1; n > 0; --n)
-            {
-                int k = r.Next(n + 1);
-                int temp = indices[n];
-                indices[n] = indices[k];
-                indices[k] = temp;
+                Debug.Log("Deck shuffled.");
             }
-            return indices;
         }
 
         /// <summary>
         /// Instatitates draw pile on the server.
         /// </summary>
-        public void InstatiateDrawPileServer()
+        public void InstantiateDrawPileServer()
         {
             if (IsServer)
-                InstatiateDrawPileServerClientRpc();
-        }
-
-        /// <summary>
-        /// Creates deck on the clients.
-        /// </summary>
-        [ClientRpc]
-        void InstatiateDrawPileServerClientRpc()
-        {
-            Debug.Log("Creating Draw Pile . . .");
-            foreach (GameObject card in deck)
             {
-                NetworkObject networkObject = card.GetComponent<NetworkObject>();
-                NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
-                _drawPile.Add(cardReference);
-            }
-            Debug.Log("Draw Pile created.");
-        }
+                Debug.Log("Creating Draw Pile...");
 
+                _drawPile.Clear(); // Clear previous draw pile if any
+
+                // Copy shuffled deck into the draw pile
+                foreach (var cardReference in deck)
+                {
+                    _drawPile.Add(cardReference);
+                }
+
+                Debug.Log("Draw Pile created.");
+            }
+        }
 
         public void ManualDrawCard(GameObject card)
         {
@@ -498,6 +495,29 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
+        private void OnDeckChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
+        {
+            switch (changeEvent.Type)
+            {
+                case NetworkListEvent<NetworkObjectReference>.EventType.Add:
+                    // A new card was added to the draw pile
+                    Debug.Log($"Card added to Deck: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noA))
+                    {
+                        deckObject.Add(noA.gameObject);
+                    }
+                    break;
+
+                case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
+                    // A card was removed from the draw pile
+                    Debug.Log($"Card removed from Deck: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noR))
+                    {
+                        deckObject.Remove(noR.gameObject);
+                    }
+                    break;
+            }
+        }
         private void OnDrawPileChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
         {
             switch (changeEvent.Type)
