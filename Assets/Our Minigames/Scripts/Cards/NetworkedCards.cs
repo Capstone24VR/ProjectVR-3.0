@@ -794,6 +794,7 @@ namespace XRMultiplayer.MiniGames
         }
         private void OnDrawPileChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
         {
+
             switch (changeEvent.Type)
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
@@ -833,20 +834,36 @@ namespace XRMultiplayer.MiniGames
 
         private void AddToPile(GameObject card, Transform pileObj, NetworkList<NetworkObjectReference> pile)
         {
-            card.transform.parent = pileObj;
-            card.transform.localPosition = Vector3.zero;
-            card.transform.localRotation = Quaternion.identity;
-
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
             if (networkObject != null && networkObject.IsSpawned)
             {
                 NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
                 pile.Add(cardReference);
+
+                card.transform.parent = pileObj;
+                card.transform.localPosition = Vector3.zero;
+                card.transform.localRotation = Quaternion.identity;
                 card.SetActive(false);
+
+                NotifyClientsOfNewCardClientRpc(cardReference);
             }
             else
             {
                 Debug.Log($"Catastrophic Error: Could not add {card.name} to pile");
+            }
+        }
+
+        [ClientRpc]
+        private void NotifyClientsOfNewCardClientRpc(NetworkObjectReference cardReference)
+        {
+            if (cardReference.TryGet(out NetworkObject networkObject))
+            {
+                // Add the card visually to the client’s draw pile
+                // Logic to visually add the card to the draw pile on the client side
+                card.transform.parent = drawPileObj.transform;
+                card.transform.localPosition = Vector3.zero;
+                card.transform.localRotation = Quaternion.identity;
+                card.SetActive(false); // Hide the card in the pile on clients
             }
         }
 
