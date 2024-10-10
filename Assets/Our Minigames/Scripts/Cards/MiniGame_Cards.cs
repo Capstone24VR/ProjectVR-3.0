@@ -53,6 +53,8 @@ namespace XRMultiplayer.MiniGames
                 PlayerHudNotification.Instance.ShowText($"Game Complete! " + winner.name + " has won.");
             }
 
+            m_MiniGameManager.SubmitScoreServerRpc(1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
+
             if (m_MiniGameManager.IsServer && m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
                 m_MiniGameManager.StopGameServerRpc();
 

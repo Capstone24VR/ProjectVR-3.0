@@ -113,7 +113,7 @@ public class NetworkedHand : NetworkBehaviour
         }
     }
 
-    private void DrawCard(NetworkObjectReference cardReference)
+    public void DrawCard(NetworkObjectReference cardReference)
     {
         if (cardReference.TryGet(out NetworkObject card))
         {
