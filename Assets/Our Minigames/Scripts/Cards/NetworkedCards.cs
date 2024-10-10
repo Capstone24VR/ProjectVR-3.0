@@ -374,9 +374,29 @@ namespace XRMultiplayer.MiniGames
                 }
 
                 Debug.Log(_drawPile.Count);
-
                 Debug.Log("Draw Pile created.");
+
+                // Notify clients to instantiate their draw piles
+                InstantiateDrawPileClientRpc();
             }
+        }
+
+        // ClientRpc to notify clients to instantiate their draw pile
+        [ClientRpc]
+        private void InstantiateDrawPileClientRpc()
+        {
+            foreach (var cardReference in deck)
+            {
+                if (cardReference.TryGet(out NetworkObject card))
+                {
+                    card.transform.SetParent(drawPileObj.transform);
+                    card.transform.localPosition = Vector3.zero;
+                    card.transform.localRotation = Quaternion.identity;
+                    card.gameObject.SetActive(false);
+                }
+            }
+
+            Debug.Log("Client draw pile instantiated.");
         }
 
         [ClientRpc]
@@ -844,26 +864,10 @@ namespace XRMultiplayer.MiniGames
                 card.transform.localPosition = Vector3.zero;
                 card.transform.localRotation = Quaternion.identity;
                 card.SetActive(false);
-
-                NotifyClientsOfNewCardClientRpc(cardReference);
             }
             else
             {
                 Debug.Log($"Catastrophic Error: Could not add {card.name} to pile");
-            }
-        }
-
-        [ClientRpc]
-        private void NotifyClientsOfNewCardClientRpc(NetworkObjectReference cardReference)
-        {
-            if (cardReference.TryGet(out NetworkObject networkObject))
-            {
-                // Add the card visually to the client’s draw pile
-                // Logic to visually add the card to the draw pile on the client side
-                card.transform.parent = drawPileObj.transform;
-                card.transform.localPosition = Vector3.zero;
-                card.transform.localRotation = Quaternion.identity;
-                card.SetActive(false); // Hide the card in the pile on clients
             }
         }
 
