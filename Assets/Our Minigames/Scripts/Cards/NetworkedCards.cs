@@ -330,7 +330,6 @@ namespace XRMultiplayer.MiniGames
             }
 
             Debug.Log("Client deck created.");
-            Debug.Log(_drawPile.Count);
             yield return null;
         }
 
@@ -374,29 +373,9 @@ namespace XRMultiplayer.MiniGames
                 }
 
                 Debug.Log(_drawPile.Count);
+
                 Debug.Log("Draw Pile created.");
-
-                // Notify clients to instantiate their draw piles
-                InstantiateDrawPileClientRpc();
             }
-        }
-
-        // ClientRpc to notify clients to instantiate their draw pile
-        [ClientRpc]
-        private void InstantiateDrawPileClientRpc()
-        {
-            foreach (var cardReference in deck)
-            {
-                if (cardReference.TryGet(out NetworkObject card))
-                {
-                    card.transform.SetParent(drawPileObj.transform);
-                    card.transform.localPosition = Vector3.zero;
-                    card.transform.localRotation = Quaternion.identity;
-                    card.gameObject.SetActive(false);
-                }
-            }
-
-            Debug.Log("Client draw pile instantiated.");
         }
 
         [ClientRpc]
@@ -814,7 +793,6 @@ namespace XRMultiplayer.MiniGames
         }
         private void OnDrawPileChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
         {
-
             switch (changeEvent.Type)
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
@@ -854,15 +832,15 @@ namespace XRMultiplayer.MiniGames
 
         private void AddToPile(GameObject card, Transform pileObj, NetworkList<NetworkObjectReference> pile)
         {
+            card.transform.parent = pileObj;
+            card.transform.localPosition = Vector3.zero;
+            card.transform.localRotation = Quaternion.identity;
+
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
             if (networkObject != null && networkObject.IsSpawned)
             {
                 NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
                 pile.Add(cardReference);
-
-                card.transform.parent = pileObj;
-                card.transform.localPosition = Vector3.zero;
-                card.transform.localRotation = Quaternion.identity;
                 card.SetActive(false);
             }
             else
