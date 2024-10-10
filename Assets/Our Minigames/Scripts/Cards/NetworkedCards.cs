@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using static Card;
 using Unity.Netcode;
-using UnityEngine.XR;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -54,11 +53,6 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] protected List<GameObject> deckObject = new List<GameObject>();
 
         [SerializeField] protected NetworkList<NetworkObjectReference> _drawPile = new NetworkList<NetworkObjectReference>();
-
-        // FOR TESTING ONLY
-        [SerializeField] protected List<GameObject> drawObject = new List<GameObject>();
-        //
-
         [SerializeField] protected NetworkList<NetworkObjectReference> _playPile = new NetworkList<NetworkObjectReference>();
 
         [SerializeField] protected int currentHandIndex;
@@ -394,147 +388,72 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-
         public void RequestDrawCard(GameObject card)
         {
-            Debug.Log("RequestDrawCard: Step 1 - Client request to draw card.");
-
-
-
+            Debug.Log("Step 1");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
-            if (networkObject == null)
-            {
-                Debug.LogError("RequestDrawCard: NetworkObject not found on the card.");
-                return;
-            }
-
-            // Check if the network object is spawned
-            if (!networkObject.IsSpawned)
-            {
-                Debug.LogError("RequestDrawCard: NetworkObject is not spawned.");
-                return;
-            }
-            else
-            {
-                Debug.Log("RequestDrawCard: NetworkObject is spawned and valid.");
-            }
-
             NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
 
-            ulong clientId = NetworkManager.Singleton.LocalClientId;
-            Debug.Log($"RequestDrawCard: Local client ID is {clientId}.");
+            //DrawTopCardServerRpc(cardReference)
 
-            if(clientId == 0)
-            {
-
-                Debug.Log("RequestDrawCard: Step 2 - Calling RequestDrawClientIDZero.");
-                DrawCardCliendIDZero(cardReference);
-            }
-            else
-            {
-                Debug.Log("RequestDrawCard: Step 2 - Calling DrawTopCardServerRpc.");
-                DrawCardServerRpc(cardReference);
-            }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void DrawCardServerRpc(NetworkObjectReference cardReference, ServerRpcParams serverRpcParams = default)
-        {
-            Debug.Log($"DrawTopCardServerRpc: Step 1 - Server processing card draw request from client {serverRpcParams.Receive.SenderClientId}.");
+        //[ServerRpc(RequireOwnership = false)]
+        //private void DrawTopCardServerRpc(NetworkObjectReference cardReference)
+        //{
+        //    Debug.Log("Step 1");
+        //    if (IsServer)
+        //    {
+        //        Debug.Log("Step 2");
+        //        NetworkObject networkObject = card.GetComponent<NetworkObject>();
+        //        if (networkObject != null && networkObject.IsSpawned)
+        //        {
+        //            // Remove the card from the draw pile
+        //            //if (_drawPile.Count > 0)
+        //            //{
+        //            //    if(_drawPile[_drawPile.Count-1].TryGet(out NetworkObject topNetworkObject))
+        //            //    {
+        //            //        topNetworkObject == networkObject
+        //            //    }
+        //            //}
+        //            NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
+        //            if (_drawPile.Contains(cardReference))
+        //            {
+        //                _drawPile.Remove(cardReference);  // Remove from draw pile
+        //                Debug.Log($"Card {card.name} picked from draw pile.");
 
-            if (IsServer)
-            {
-                Debug.Log("DrawTopCardServerRpc: Step 2 - Confirmed server role.");
+        //                // Add the card to the current player's hand (call NetworkedHand's draw method)
+        //                NetworkedHand currentHand = activeHands[currentHandIndex];
+        //                activeHands[currentHandIndex].DrawCardServerRpc(networkObject.gameObject); // This method is from NetworkedHand.cs
 
-                if (cardReference.TryGet(out NetworkObject networkObject))
-                {
-                    Debug.Log($"DrawTopCardServerRpc: Step 3 - NetworkObject retrieved, card name: {networkObject.name}.");
+        //                // Optionally trigger a client RPC to visually update clients on the draw action
+        //                UpdatePlayerHandClientRpc(cardReference, currentHand.NetworkObjectId);
+        //            }
+        //            else
+        //            {
+        //                Debug.Log("Card not found in draw pile.");
+        //            }
+        //        }
+        //    }
+        //}
 
-                    if (_drawPile.Contains(cardReference))
-                    {
-                        _drawPile.Remove(cardReference);  // Remove from draw pile
-                        Debug.Log($"DrawTopCardServerRpc: Step 4 - Card {networkObject.gameObject.name} removed from draw pile.");
+        //[ClientRpc]
+        //public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, ulong handId)
+        //{
+        //    if (cardReference.TryGet(out NetworkObject networkObject))
+        //    {
+        //        GameObject card = networkObject.gameObject;
 
-                        Debug.Log("DrawTopCardServerRpc: Step 5 - Calling DrawCardServerRpc on the hand.");
-                        activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // Call method from NetworkedHand.cs
-
-                        //Debug.Log("DrawTopCardServerRpc: Step 6 - Calling UpdatePlayerHandClientRpc to notify clients.");
-                        //UpdatePlayerHandClientRpc(cardReference);
-                    }
-                    else
-                    {
-                        Debug.LogError("DrawTopCardServerRpc: Card not found in draw pile.");
-                    }
-                }
-                else
-                {
-                    Debug.LogError("DrawTopCardServerRpc: Failed to retrieve NetworkObject from cardReference.");
-                }
-            }
-            else
-            {
-                Debug.LogError("DrawTopCardServerRpc: This function should only be called on the server.");
-            }
-        }
-
-        private void DrawCardCliendIDZero(NetworkObjectReference cardReference)
-        {
-            Debug.Log($"DrawCardCliendIDZero: Step 1 - Server processing card draw request from client {NetworkManager.Singleton.LocalClientId}.");
-            Debug.Log($"DrawTopCardServerRpc: {NetworkManager.Singleton.IsHost}.");
-            Debug.Log($"DrawTopCardServerRpc: {NetworkManager.Singleton.IsServer}.");
-            if (NetworkManager.Singleton.IsServer)
-            {
-                Debug.Log("DrawCardCliendIDZero: Step 2 - Confirmed server role.");
-
-                if (cardReference.TryGet(out NetworkObject networkObject))
-                {
-                    Debug.Log($"DrawCardCliendIDZero: Step 3 - NetworkObject retrieved, card name: {networkObject.name}.");
-                    Debug.Log($"Current Draw Pile Count: {_drawPile.Count}");
-                    if (_drawPile.Contains(cardReference))
-                    {
-                        _drawPile.Remove(cardReference);  // Remove from draw pile
-                        Debug.Log($"DrawCardCliendIDZero: Step 4 - Card {networkObject.gameObject.name} removed from draw pile.");
-
-                        Debug.Log("DrawCardCliendIDZero: Step 5 - Calling DrawCardServerRpc on the hand.");
-                        activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // Call method from NetworkedHand.cs
-
-                    }
-                    else
-                    {
-                        Debug.LogError("DrawCardCliendIDZero: Card not found in draw pile.");
-                    }
-                }
-                else
-                {
-                    Debug.LogError("DrawCardCliendIDZero: Failed to retrieve NetworkObject from cardReference.");
-                }
-            }
-            else
-            {
-                Debug.LogError("DrawCardCliendIDZero: This function should only be called on the server.");
-            }
-        }
-
-        [ClientRpc]
-        public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference)
-        {
-            Debug.Log("UpdatePlayerHandClientRpc: Step 1 - Updating player hand on the client.");
-
-            if (cardReference.TryGet(out NetworkObject networkObject))
-            {
-                GameObject card = networkObject.gameObject;
-                Debug.Log($"UpdatePlayerHandClientRpc: Step 2 - Card retrieved: {card.name}.");
-
-
-                Debug.Log("UpdatePlayerHandClientRpc: Step 3 - Hand matched. Adding card to hand.");
-                activeHands[currentHandIndex].DrawCard(card);  // Add card to the correct hand on the client side
-            }
-            else
-            {
-                Debug.LogError("UpdatePlayerHandClientRpc: Failed to retrieve NetworkObject from cardReference.");
-            }
-        }
-
+        //        foreach (NetworkedHand hand in activeHands)
+        //        {
+        //            if (hand.NetworkObjectId == handId)
+        //            {
+        //                hand.DrawCard(card);  // Add card to the correct hand on the client side
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
 
 
 
@@ -798,19 +717,11 @@ namespace XRMultiplayer.MiniGames
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
                     Debug.Log($"Card added to draw pile: {changeEvent.Value}");
-                    if (changeEvent.Value.TryGet(out NetworkObject noA))
-                    {
-                        drawObject.Add(noA.gameObject);
-                    }
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
                     Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
-                    if (changeEvent.Value.TryGet(out NetworkObject noR))
-                    {
-                        drawObject.Remove(noR.gameObject);
-                    }
                     break;
             }
         }
