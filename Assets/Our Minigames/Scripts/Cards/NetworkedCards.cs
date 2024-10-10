@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using static Card;
 using Unity.Netcode;
+using UnityEngine.XR.Content.Interaction;
+using System.Linq;
+using UnityEngine.XR;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -391,163 +394,93 @@ namespace XRMultiplayer.MiniGames
         public void RequestDrawCard(GameObject card)
         {
             Debug.Log("Step 1");
-            NetworkObject networkObject = card.GetComponent<NetworkObject>();
-            NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
-
-            //DrawTopCardServerRpc(cardReference)
-
+            NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
+            Debug.Log($"Is the object spawned? {card.GetComponent<NetworkObject>().IsSpawned}");
+            Debug.Log($"Is the object owned by the server? {card.GetComponent<NetworkObject>().IsOwnedByServer}");
+            DrawCardServer(cardReference);
+            Debug.Log(_drawPile.Count);
+            Debug.Log("HELP!");
         }
 
-        //[ServerRpc(RequireOwnership = false)]
-        //private void DrawTopCardServerRpc(NetworkObjectReference cardReference)
-        //{
-        //    Debug.Log("Step 1");
-        //    if (IsServer)
-        //    {
-        //        Debug.Log("Step 2");
-        //        NetworkObject networkObject = card.GetComponent<NetworkObject>();
-        //        if (networkObject != null && networkObject.IsSpawned)
-        //        {
-        //            // Remove the card from the draw pile
-        //            //if (_drawPile.Count > 0)
-        //            //{
-        //            //    if(_drawPile[_drawPile.Count-1].TryGet(out NetworkObject topNetworkObject))
-        //            //    {
-        //            //        topNetworkObject == networkObject
-        //            //    }
-        //            //}
-        //            NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
-        //            if (_drawPile.Contains(cardReference))
-        //            {
-        //                _drawPile.Remove(cardReference);  // Remove from draw pile
-        //                Debug.Log($"Card {card.name} picked from draw pile.");
 
-        //                // Add the card to the current player's hand (call NetworkedHand's draw method)
-        //                NetworkedHand currentHand = activeHands[currentHandIndex];
-        //                activeHands[currentHandIndex].DrawCardServerRpc(networkObject.gameObject); // This method is from NetworkedHand.cs
+        public void DrawCardServer(NetworkObjectReference cardReference)
+        {
+            Debug.Log("Step 2");
+            if (NetworkManager.Singleton.IsServer)
+            {
+                Debug.Log("Step 3");
+                Debug.Log(_drawPile.Count);
+                if (_drawPile.Count > 0)
+                {
+                    Debug.Log("Step 4");
 
-        //                // Optionally trigger a client RPC to visually update clients on the draw action
-        //                UpdatePlayerHandClientRpc(cardReference, currentHand.NetworkObjectId);
-        //            }
-        //            else
-        //            {
-        //                Debug.Log("Card not found in draw pile.");
-        //            }
-        //        }
-        //    }
-        //}
+                    long playerId = miniManager.GetLocalPlayerID();
+                    Debug.Log($"Player id:{playerId}");
+                    Debug.Log(activeHands[currentHandIndex].ownerManager.HandOwnerId);
 
-        //[ClientRpc]
-        //public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, ulong handId)
-        //{
-        //    if (cardReference.TryGet(out NetworkObject networkObject))
-        //    {
-        //        GameObject card = networkObject.gameObject;
+                    // Checking to see if this is top card.
+                    if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject topCard))
+                    {
+                        Debug.Log("Step 5");
+                        cardReference.TryGet(out NetworkObject card);
+                        Debug.Log($"{card.name}\t {topCard.name}");
+                        if (card.gameObject == topCard.gameObject)
+                        {
+                            Debug.Log($"Attempting to draw top card, {card.name} . . . ");
+                            activeHands[currentHandIndex].DrawCardServerRpc(topCard);
+                            _drawPile.Remove(cardReference);
 
-        //        foreach (NetworkedHand hand in activeHands)
-        //        {
-        //            if (hand.NetworkObjectId == handId)
-        //            {
-        //                hand.DrawCard(card);  // Add card to the correct hand on the client side
-        //                break;
-        //            }
-        //        }
-        //    }
-        //}
+                            // Notify Clients of Draw Change
+                            ManualDrawCardClientRpc(topCard.NetworkObjectId);
 
 
+                            // Checking to see if _drawPile is empty
+                            if (_drawPile.Count > 0)
+                            {
+                                if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject newTopCard))
+                                {
+                                    SetCardActiveClientRpc(newTopCard); // Set newTopCard as active
+                                }
+                                else
+                                {
+                                    Debug.Log("Draw pile is empty . . ."); // _drawPile is empty
+                                }
+                            }
 
+                            if (!IsValidPlayCrazyEights(topCard.gameObject)) // Check if newly drawn card is valid
+                            {
+                                UpdateCurrentIndex(); // Pass turn if card isn't playable
+                            }
 
-        //public void RequestDrawCard(GameObject card)
-        //{
-        //    Debug.Log("Step 1");
-        //    NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
-        //    Debug.Log($"Is the object spawned? {card.GetComponent<NetworkObject>().IsSpawned}");
-        //    Debug.Log($"Is the object owned by the server? {card.GetComponent<NetworkObject>().IsOwnedByServer}");
-        //    DrawCardServer(cardReference);
-        //    Debug.Log(_drawPile.Count);
-        //    Debug.Log("HELP!");
-        //}
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Error: cannot get card for manual drawing");
+                        return;
+                    }
+                }
+            }
+        }
 
+        [ClientRpc]
+        private void ManualDrawCardClientRpc(ulong cardNetworkId)
+        {
+            // This method is called on all clients to reflect the drawn card
+            NetworkObject card = NetworkManager.Singleton.SpawnManager.SpawnedObjects[cardNetworkId];
 
-        //public void DrawCardServer(NetworkObjectReference cardReference)
-        //{
-        //    Debug.Log("Step 2");
-        //    if (NetworkManager.Singleton.IsServer)
-        //    {
-        //        Debug.Log("Step 3");
-        //        Debug.Log(_drawPile.Count);
-        //        if (_drawPile.Count > 0)
-        //        {
-        //            Debug.Log("Step 4");
+            // Update the client-side representation of the drawn card
+            activeHands[currentHandIndex].DrawCardServerRpc(card);  // You can define this method to handle the visuals
 
-        //            long playerId = miniManager.GetLocalPlayerID();
-        //            Debug.Log($"Player id:{playerId}");
-        //            Debug.Log(activeHands[currentHandIndex].ownerManager.HandOwnerId);
-
-        //            // Checking to see if this is top card.
-        //            if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject topCard))
-        //            {
-        //                Debug.Log("Step 5");
-        //                cardReference.TryGet(out NetworkObject card);
-        //                Debug.Log($"{card.name}\t {topCard.name}");
-        //                if (card.gameObject == topCard.gameObject)
-        //                {
-        //                    Debug.Log($"Attempting to draw top card, {card.name} . . . ");
-        //                    activeHands[currentHandIndex].DrawCardServerRpc(topCard);
-        //                    _drawPile.Remove(cardReference);
-
-        //                    // Notify Clients of Draw Change
-        //                    ManualDrawCardClientRpc(topCard.NetworkObjectId);
-
-
-        //                    // Checking to see if _drawPile is empty
-        //                    if (_drawPile.Count > 0)
-        //                    {
-        //                        if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject newTopCard))
-        //                        {
-        //                            SetCardActiveClientRpc(newTopCard); // Set newTopCard as active
-        //                        }
-        //                        else
-        //                        {
-        //                            Debug.Log("Draw pile is empty . . ."); // _drawPile is empty
-        //                        }
-        //                    }
-
-        //                    if (!IsValidPlayCrazyEights(topCard.gameObject)) // Check if newly drawn card is valid
-        //                    {
-        //                        UpdateCurrentIndex(); // Pass turn if card isn't playable
-        //                    }
-
-        //                }
-        //            }
-        //            else
-        //            {
-        //                Debug.Log("Error: cannot get card for manual drawing");
-        //                return;
-        //            }
-        //        }
-        //    }
-        //}
-
-        //[ClientRpc]
-        //private void ManualDrawCardClientRpc(ulong cardNetworkId)
-        //{
-        //    // This method is called on all clients to reflect the drawn card
-        //    NetworkObject card = NetworkManager.Singleton.SpawnManager.SpawnedObjects[cardNetworkId];
-
-        //    // Update the client-side representation of the drawn card
-        //    activeHands[currentHandIndex].DrawCardServerRpc(card);  // You can define this method to handle the visuals
-
-        //    // If needed, update the visibility of the new top card
-        //    if (_drawPile.Count > 0)
-        //    {
-        //        if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject newTopCard))
-        //        {
-        //            newTopCard.gameObject.SetActive(true);
-        //        }
-        //    }
-        //}
+            // If needed, update the visibility of the new top card
+            if (_drawPile.Count > 0)
+            {
+                if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject newTopCard))
+                {
+                    newTopCard.gameObject.SetActive(true);
+                }
+            }
+        }
 
 
         public void PlayCard(GameObject card)
