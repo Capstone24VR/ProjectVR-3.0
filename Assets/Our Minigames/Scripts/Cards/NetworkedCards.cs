@@ -502,14 +502,11 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            Debug.Log($"Someone is attempting to Draw {card.name}");
-            if (IsClient)
-            {
-                Debug.Log("Step 1");
-                NetworkObject networkObject = card.GetComponent<NetworkObject>();
+            Debug.Log($"I am attempting to Draw {card.name}");
+            Debug.Log("Step 1");
+            NetworkObject networkObject = card.GetComponent<NetworkObject>();
 
-                DrawTopCardServerRpc(networkObject.NetworkObjectId);
-            }
+            DrawTopCardServerRpc(networkObject.NetworkObjectId);
         }
 
         [ServerRpc(RequireOwnership = false)]

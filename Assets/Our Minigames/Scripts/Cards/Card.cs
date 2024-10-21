@@ -48,7 +48,6 @@ public class Card : MonoBehaviour
 
     public void ResetPosition()
     {
-        Debug.Log($"{suit} {value} position: {_position}");
         GetComponent<Rigidbody>().isKinematic = true;
         transform.localPosition = _position;
         transform.localRotation = Quaternion.identity;
