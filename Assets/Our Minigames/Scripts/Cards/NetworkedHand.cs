@@ -71,7 +71,7 @@ public class NetworkedHand : NetworkBehaviour
     public bool canDraw() { return heldCards.Count < maxCards; }
     public void ConfigureChildPositions()
     {
-        List<GameObject> cardObjects = new List<GameObject>();
+        List<ulong> cardObjectsIds = new List<ulong>();
         // FOR TESTING ONLY
         heldCardsObj.Clear();
         // 
@@ -82,10 +82,10 @@ public class NetworkedHand : NetworkBehaviour
                 // FOR TESTING ONLY
                 heldCardsObj.Add(card.gameObject);
                 // 
-                cardObjects.Add(card.gameObject);
+                cardObjectsIds.Add(card.NetworkObjectId);
             }
         }
-        ConfigureChildrenPositions(cardObjects);
+        ConfigureChildrenPositionsClientRpc(cardObjectsIds.ToArray());
     }
 
     [ServerRpc]
@@ -157,6 +157,30 @@ public class NetworkedHand : NetworkBehaviour
             cards[i].GetComponent<Card>().SetPosition(newPosition);
 
             startingPos++;
+        }
+    }
+
+    [ClientRpc]
+    public void ConfigureChildrenPositionsClientRpc(ulong[] networkObjectIds)
+    {
+        float startingPos = -networkObjectIds.Length / 2;
+
+        if (networkObjectIds.Length == 1) { startingPos = 0; }
+        if (networkObjectIds.Length % 2 == 0) { startingPos += 0.5f; }
+
+        for (int i = 0; i < networkObjectIds.Length; i++)
+        {
+            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
+            if (cardNetworkObject != null)
+            {
+                GameObject card = cardNetworkObject.gameObject;
+                card.transform.localRotation = Quaternion.identity;
+                Vector3 newPosition = new Vector3(startingPos * bunching, 0, 0);
+                card.transform.localPosition = newPosition;
+                card.GetComponent<Card>().SetPosition(newPosition);
+
+                startingPos++;
+            }
         }
     }
 }
