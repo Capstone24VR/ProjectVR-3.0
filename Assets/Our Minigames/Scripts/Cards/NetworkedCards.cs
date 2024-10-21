@@ -442,8 +442,6 @@ namespace XRMultiplayer.MiniGames
         {
             GameObject pileObj = isPlay ? playPileObj : drawPileObj;
 
-            yield return new WaitForSeconds(0.5f); // Short delay incase Server needs to do more work
-
             NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
             if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
             {
