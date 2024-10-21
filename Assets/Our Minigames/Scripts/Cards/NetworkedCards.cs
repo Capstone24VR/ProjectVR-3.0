@@ -502,6 +502,7 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
+            Debug.Log($"Someone is attempting to Draw {card.name}");
             if (IsClient)
             {
                 Debug.Log("Step 1");
