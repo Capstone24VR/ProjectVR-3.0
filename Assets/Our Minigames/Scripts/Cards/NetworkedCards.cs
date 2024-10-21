@@ -505,7 +505,17 @@ namespace XRMultiplayer.MiniGames
             Debug.Log($"{NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
 
-            if(networkObject != null )
+            if (networkObject.IsSpawned)
+            {
+                Debug.Log($"NetworkObject {networkObject.NetworkObjectId} is spawned and ready.");
+                // Now it's safe to send RPCs or reference this object
+            }
+            else
+            {
+                Debug.LogError($"NetworkObject {networkObject.NetworkObjectId} has not been spawned yet.");
+            }
+
+            if (networkObject != null )
             {
                 Debug.Log("Step 1");
                 DrawTopCardServerRpc(networkObject.NetworkObjectId);
