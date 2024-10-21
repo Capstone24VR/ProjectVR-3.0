@@ -22,11 +22,6 @@ public class NetworkedHand : NetworkBehaviour
     public HandOwnerManager ownerManager;
 
     /// <summary>
-    /// How thick the cards are
-    /// </summary>
-    [SerializeField] float _xOffset = 0.1f;
-
-    /// <summary>
     /// How close each card should be
     /// </summary>
     [SerializeField] float bunching = .12f;
