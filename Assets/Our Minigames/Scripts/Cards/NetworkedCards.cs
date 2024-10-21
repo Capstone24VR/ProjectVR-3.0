@@ -193,6 +193,8 @@ namespace XRMultiplayer.MiniGames
             List<int> values = new List<int>();
             List<ulong> networkObjectIds = new List<ulong>();
 
+            int cardsSpawned = 0;
+
             // Iterate through suits and values to create a full deck
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
@@ -206,6 +208,12 @@ namespace XRMultiplayer.MiniGames
                     if (networkObject != null)
                     {
                         networkObject.Spawn();
+                        Debug.Log($"{suit} {value} has been spawned with id of: {networkObject.NetworkObjectId}");
+                        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(networkObject.NetworkObjectId))
+                        {
+                            Debug.LogError($"Failed to register {suit} {value} with NetworkObjectId {networkObject.NetworkObjectId}");
+                        }
+                        cardsSpawned++;
                     }
                     else
                     {
@@ -238,9 +246,13 @@ namespace XRMultiplayer.MiniGames
                 }
             }
 
-            Debug.Log("Deck created ServerSide. Notifying Clients . . .");
-            yield return new WaitForSeconds(0.5f); // Optional delay for synchronization
 
+            while(cardsSpawned < 52)
+            {
+                yield return null;  // Wait until next frame;
+            }
+
+            Debug.Log("Deck created ServerSide. Notifying Clients . . .");
             // Notify clients with card data
             CreateDeckClientRpc(suits.ToArray(), values.ToArray(), networkObjectIds.ToArray());
         }
