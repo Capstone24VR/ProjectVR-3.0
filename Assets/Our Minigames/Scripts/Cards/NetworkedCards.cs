@@ -502,18 +502,21 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            Debug.Log("Step 1");
-            NetworkObject networkObject = card.GetComponent<NetworkObject>();
-            NetworkObjectReference cardReference = new NetworkObjectReference(networkObject);
+            if (IsClient)
+            {
+                Debug.Log("Step 1");
+                NetworkObject networkObject = card.GetComponent<NetworkObject>();
 
-            DrawTopCardServerRpc(cardReference,  NetworkManager.Singleton.LocalClientId);
-
+                DrawTopCardServerRpc(networkObject.NetworkObjectId);
+            }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void DrawTopCardServerRpc(NetworkObjectReference cardReference, ulong clientId)
+        private void DrawTopCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
         {
+            ulong clientId = rpcParams.Receive.SenderClientId;
             Debug.Log($"Server processing card draw request from client {clientId}.");
+
             if (IsServer)
             {
                 // Remove the card from the draw pile
@@ -527,14 +530,17 @@ namespace XRMultiplayer.MiniGames
 
 
                 Debug.Log("Step 2");
-                if (cardReference.TryGet(out NetworkObject networkObject))
+
+                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+                if (cardNetworkObject != null)
                 {
+                    NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
                     if (_drawPile.Contains(cardReference))
                     {
                         _drawPile.Remove(cardReference);  // Remove from draw pile
                         Debug.Log($"Card {card.name} picked from draw pile.");
 
-                        activeHands[currentHandIndex].DrawCardServerRpc(networkObject.gameObject); // This method is from NetworkedHand.cs
+                        activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // This method is from NetworkedHand.cs
 
                         // Optionally trigger a client RPC to visually update clients on the draw action
                         UpdatePlayerHandClientRpc(cardReference, activeHands[currentHandIndex].NetworkObjectId);
@@ -547,8 +553,6 @@ namespace XRMultiplayer.MiniGames
                 }
             }
         }
-
-        
 
         protected void StartCrazyEights()
         {
