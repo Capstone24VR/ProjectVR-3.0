@@ -502,11 +502,20 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            Debug.Log($"I am attempting to Draw {card.name}");
-            Debug.Log("Step 1");
+            Debug.Log($"{NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
 
-            DrawTopCardServerRpc(networkObject.NetworkObjectId);
+            if(networkObject != null )
+            {
+                Debug.Log("Step 1");
+                DrawTopCardServerRpc(networkObject.NetworkObjectId);
+                Debug.Log("After Draw Top Card Server Rpc");
+            }
+            else
+            {
+                Debug.Log("Error on request, card DNE");
+            }
+            
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -517,17 +526,10 @@ namespace XRMultiplayer.MiniGames
 
             if (IsServer)
             {
-                // Remove the card from the draw pile
-                //if (_drawPile.Count > 0)
-                //{
-                //    if(_drawPile[_drawPile.Count-1].TryGet(out NetworkObject topNetworkObject))
-                //    {
-                //        topNetworkObject == networkObject
-                //    }
-                //}
+           
 
+                Debug.Log($"Step 2: Server _DrawPile Size: {_drawPile.Count}");
 
-                Debug.Log("Step 2");
 
                 NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
                 if (cardNetworkObject != null)
