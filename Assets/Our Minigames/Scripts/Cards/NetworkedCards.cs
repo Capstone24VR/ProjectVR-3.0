@@ -710,7 +710,7 @@ namespace XRMultiplayer.MiniGames
             }
             else
             {
-                Debug.Log("FATAL ERROR: IDK WHAT HAPPENED HERE BY THE UPDATE FUNC IS SCREWED")
+                Debug.Log("FATAL ERROR: IDK WHAT HAPPENED HERE BY THE UPDATE FUNC IS SCREWED");
             }
            
         }
