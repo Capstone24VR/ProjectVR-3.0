@@ -11,7 +11,7 @@ public class PlayPile : MonoBehaviour
     {
         if (!other.GetComponent<Card>().played)
         {
-            m_NetworkedGameplay.PlayCard(other.gameObject);
+            m_NetworkedGameplay.RequestPlayCard(other.gameObject);
         }
     }
 }
