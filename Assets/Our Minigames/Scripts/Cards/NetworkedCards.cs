@@ -460,7 +460,7 @@ namespace XRMultiplayer.MiniGames
                 if (isPlay) // Set played to true to stop Play function from playing and disable XR grab interactable
                 { 
                     cardNetworkObject.gameObject.GetComponent<Card>().played = true;
-                    cardNetworkObject.gameObject.GetComponent<XRGrabInteractable>().enabled = false;
+                    cardNetworkObject.gameObject.GetComponent<Card>().SetCardInteractive(false);
                 } 
 
                 cardNetworkObject.gameObject.transform.parent = pileObj.transform;

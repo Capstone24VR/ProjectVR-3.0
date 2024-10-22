@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -114,6 +115,12 @@ public class Card : NetworkBehaviour
     private void HoverDeSelectClientRpc()
     {
         ScaleCard(_localScale); // Apply hover deselect effect on all clients
+    }
+
+    public void SetCardInteractive(bool value)
+    {
+        _xrInteract.trackPosition = value;
+        _xrInteract.trackRotation = value;
     }
 
     public void SetInHand(bool isInHand)
