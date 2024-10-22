@@ -519,6 +519,8 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
+            if (!deckObject.Contains(card)) { return; }
+
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
 
@@ -534,9 +536,7 @@ namespace XRMultiplayer.MiniGames
 
             if (networkObject != null )
             {
-                Debug.Log("Step 1");
                 DrawTopCardServerRpc(networkObject.NetworkObjectId);
-                Debug.Log("After Draw Top Card Server Rpc");
             }
             else
             {
@@ -553,10 +553,6 @@ namespace XRMultiplayer.MiniGames
 
             if (IsServer)
             {
-           
-
-                Debug.Log($"Step 2: Server _DrawPile Size: {_drawPile.Count}");
-
 
                 NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
                 if (cardNetworkObject != null)
@@ -571,6 +567,8 @@ namespace XRMultiplayer.MiniGames
 
                         // Optionally trigger a client RPC to visually update clients on the draw action
                         UpdatePlayerHandClientRpc(cardReference, activeHands[currentHandIndex].NetworkObjectId);
+
+                        UpdateCurrentIndexServerRpc();
                     }
                     else
                     {
@@ -626,8 +624,6 @@ namespace XRMultiplayer.MiniGames
         {
             Debug.Log(card.name);
 
-
-
             if (!activeHands[currentHandIndex].heldCards.Contains(card)) // Card from wrong hand do not accept
             {
                 Debug.Log("Wrong player!");
@@ -641,7 +637,6 @@ namespace XRMultiplayer.MiniGames
 
             card.SetActive(false);
             card.GetComponent<Card>().played = true;
-            card.GetComponent<XRGrabInteractable>().enabled = false;
 
             activeHands[currentHandIndex].heldCards.Remove(card);
             activeHands[currentHandIndex].ConfigureChildPositions();
@@ -672,7 +667,7 @@ namespace XRMultiplayer.MiniGames
                 }
             }
 
-            UpdateCurrentIndex();
+            UpdateCurrentIndexServerRpc();
         }
 
         protected bool IsValidPlayCrazyEights(GameObject card)
@@ -703,12 +698,29 @@ namespace XRMultiplayer.MiniGames
             return false;
         }
 
-        public void UpdateCurrentIndex()
+        [ServerRpc]
+        public void UpdateCurrentIndexServerRpc()
         {
-            if (currentHandIndex == activeHands.Count - 1) { currentHandIndex = 0; }
-            else { currentHandIndex++; }
+            if (IsServer)
+            {
+                if (currentHandIndex == activeHands.Count - 1) { currentHandIndex = 0; }
+                else { currentHandIndex++; }
 
-            Debug.Log("Setting current hand to " + activeHands[currentHandIndex].name);
+                UpdateCurrentIndexClientRpc(currentHandIndex);
+            }
+            else
+            {
+                Debug.Log("FATAL ERROR: IDK WHAT HAPPENED HERE BY THE UPDATE FUNC IS SCREWED")
+            }
+           
+        }
+
+        [ClientRpc]
+        private void UpdateCurrentIndexClientRpc(int newIndex)
+        {
+            currentHandIndex = newIndex;
+
+            Debug.Log("Server has set current hand to " + activeHands[currentHandIndex].name);
         }
 
         public void CheckForPlayerWin()
