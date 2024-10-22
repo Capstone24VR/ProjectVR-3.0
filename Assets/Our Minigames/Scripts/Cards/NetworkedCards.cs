@@ -341,7 +341,6 @@ namespace XRMultiplayer.MiniGames
             if (clientsThatHaveCompletedDeck.Count == miniManager.currentPlayerDictionary.Count)
             {
                 Debug.Log("All clients have finished deck creation. Ready to start the game.");
-                // Optionally, you can directly start the game here if desired
             }
         }
 
@@ -514,7 +513,7 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            Debug.Log($"{NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
 
             if (networkObject.IsSpawned)

@@ -135,59 +135,10 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6831360945790670256}
-        m_TargetAssemblyTypeName: Card, Assembly-CSharp
-        m_MethodName: HoverDeSelect
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6831360945790670256}
-        m_TargetAssemblyTypeName: Card, Assembly-CSharp
-        m_MethodName: ResetPosition
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6831360945790670256}
-        m_TargetAssemblyTypeName: Card, Assembly-CSharp
-        m_MethodName: HoverDeSelect
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1648893421885694404, guid: 1168545f41604bf438a112291fd57ce0,
-          type: 3}
-        m_TargetAssemblyTypeName: XRMultiplayer.MiniGames.NetworkedCards, Assembly-CSharp
-        m_MethodName: RequestDrawCard
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 3529856017834294217}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -294,7 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2903874211
+  GlobalObjectIdHash: 601723046
   InScenePlacedSourceGlobalObjectIdHash: 2609386950
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

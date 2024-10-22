@@ -137,12 +137,26 @@ public class Card : NetworkBehaviour
         HoverDeSelect(); // Trigger hover deselect effect
     }
 
+    protected virtual void OnSelectEntered(SelectEnterEventArgs args)
+    {
+        HoverDeSelect();
+    }
+
+    protected virtual void OnSelectExited(SelectExitEventArgs args)
+    {
+        ResetPosition();
+        HoverDeSelect();
+        _cardManager.RequestDrawCard(gameObject);
+    }
+
     private void OnEnable()
     {
         if (_xrInteract != null)
         {
             _xrInteract.hoverEntered.AddListener(OnHoverEntered);
             _xrInteract.hoverExited.AddListener(OnHoverExited);
+            _xrInteract.selectEntered.AddListener(OnSelectEntered);
+            _xrInteract.selectExited.AddListener(OnSelectExited);
         }
     }
 
@@ -152,6 +166,8 @@ public class Card : NetworkBehaviour
         {
             _xrInteract.hoverEntered.RemoveListener(OnHoverEntered);
             _xrInteract.hoverExited.RemoveListener(OnHoverExited);
+            _xrInteract.selectEntered.RemoveListener(OnSelectEntered);
+            _xrInteract.selectExited.RemoveListener(OnSelectExited);
         }
     }
 }
