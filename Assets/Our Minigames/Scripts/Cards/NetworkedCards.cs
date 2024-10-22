@@ -615,27 +615,30 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        public void RequestPlayCard(GameObject card)
+        public void RequestPlayCard(ulong networkObjectId)
         {
-            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {card.name}");
+            NetworkObject networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
 
-            if (!activeHands[currentHandIndex].heldCards.Contains(card)) // Card from wrong hand do not accept
+            if (networkObject.IsSpawned)
+            {
+                Debug.Log($"Network Object({networkObject.name}) is Spawned and ready for use.");
+            }
+            else
+            {
+                Debug.Log($"Fatal Error! Network Object({networkObject.name}) is not spawned");
+                return;
+            }
+
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {networkObject.gameObject.name}");
+            if (!activeHands[currentHandIndex].heldCards.Contains(networkObject)) // Card from wrong hand do not accept
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId}'s turn!");
                 return;
             }
 
-            NetworkObject networkObject = card.GetComponent<NetworkObject>();
-
-            if (!networkObject.IsSpawned)
-            {
-                Debug.Log("For some reason the Object hasn't spawned");
-            }
-
-
             if (networkObject != null)
             {
-                PlayCardServerRpc(networkObject.NetworkObjectId);
+                PlayCardServerRpc(networkObjectId);
             }
             else
             {

@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using XRMultiplayer.MiniGames;
+
 
 public class PlayPile : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class PlayPile : MonoBehaviour
     {
         if (!other.GetComponent<Card>().played)
         {
-            m_NetworkedGameplay.RequestPlayCard(other.gameObject);
+            m_NetworkedGameplay.RequestPlayCard(other.GetComponent<NetworkObject>().NetworkObjectId);
         }
     }
 }

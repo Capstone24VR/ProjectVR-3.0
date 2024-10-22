@@ -124,17 +124,8 @@ public class NetworkedHand : NetworkBehaviour
     [ClientRpc]
     public void RemoveCardClientRpc(ulong networkObjectId)
     {
-        NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-        if (cardNetworkObject != null)
-        {
-            NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
-
-            // Remove the card from the hand on all clients
-            heldCards.Remove(cardReference);
-
-            // Reconfigure child positions after card removal
-            ConfigureChildPositions();
-        }
+        // Reconfigure child positions after card removal
+        ConfigureChildPositions();
     }
 
     public void Clear()
