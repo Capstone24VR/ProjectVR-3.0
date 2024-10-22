@@ -564,6 +564,8 @@ namespace XRMultiplayer.MiniGames
 
                         activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // This method is from NetworkedHand.cs
 
+                        Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {card.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
+
                         // Optionally trigger a client RPC to visually update clients on the draw action
                         UpdatePlayerHandClientRpc(cardReference, activeHands[currentHandIndex].NetworkObjectId);
 
