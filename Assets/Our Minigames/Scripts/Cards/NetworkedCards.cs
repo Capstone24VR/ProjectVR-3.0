@@ -127,7 +127,7 @@ namespace XRMultiplayer.MiniGames
 
             while (clientsThatHaveCompletedDeck.Count < miniManager.currentPlayerDictionary.Count)
             {
-                yield return null;
+                yield return new WaitForSeconds(0.1f); // Short short delay for waiting
             }
 
             Debug.Log("All clients have finished creating their decks. Starting Game . . .");
@@ -393,7 +393,7 @@ namespace XRMultiplayer.MiniGames
             NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
             if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
             {
-                Debug.Log($"Start Crazy Eights, attempting to set card{cardNetworkObject.gameObject.name} Active on clients");
+                Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} active to {value} on clients");
                 cardNetworkObject.gameObject.SetActive(value);
                 Debug.Log($"Checking if card is active: " + cardNetworkObject.isActiveAndEnabled);
             }
@@ -405,36 +405,48 @@ namespace XRMultiplayer.MiniGames
 
         private void AddToPlayPileServer(GameObject card)
         {
-            NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
-            card.GetComponent<Card>().played = true;
+            if (IsServer)
+            {
+                NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
+                card.GetComponent<Card>().played = true;
 
-            _playPile.Add(cardReference);
-            AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, true);
+                _playPile.Add(cardReference);
+                AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, true);
+            }
         }
 
         private void AddToPlayPileServer(NetworkObjectReference cardReference)
         {
-            if (cardReference.TryGet(out NetworkObject networkObject))
+            if (IsServer)
             {
-                _playPile.Add(cardReference);
-                AddToPileClientRpc(networkObject.NetworkObjectId, true);
+                if (cardReference.TryGet(out NetworkObject networkObject))
+                {
+                    _playPile.Add(cardReference);
+                    AddToPileClientRpc(networkObject.NetworkObjectId, true);
+                }
             }
         }
 
         private void AddToDrawPileServer(GameObject card)
         {
-            NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
+            if (IsServer)
+            {
+                NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
 
-            _drawPile.Add(cardReference);
-            AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, false);
+                _drawPile.Add(cardReference);
+                AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, false);
+            }
         }
 
         private void AddToDrawPileServer(NetworkObjectReference cardReference)
         {
-            if (cardReference.TryGet(out NetworkObject networkObject))
+            if (IsServer)
             {
-                _drawPile.Add(cardReference);
-                AddToPileClientRpc(networkObject.NetworkObjectId, false);
+                if (cardReference.TryGet(out NetworkObject networkObject))
+                {
+                    _drawPile.Add(cardReference);
+                    AddToPileClientRpc(networkObject.NetworkObjectId, false);
+                }
             }
         }
 
@@ -459,7 +471,6 @@ namespace XRMultiplayer.MiniGames
                 if (isPlay) // Set played to true to stop Play function from playing and disable XR grab interactable
                 { 
                     cardNetworkObject.gameObject.GetComponent<Card>().played = true;
-                    cardNetworkObject.gameObject.GetComponent<Card>().SetCardInteractive(false);
                 } 
 
                 cardNetworkObject.gameObject.transform.parent = pileObj.transform;
@@ -553,7 +564,7 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            if (!deckObject.Contains(card)) { return; }
+            if (!_drawPile.Contains(card)) { return; }
 
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
@@ -670,17 +681,16 @@ namespace XRMultiplayer.MiniGames
 
                     activeHands[currentHandIndex].RemoveCardServerRpc(cardReference.NetworkObjectId);
 
-                    if (_playPile.Count > 0) // Set top card un Active
+                    if (_playPile.Count > 0) // Get Old Top Card Reference
                     {
                         NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
+                        AddToPlayPileServer(cardReference);
+
+                        SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
                         SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);
+
+                        UpdateCurrentIndexServerRpc();
                     }
-
-
-                    AddToPlayPileServer(card);
-
-                    UpdateCurrentIndexServerRpc();
-
                 }
             }
         }
