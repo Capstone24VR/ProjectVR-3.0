@@ -55,7 +55,6 @@ public class Card : NetworkBehaviour
         _position = position;
     }
 
-
     public void ResetPosition()
     {
         GetComponent<Rigidbody>().isKinematic = true;
@@ -67,44 +66,59 @@ public class Card : NetworkBehaviour
     public void HoverSelect()
     {
         ScaleCard(_localScale * 1.25f);
+
+        // Call ServerRpc to inform the server of this hover event
+        HoverSelectServerRpc();
     }
 
     // Hover deselect effect
     public void HoverDeSelect()
     {
         ScaleCard(_localScale);
+
+        // Call ServerRpc to inform the server of this deselect event
+        HoverDeSelectServerRpc();
     }
 
     private void ScaleCard(Vector3 newScale)
     {
         // Update local scale
         transform.localScale = newScale;
-
-        // If the server is executing this, synchronize the scale to all clients
-        if (IsServer)
-        {
-            RpcScaleCard(newScale);
-        }
     }
 
-
-    private void RpcScaleCard(Vector3 scale)
+    // ServerRpc to inform the server about the hover select event
+    [ServerRpc(RequireOwnership = false)]
+    private void HoverSelectServerRpc()
     {
-        // Apply the scale change on all clients
-        transform.localScale = scale;
+        // Server will inform all clients to apply the hover select effect
+        HoverSelectClientRpc();
+    }
+
+    // ServerRpc to inform the server about the hover deselect event
+    [ServerRpc(RequireOwnership = false)]
+    private void HoverDeSelectServerRpc()
+    {
+        // Server will inform all clients to apply the hover deselect effect
+        HoverDeSelectClientRpc();
+    }
+
+    // ClientRpc to apply hover select on all clients
+    [ClientRpc]
+    private void HoverSelectClientRpc()
+    {
+        ScaleCard(_localScale * 1.25f); // Apply hover select effect on all clients
+    }
+
+    // ClientRpc to apply hover deselect on all clients
+    [ClientRpc]
+    private void HoverDeSelectClientRpc()
+    {
+        ScaleCard(_localScale); // Apply hover deselect effect on all clients
     }
 
     public void SetInHand(bool isInHand)
     {
         inHand = isInHand;
-        if (inHand)
-        {
-            // Debug.Log($"Card {suit} {value} is now in hand.");
-        }
-        else
-        {
-            // Debug.Log($"Card {suit} {value} is no longer in hand.");
-        }
     }
 
     public string GetCardId()
