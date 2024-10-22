@@ -567,7 +567,7 @@ namespace XRMultiplayer.MiniGames
                         Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {card.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
 
                         // Optionally trigger a client RPC to visually update clients on the draw action
-                        UpdatePlayerHandClientRpc(cardReference, activeHands[currentHandIndex].NetworkObjectId);
+                        UpdatePlayerHandClientRpc(cardReference, currentHandIndex);
 
                         UpdateCurrentIndexServerRpc();
 
@@ -619,16 +619,9 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ClientRpc]
-        public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, ulong handId)
+        public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, int index)
         {
-            foreach (NetworkedHand hand in activeHands)
-            {
-                if (hand.NetworkObjectId == handId)
-                {
-                    hand.DrawCardClientRpc(cardReference);  // Add card to the correct hand on the client side
-                    break;
-                }
-            }
+            activeHands[index].DrawCardClientRpc(cardReference);  // Add card to the correct hand on the client side
         }
 
         public void PlayCard(GameObject card)
