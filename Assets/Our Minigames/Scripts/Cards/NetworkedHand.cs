@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -81,13 +80,6 @@ public class NetworkedHand : NetworkBehaviour
             // The server adds the card to the heldCards list
             heldCards.Add(cardReference);
             ConfigureChildPositions();  // Re-arrange cards in hand
-
-            // Update the card's status (optional)
-            Card cardComponent = card.GetComponent<Card>();
-            if (cardComponent != null)
-            {
-                cardComponent.SetInHand(true);
-            }
         }
     }
 
@@ -102,6 +94,12 @@ public class NetworkedHand : NetworkBehaviour
             card.transform.localPosition = Vector3.zero;
             card.gameObject.SetActive(true);
             ConfigureChildPositions();  // Update positions of cards
+            
+            Card cardComponent = card.GetComponent<Card>();
+            if (cardComponent != null)
+            {
+                cardComponent.SetInHand(true);
+            }
         }
     }
 

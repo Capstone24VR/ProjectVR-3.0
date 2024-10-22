@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using static Card;
 using Unity.Netcode;
 
@@ -569,6 +568,16 @@ namespace XRMultiplayer.MiniGames
                         UpdatePlayerHandClientRpc(cardReference, activeHands[currentHandIndex].NetworkObjectId);
 
                         UpdateCurrentIndexServerRpc();
+
+                        if (_drawPile.Count > 0)
+                        {
+                            if(_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject nextCard))
+                            {
+                                Debug.Log($"Server is setting next card({nextCard.gameObject.name}) active for all Clients");
+                                SetCardActiveClientRpc(nextCard.NetworkObjectId, true);
+                            }
+                        }
+
                     }
                     else
                     {
