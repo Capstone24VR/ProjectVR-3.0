@@ -626,6 +626,13 @@ namespace XRMultiplayer.MiniGames
             }
 
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
+
+            if (!networkObject.IsSpawned)
+            {
+                Debug.Log("For some reason the Object hasn't spawned");
+            }
+
+
             if (networkObject != null)
             {
                 PlayCardServerRpc(networkObject.NetworkObjectId);
