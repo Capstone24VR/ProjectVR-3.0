@@ -35,6 +35,7 @@ public class NetworkedHand : NetworkBehaviour
     /// </summary>
     [SerializeField] public List<GameObject> heldCardsObj = new List<GameObject>();
 
+
     private void Awake()
     {
         heldCards = new NetworkList<NetworkObjectReference>();
@@ -100,6 +101,39 @@ public class NetworkedHand : NetworkBehaviour
             {
                 cardComponent.SetInHand(true);
             }
+        }
+    }
+
+    [ServerRpc]
+    public void RemoveCardServerRpc(ulong networkObjectId)
+    {
+        NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+        if (cardNetworkObject != null)
+        {
+            NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
+
+            // Remove the card from the hand on the server
+            heldCards.Remove(cardReference);
+
+            // Call the ClientRpc to update the hand positions on all clients
+            RemoveCardClientRpc(networkObjectId);
+        }
+    }
+
+    // ClientRpc to handle card removal and reconfiguration on all clients
+    [ClientRpc]
+    public void RemoveCardClientRpc(ulong networkObjectId)
+    {
+        NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+        if (cardNetworkObject != null)
+        {
+            NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
+
+            // Remove the card from the hand on all clients
+            heldCards.Remove(cardReference);
+
+            // Reconfigure child positions after card removal
+            ConfigureChildPositions();
         }
     }
 

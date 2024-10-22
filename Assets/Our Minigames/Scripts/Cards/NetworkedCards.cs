@@ -516,79 +516,6 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        public void RequestDrawCard(GameObject card)
-        {
-            if (!deckObject.Contains(card)) { return; }
-
-            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
-            NetworkObject networkObject = card.GetComponent<NetworkObject>();
-
-            if (networkObject.IsSpawned)
-            {
-                Debug.Log($"NetworkObject {networkObject.NetworkObjectId} is spawned and ready.");
-                // Now it's safe to send RPCs or reference this object
-            }
-            else
-            {
-                Debug.LogError($"NetworkObject {networkObject.NetworkObjectId} has not been spawned yet.");
-            }
-
-            if (networkObject != null )
-            {
-                DrawTopCardServerRpc(networkObject.NetworkObjectId);
-            }
-            else
-            {
-                Debug.Log("Error on request, card DNE");
-            }
-            
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void DrawTopCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
-        {
-            ulong clientId = rpcParams.Receive.SenderClientId;
-            Debug.Log($"Server processing card draw request from client {clientId}.");
-
-            if (IsServer)
-            {
-
-                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-                if (cardNetworkObject != null)
-                {
-                    NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
-                    if (_drawPile.Contains(cardReference))
-                    {
-                        _drawPile.Remove(cardReference);  // Remove from draw pile
-                        Debug.Log($"Card {card.name} picked from draw pile.");
-
-                        activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // This method is from NetworkedHand.cs
-
-                        Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {card.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
-
-                        // Optionally trigger a client RPC to visually update clients on the draw action
-                        UpdatePlayerHandClientRpc(cardReference, currentHandIndex);
-
-                        UpdateCurrentIndexServerRpc();
-
-                        if (_drawPile.Count > 0)
-                        {
-                            if(_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject nextCard))
-                            {
-                                Debug.Log($"Server is setting next card({nextCard.gameObject.name}) active for all Clients");
-                                SetCardActiveClientRpc(nextCard.NetworkObjectId, true);
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        Debug.Log("Card not found in draw pile.");
-                    }
-
-                }
-            }
-        }
 
         protected void StartCrazyEights()
         {
@@ -624,54 +551,128 @@ namespace XRMultiplayer.MiniGames
             activeHands[index].DrawCardClientRpc(cardReference);  // Add card to the correct hand on the client side
         }
 
-        public void PlayCard(GameObject card)
+        public void RequestDrawCard(GameObject card)
         {
-            Debug.Log(card.name);
+            if (!deckObject.Contains(card)) { return; }
+
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
+            NetworkObject networkObject = card.GetComponent<NetworkObject>();
+
+            if (networkObject != null)
+            {
+                DrawTopCardServerRpc(networkObject.NetworkObjectId);
+            }
+            else
+            {
+                Debug.Log("Error on request, card DNE");
+            }
+
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void DrawTopCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
+        {
+            ulong clientId = rpcParams.Receive.SenderClientId;
+            Debug.Log($"Server processing card draw request from client {clientId}.");
+
+            if (IsServer)
+            {
+
+                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+                if (cardNetworkObject != null)
+                {
+                    NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
+                    if (_drawPile.Contains(cardReference))
+                    {
+                        _drawPile.Remove(cardReference);  // Remove from draw pile
+                        Debug.Log($"Card {card.name} picked from draw pile.");
+
+                        activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // This method is from NetworkedHand.cs
+
+                        Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {card.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
+
+                        // Optionally trigger a client RPC to visually update clients on the draw action
+                        UpdatePlayerHandClientRpc(cardReference, currentHandIndex);
+
+                        UpdateCurrentIndexServerRpc();
+
+                        if (_drawPile.Count > 0)
+                        {
+                            if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject nextCard))
+                            {
+                                Debug.Log($"Server is setting next card({nextCard.gameObject.name}) active for all Clients");
+                                SetCardActiveClientRpc(nextCard.NetworkObjectId, true);
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        Debug.Log("Card not found in draw pile.");
+                    }
+
+                }
+            }
+        }
+
+        public void RequestPlayCard(GameObject card)
+        {
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {card.name}");
 
             if (!activeHands[currentHandIndex].heldCards.Contains(card)) // Card from wrong hand do not accept
             {
-                Debug.Log("Wrong player!");
+                Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId}'s turn!");
                 return;
             }
 
-            //if (!IsValidPlayCrazyEights(card))
-            //{
-            //    return;
-            //}
-
-            card.SetActive(false);
-            card.GetComponent<Card>().played = true;
-
-            activeHands[currentHandIndex].heldCards.Remove(card);
-            activeHands[currentHandIndex].ConfigureChildPositions();
-
-            AddToPlayPileServer(card);
-
-            if (_playPile.Count > 0)
+            NetworkObject networkObject = card.GetComponent<NetworkObject>();
+            if (networkObject != null)
             {
-                NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
-                if (oldTopCardReference.TryGet(out NetworkObject oldNetworkObject))
+                PlayCardServerRpc(networkObject.NetworkObjectId);
+            }
+            else
+            {
+                Debug.Log("Error on request, card DNE");
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void PlayCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
+        {
+            ulong clientId = rpcParams.Receive.SenderClientId;
+            Debug.Log($"Server processing card draw request from client {clientId}.");
+
+            if (IsServer)
+            {
+                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+                if (cardNetworkObject != null)
                 {
-                    GameObject oldTopCard = oldNetworkObject.gameObject;
-                    oldTopCard.SetActive(false);
+
+
+                    //if (!IsValidPlayCrazyEights(card))
+                    //{
+                    //    return;
+                    //}
+
+
+                    cardNetworkObject.gameObject.GetComponent<Card>().played = true;
+                    NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
+
+                    activeHands[currentHandIndex].RemoveCardServerRpc(cardReference.NetworkObjectId);
+
+                    if (_playPile.Count > 0) // Set top card un Active
+                    {
+                        NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
+                        SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);
+                    }
+
+
+                    AddToPlayPileServer(card);
+
+                    UpdateCurrentIndexServerRpc();
+
                 }
             }
-
-            NetworkObject newNetworkObject = card.GetComponent<NetworkObject>();
-            NetworkObjectReference newCardReference = new NetworkObjectReference(newNetworkObject);
-            _playPile.Add(newCardReference);
-
-            if (_playPile.Count > 0)
-            {
-                NetworkObjectReference topCardReference = _playPile[_playPile.Count - 1];
-                if (topCardReference.TryGet(out NetworkObject NetworkObject))
-                {
-                    GameObject topCard = NetworkObject.gameObject;
-                    topCard.SetActive(false);
-                }
-            }
-
-            UpdateCurrentIndexServerRpc();
         }
 
         protected bool IsValidPlayCrazyEights(GameObject card)
