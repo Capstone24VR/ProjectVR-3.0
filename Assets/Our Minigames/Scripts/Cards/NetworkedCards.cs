@@ -407,6 +407,7 @@ namespace XRMultiplayer.MiniGames
         private void AddToPlayPileServer(GameObject card)
         {
             NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
+            card.GetComponent<Card>().played = true;
 
             _playPile.Add(cardReference);
             AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, true);
@@ -456,6 +457,7 @@ namespace XRMultiplayer.MiniGames
             NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
             if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
             {
+                if (isPlay) { cardNetworkObject.gameObject.GetComponent<Card>().played = true; } // Set played to true to stop Play function from playing
 
                 cardNetworkObject.gameObject.transform.parent = pileObj.transform;
                 cardNetworkObject.gameObject.transform.localPosition = Vector3.zero;
