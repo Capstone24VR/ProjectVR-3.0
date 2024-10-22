@@ -457,7 +457,11 @@ namespace XRMultiplayer.MiniGames
             NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
             if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
             {
-                if (isPlay) { cardNetworkObject.gameObject.GetComponent<Card>().played = true; } // Set played to true to stop Play function from playing
+                if (isPlay) // Set played to true to stop Play function from playing and disable XR grab interactable
+                { 
+                    cardNetworkObject.gameObject.GetComponent<Card>().played = true;
+                    cardNetworkObject.gameObject.GetComponent<XRGrabInteractable>().enabled = false;
+                } 
 
                 cardNetworkObject.gameObject.transform.parent = pileObj.transform;
                 cardNetworkObject.gameObject.transform.localPosition = Vector3.zero;
