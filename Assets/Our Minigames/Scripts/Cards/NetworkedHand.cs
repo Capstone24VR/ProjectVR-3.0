@@ -69,8 +69,25 @@ public class NetworkedHand : NetworkBehaviour
         if (NetworkManager.Singleton.IsServer)
         {
             // Draw the card on the server and update all clients
-            DrawCard(cardReference);
+            DrawCardOnServer(cardReference);
             DrawCardClientRpc(cardReference);  // Notify clients to update visuals
+        }
+    }
+
+    public void DrawCardOnServer(NetworkObjectReference cardReference)
+    {
+        if (cardReference.TryGet(out NetworkObject card))
+        {
+            // The server adds the card to the heldCards list
+            heldCards.Add(cardReference);
+            ConfigureChildPositions();  // Re-arrange cards in hand
+
+            // Update the card's status (optional)
+            Card cardComponent = card.GetComponent<Card>();
+            if (cardComponent != null)
+            {
+                cardComponent.SetInHand(true);
+            }
         }
     }
 
@@ -85,28 +102,6 @@ public class NetworkedHand : NetworkBehaviour
             card.transform.localPosition = Vector3.zero;
             card.gameObject.SetActive(true);
             ConfigureChildPositions();  // Update positions of cards
-        }
-    }
-
-    public void DrawCard(NetworkObjectReference cardReference)
-    {
-        if (cardReference.TryGet(out NetworkObject card))
-        {
-            // The server adds the card to the heldCards list
-            heldCards.Add(cardReference);
-            ConfigureChildPositions();  // Re-arrange cards in hand
-
-            card.transform.SetParent(transform, true);
-            card.transform.localRotation = Quaternion.identity;
-            card.transform.localPosition = Vector3.zero;
-            card.gameObject.SetActive(true);
-
-            // Update the card's status (optional)
-            Card cardComponent = card.GetComponent<Card>();
-            if (cardComponent != null)
-            {
-                cardComponent.SetInHand(true);
-            }
         }
     }
 
