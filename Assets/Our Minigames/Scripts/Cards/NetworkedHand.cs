@@ -47,36 +47,16 @@ public class NetworkedHand : NetworkBehaviour
         heldCards.OnListChanged += OnHeldCardsChange;
     }
 
-    private void OnHeldCardsChange(NetworkListEvent<NetworkObjectReference> changeEvent)
-    {
-        // Handle changes to the heldCards list
-        switch (changeEvent.Type)
-        {
-            case NetworkListEvent<NetworkObjectReference>.EventType.Add:
-                //Debug.Log($"Card added: {changeEvent.Value}");
-                break;
-            case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
-                //Debug.Log($"Card removed: {changeEvent.Value}");
-                break;
-        }
-    }
-
     public bool isFull() { return heldCards.Count == maxCards; }
     public bool isEmpty() { return heldCards.Count == 0; }
     public bool canDraw() { return heldCards.Count < maxCards; }
     public void ConfigureChildPositions()
     {
         List<ulong> cardObjectsIds = new List<ulong>();
-        // FOR TESTING ONLY
-        heldCardsObj.Clear();
-        // 
         foreach (var cardReference in heldCards)  // Transform references into actual game Objects to use
         {
             if (cardReference.TryGet(out NetworkObject card))
             {
-                // FOR TESTING ONLY
-                heldCardsObj.Add(card.gameObject);
-                // 
                 cardObjectsIds.Add(card.NetworkObjectId);
             }
         }
@@ -95,7 +75,7 @@ public class NetworkedHand : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void DrawCardClientRpc(NetworkObjectReference cardReference)
+    public void DrawCardClientRpc(NetworkObjectReference cardReference)
     {
         // Only update the visuals on the client side
         if (cardReference.TryGet(out NetworkObject card))
@@ -134,7 +114,6 @@ public class NetworkedHand : NetworkBehaviour
     {
         heldCards.Clear();
     }
-
 
 
     public void ConfigureChildrenPositions(List<GameObject> cards)
@@ -176,6 +155,27 @@ public class NetworkedHand : NetworkBehaviour
 
                 startingPos++;
             }
+        }
+    }
+    private void OnHeldCardsChange(NetworkListEvent<NetworkObjectReference> changeEvent)
+    {
+        // Handle changes to the heldCards list
+        switch (changeEvent.Type)
+        {
+            case NetworkListEvent<NetworkObjectReference>.EventType.Add:
+                //Debug.Log($"Card added: {changeEvent.Value}");
+                if (changeEvent.Value.TryGet(out NetworkObject noA))
+                {
+                    heldCardsObj.Add(noA.gameObject);
+                }
+                break;
+            case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
+                //Debug.Log($"Card removed: {changeEvent.Value}");
+                if (changeEvent.Value.TryGet(out NetworkObject noR))
+                {
+                    heldCardsObj.Remove(noR.gameObject);
+                }
+                break;
         }
     }
 }

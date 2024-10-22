@@ -608,17 +608,12 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, ulong handId)
         {
-            if (cardReference.TryGet(out NetworkObject networkObject))
+            foreach (NetworkedHand hand in activeHands)
             {
-                GameObject card = networkObject.gameObject;
-
-                foreach (NetworkedHand hand in activeHands)
+                if (hand.NetworkObjectId == handId)
                 {
-                    if (hand.NetworkObjectId == handId)
-                    {
-                        hand.DrawCard(card);  // Add card to the correct hand on the client side
-                        break;
-                    }
+                    hand.DrawCardClientRpc(cardReference);  // Add card to the correct hand on the client side
+                    break;
                 }
             }
         }
