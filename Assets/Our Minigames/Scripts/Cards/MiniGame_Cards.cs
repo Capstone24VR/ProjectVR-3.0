@@ -48,6 +48,7 @@ namespace XRMultiplayer.MiniGames
         public override void FinishGame(bool submitScore = true)
         {
             base.FinishGame(submitScore);
+            m_NetworkedGameplay.EndGame();
         }
 
         public IEnumerator PlayerWonRoutine(GameObject winner)

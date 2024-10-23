@@ -38,6 +38,11 @@ namespace XRMultiplayer.MiniGames
         MiniGame_Cards m_MiniGame;
 
         /// <summary>
+        /// Whether the game has started
+        /// </summary>
+        [SerializeField] bool gameStarted = false;
+
+        /// <summary>
         /// The current routine being played.
         /// </summary>
         IEnumerator m_CurrentRoutine;
@@ -549,6 +554,7 @@ namespace XRMultiplayer.MiniGames
             SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
 
             Debug.Log("First card drawn.");
+            gameStarted = true;
         }
 
         [ClientRpc]
@@ -745,14 +751,18 @@ namespace XRMultiplayer.MiniGames
 
         public void CheckForPlayerWin()
         {
-            foreach (NetworkedHand hand in activeHands)
+            if (gameStarted)
             {
-                if (hand.isEmpty())
+                foreach (NetworkedHand hand in activeHands)
                 {
-                    Debug.Log(hand.name + "is empty, calling courotine");
-                    StartCoroutine(m_MiniGame.PlayerWonRoutine(hand.gameObject));
+                    if (hand.isEmpty())
+                    {
+                        Debug.Log(hand.name + "is empty, calling courotine");
+                        StartCoroutine(m_MiniGame.PlayerWonRoutine(hand.gameObject));
+                    }
                 }
             }
+            
         }
 
         private void OnDeckChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
