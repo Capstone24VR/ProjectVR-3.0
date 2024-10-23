@@ -169,11 +169,6 @@ namespace XRMultiplayer.MiniGames
             RemoveGeneratedCardsServer();
         }
 
-        public void UpdateGame(float deltaTime)
-        {
-            CheckForPlayerWin();
-        }
-
 
         /// <summary>
         /// Creates deck on the server.

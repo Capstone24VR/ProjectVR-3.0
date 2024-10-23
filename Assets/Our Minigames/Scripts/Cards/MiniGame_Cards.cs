@@ -38,6 +38,10 @@ namespace XRMultiplayer.MiniGames
         public override void UpdateGame(float deltaTime)
         {
             base.UpdateGame(deltaTime);
+            if (m_NetworkedGameplay.IsServer)
+            {
+                m_NetworkedGameplay.CheckForPlayerWin();
+            }
         }
 
 
