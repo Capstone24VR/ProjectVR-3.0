@@ -43,6 +43,12 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         public Dictionary<XRINetworkPlayer, ScoreboardSlot> currentPlayerDictionary = new();
 
+        /// <summary>
+        /// The ID of the local player
+        /// </summary>
+        private long localPlayerID = -10;
+
+
         [Tooltip("The current minigame being used")]
         public MiniGameBase currentMiniGame;
 
@@ -616,17 +622,11 @@ namespace XRMultiplayer.MiniGames
         public void AddLocalPlayer()
         {
             // Get the local player ID from XRINetworkPlayer
-            currentPlayerId = (long)XRINetworkPlayer.LocalPlayer.OwnerClientId;
-            Debug.Log($"Local Player with ID {currentPlayerId} is joining the game.");
+            localPlayerID = (long)XRINetworkPlayer.LocalPlayer.OwnerClientId;
+            Debug.Log($"Local Player with ID {localPlayerID} is joining the game.");
 
-            // Perform other necessary actions to add the player to the game
             m_DynamicButton.button.interactable = false;
-            AddPlayerServerRpc((ulong)currentPlayerId);;  // Send player ID to server
-        }
-
-        public long GetCurrentPlayerId()
-        {
-            return (long)currentPlayerId;
+            AddPlayerServerRpc((ulong)localPlayerID);
         }
 
         /// <summary>
@@ -636,6 +636,12 @@ namespace XRMultiplayer.MiniGames
         {
             m_DynamicButton.UpdateButton(AddLocalPlayer, "Join", false, false);
             RemovePlayerServerRpc(XRINetworkPlayer.LocalPlayer.OwnerClientId);
+        }
+
+
+        public long GetLocalPlayerID()
+        {
+            return localPlayerID;
         }
 
         [ServerRpc(RequireOwnership = false)]

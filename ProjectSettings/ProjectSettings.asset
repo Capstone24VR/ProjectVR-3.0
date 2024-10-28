@@ -82,7 +82,7 @@ PlayerSettings:
   androidAutoRotationBehavior: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
-  runInBackground: 0
+  runInBackground: 1
   captureSingleScreen: 0
   muteOtherAudioSources: 0
   Prepare IOS For Recording: 0
@@ -942,8 +942,8 @@ PlayerSettings:
   cloudProjectId: 5fb3d2cf-0257-4830-8dc9-740ba02decdc
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Multiplayer Demo (1)
-  organizationId: wts2840603644
+  projectName: ProjectVR-3.0
+  organizationId: capstone24vrteam
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
