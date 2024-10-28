@@ -52,6 +52,7 @@ namespace XRMultiplayer
         // Method to retrieve the current player ID
         public long GetLocalPlayerId()
         {
+            Debug.Log("Getting local player Id: " + NetworkManager.Singleton.LocalClientId);
             return localPlayerID;
         }
 

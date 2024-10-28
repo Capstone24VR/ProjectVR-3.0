@@ -51,6 +51,32 @@ namespace XRMultiplayer.MiniGames
             m_NetworkedGameplay.EndGame();
         }
 
+        public IEnumerator SendAllPlayersMessage(string message, int seconds)
+        {
+            while (seconds > 0)
+            {
+                if (m_MiniGameManager.LocalPlayerInGame)
+                {
+                    PlayerHudNotification.Instance.ShowText(message);
+                }
+                yield return new WaitForSeconds(1.0f);
+                seconds--;
+            }
+        }
+
+        public IEnumerator SendPlayerMessage(string message, ulong localId, int seconds)
+        {
+            while (seconds > 0)
+            {
+                if (m_MiniGameManager.LocalPlayerInGame && (ulong)m_MiniGameManager.GetLocalPlayerID() == localId)
+                {
+                    PlayerHudNotification.Instance.ShowText(message);
+                }
+                yield return new WaitForSeconds(1.0f);
+                seconds--;
+            }
+        }
+
         public IEnumerator PlayerWonRoutine(GameObject winner)
         {
             if (m_MiniGameManager.LocalPlayerInGame)

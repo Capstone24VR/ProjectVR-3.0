@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Card;
 using Unity.Netcode;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEditor.PackageManager;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -43,9 +45,9 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] bool gameStarted = false;
 
         /// <summary>
-        /// The current routine being played.
+        /// The current message routine being played.
         /// </summary>
-        IEnumerator m_CurrentRoutine;
+        IEnumerator m_CurrentMessageRoutine;
 
         /// <summary>
         /// Keeps track of the clients who have completed deck creation
@@ -59,7 +61,8 @@ namespace XRMultiplayer.MiniGames
 
 
         [SerializeField] protected NetworkList<NetworkObjectReference> deck = new NetworkList<NetworkObjectReference>();
-        [SerializeField] protected List<GameObject> deckObject = new List<GameObject>();
+        [SerializeField] protected List<GameObject> drawObject = new List<GameObject>();
+        [SerializeField] protected List<GameObject> playObject = new List<GameObject>();
 
         [SerializeField] protected NetworkList<NetworkObjectReference> _drawPile = new NetworkList<NetworkObjectReference>();
         [SerializeField] protected NetworkList<NetworkObjectReference> _playPile = new NetworkList<NetworkObjectReference>();
@@ -227,7 +230,6 @@ namespace XRMultiplayer.MiniGames
                         cardComponent.suit = suit;
                         cardComponent.value = value;
                         newCard.name = $"Card: {suit} {value}";
-                        newCard.SetActive(true); // Hide the card until needed
 
                         // Add card data to lists for client notification
                         suits.Add((int)suit);
@@ -246,7 +248,7 @@ namespace XRMultiplayer.MiniGames
             }
 
 
-            while(cardsSpawned < 52)
+            while (cardsSpawned < 52)
             {
                 yield return null;  // Wait until next frame;
             }
@@ -409,6 +411,7 @@ namespace XRMultiplayer.MiniGames
             {
                 NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
                 card.GetComponent<Card>().played = true;
+                card.GetComponent<Card>().inHand = false;
 
                 _playPile.Add(cardReference);
                 AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, true);
@@ -459,6 +462,7 @@ namespace XRMultiplayer.MiniGames
         private void AddToPileClientRpc(ulong networkObjectId, bool isPlay)
         {
             StartCoroutine(AddToPileOnClient(networkObjectId, isPlay));
+            SetCardActiveClientRpc(networkObjectId, false);
         }
 
         IEnumerator AddToPileOnClient(ulong networkObjectId, bool isPlay)
@@ -469,16 +473,16 @@ namespace XRMultiplayer.MiniGames
             if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
             {
                 if (isPlay) // Set played to true to stop Play function from playing and disable XR grab interactable
-                { 
+                {
                     cardNetworkObject.gameObject.GetComponent<Card>().played = true;
-                } 
+                }
 
                 cardNetworkObject.gameObject.transform.parent = pileObj.transform;
                 cardNetworkObject.gameObject.transform.localPosition = Vector3.zero;
                 cardNetworkObject.gameObject.transform.localRotation = Quaternion.identity;
+                cardNetworkObject.gameObject.GetComponent<Card>().inHand = false;
 
                 Debug.Log($"Setting {cardNetworkObject.gameObject.name} false");
-                cardNetworkObject.gameObject.SetActive(false);
             }
             else
             {
@@ -504,7 +508,6 @@ namespace XRMultiplayer.MiniGames
                 // Clear the piles
                 _playPile.Clear();
                 _drawPile.Clear();
-                deckObject.Clear();
 
                 foreach (NetworkObjectReference cardRef in deck)
                 {
@@ -521,6 +524,8 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void ClearAllClientHandsClientRpc()
         {
+            drawObject.Clear();
+            playObject.Clear();
             foreach (NetworkedHand hand in activeHands)
             {
                 hand.Clear();  // Clients also clear their hands
@@ -554,6 +559,8 @@ namespace XRMultiplayer.MiniGames
             SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
 
             Debug.Log("First card drawn.");
+            UpdateCurrentIndexClientRpc(currentHandIndex);
+
             gameStarted = true;
         }
 
@@ -566,6 +573,7 @@ namespace XRMultiplayer.MiniGames
         public void RequestDrawCard(GameObject card)
         {
             if (!_drawPile.Contains(card)) { return; }
+
 
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
@@ -597,14 +605,22 @@ namespace XRMultiplayer.MiniGames
                     if (_drawPile.Contains(cardReference))
                     {
                         _drawPile.Remove(cardReference);  // Remove from draw pile
-                        Debug.Log($"Card {card.name} picked from draw pile.");
+                        Debug.Log($"Card {cardNetworkObject.gameObject.name} picked from draw pile.");
 
                         activeHands[currentHandIndex].DrawCardServerRpc(cardReference); // This method is from NetworkedHand.cs
 
-                        Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {card.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
+                        Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {cardNetworkObject.gameObject.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
 
                         // Optionally trigger a client RPC to visually update clients on the draw action
                         UpdatePlayerHandClientRpc(cardReference, currentHandIndex);
+
+
+                        // ToDO: implement checking if card is valid don't skip turn
+                        //if (IsValidPlayCrazyEights(cardNetworkObject.gameObject))
+                        //{
+
+                        //}
+
 
                         UpdateCurrentIndexServerRpc();
 
@@ -612,7 +628,6 @@ namespace XRMultiplayer.MiniGames
                         {
                             if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject nextCard))
                             {
-                                Debug.Log($"Server is setting next card({nextCard.gameObject.name}) active for all Clients");
                                 SetCardActiveClientRpc(nextCard.NetworkObjectId, true);
                             }
                         }
@@ -662,7 +677,7 @@ namespace XRMultiplayer.MiniGames
         public void PlayCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
-            Debug.Log($"Server processing card draw request from client {clientId}.");
+            Debug.Log($"Server processing card play request from client {clientId}.");
 
             if (IsServer)
             {
@@ -670,11 +685,18 @@ namespace XRMultiplayer.MiniGames
                 if (cardNetworkObject != null)
                 {
 
+                    if (!IsValidPlayCrazyEights(cardNetworkObject.gameObject))
+                    {
+                        string message = cardNetworkObject.gameObject.name + "is not a valid play!";
 
-                    //if (!IsValidPlayCrazyEights(card))
-                    //{
-                    //    return;
-                    //}
+                        if (m_CurrentMessageRoutine != null)
+                        {
+                            StopCoroutine(m_CurrentMessageRoutine);
+                        }
+                        m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, clientId, 3);
+                        StartCoroutine(m_CurrentMessageRoutine);
+                        return;
+                    }
 
 
                     cardNetworkObject.gameObject.GetComponent<Card>().played = true;
@@ -686,6 +708,8 @@ namespace XRMultiplayer.MiniGames
                     {
                         NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
                         AddToPlayPileServer(cardReference);
+
+                        Debug.Log($"Checking {cardNetworkObject.gameObject.name} status. . . played: {cardNetworkObject.gameObject.GetComponent<Card>().played}\t parent: {cardNetworkObject.gameObject.transform.parent}\t position:{cardNetworkObject.gameObject.transform.localRotation}\t position:{cardNetworkObject.gameObject.transform.localRotation}");
 
                         SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
                         SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);
@@ -720,7 +744,6 @@ namespace XRMultiplayer.MiniGames
                     Debug.Log("FATAL ERROR: Card not found at playPile(ISVALIDPLAY)");
                 }
             }
-            Debug.Log("Card setup failed or Card is not valid");
             return false;
         }
 
@@ -738,13 +761,38 @@ namespace XRMultiplayer.MiniGames
             {
                 Debug.Log("FATAL ERROR: IDK WHAT HAPPENED HERE BY THE UPDATE FUNC IS SCREWED");
             }
-           
+
         }
 
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex)
         {
+            Debug.Log($"Current Hand owner id: {(ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            if ((ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId == NetworkManager.Singleton.LocalClientId && gameStarted)
+            {
+                if (m_CurrentMessageRoutine != null)
+                {
+                    StopCoroutine(m_CurrentMessageRoutine);
+                }
+                m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("Your turn has ended!", NetworkManager.Singleton.LocalClientId, 3);
+                StartCoroutine(m_CurrentMessageRoutine);
+            }
+
             currentHandIndex = newIndex;
+
+
+            Debug.Log($"New Hand owner id: {(ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+
+            if ((ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId == NetworkManager.Singleton.LocalClientId)
+            {
+                Debug.Log("AM here!");
+                if (m_CurrentMessageRoutine != null)
+                {
+                    StopCoroutine(m_CurrentMessageRoutine);
+                }
+                m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("Its your turn!", NetworkManager.Singleton.LocalClientId, 3);
+                StartCoroutine(m_CurrentMessageRoutine);
+            }
 
             Debug.Log("Server has set current hand to " + activeHands[currentHandIndex].name);
         }
@@ -762,7 +810,7 @@ namespace XRMultiplayer.MiniGames
                     }
                 }
             }
-            
+
         }
 
         private void OnDeckChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
@@ -772,19 +820,11 @@ namespace XRMultiplayer.MiniGames
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
                     Debug.Log($"Card added to Deck: {changeEvent.Value}");
-                    if (changeEvent.Value.TryGet(out NetworkObject noA))
-                    {
-                        deckObject.Add(noA.gameObject);
-                    }
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
                     Debug.Log($"Card removed from Deck: {changeEvent.Value}");
-                    if (changeEvent.Value.TryGet(out NetworkObject noR))
-                    {
-                        deckObject.Remove(noR.gameObject);
-                    }
                     break;
             }
         }
@@ -795,11 +835,19 @@ namespace XRMultiplayer.MiniGames
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
                     Debug.Log($"Card added to draw pile: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noA))
+                    {
+                        drawObject.Add(noA.gameObject);
+                    }
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
                     Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noR))
+                    {
+                        drawObject.Remove(noR.gameObject);
+                    }
                     break;
             }
         }
@@ -810,11 +858,19 @@ namespace XRMultiplayer.MiniGames
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
                     Debug.Log($"Card added to play pile: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noA))
+                    {
+                        playObject.Add(noA.gameObject);
+                    }
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
                     Debug.Log($"Card removed from play pile: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noR))
+                    {
+                        playObject.Remove(noR.gameObject);
+                    }
                     break;
             }
         }
