@@ -23,6 +23,16 @@ public class HandOwnerManager : MonoBehaviour
         }
     }
 
+
+    public ulong ClientID
+    {
+        get => _localClientId; 
+        set
+        {
+            _localClientId = value; 
+        }
+    }
+
     public SeatHandler seatHandler; // Reference to the SubTrigger object (assigned via Inspector)
 
     private void Start()
@@ -40,11 +50,14 @@ public class HandOwnerManager : MonoBehaviour
         if (seatHandler != null && seatHandler.IsPlayerInTrigger())
         {
             long playerId = seatHandler.GetLocalPlayerId();
+            ulong localClientId = seatHandler.GetClientID();
 
             // Update HandOwnerId only if the current player is different
             if (HandOwnerId != playerId)
             {
                 HandOwnerId = playerId;
+                ClientID = localClientId;
+
                 //Debug.Log($"HandOwnerManager: Hand owner ID set to {HandOwnerId}.");
             }
         }
@@ -54,6 +67,7 @@ public class HandOwnerManager : MonoBehaviour
             if (HandOwnerId != -2)
             {
                 HandOwnerId = -2; // Reset to default or unassigned state
+                ClientID = 9999;
                 //Debug.Log("HandOwnerManager: No player in SubTrigger, Hand owner ID reset.");
             }
         }

@@ -767,8 +767,8 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex)
         {
-            Debug.Log($"Current Hand owner id: {(ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
-            if ((ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId == NetworkManager.Singleton.LocalClientId && gameStarted)
+            Debug.Log($"Current Hand owner id: {activeHands[currentHandIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -781,9 +781,9 @@ namespace XRMultiplayer.MiniGames
             currentHandIndex = newIndex;
 
 
-            Debug.Log($"New Hand owner id: {(ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            Debug.Log($"New Hand owner id: {activeHands[currentHandIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
 
-            if ((ulong)activeHands[currentHandIndex].ownerManager.HandOwnerId == NetworkManager.Singleton.LocalClientId)
+            if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
             {
                 Debug.Log("AM here!");
                 if (m_CurrentMessageRoutine != null)

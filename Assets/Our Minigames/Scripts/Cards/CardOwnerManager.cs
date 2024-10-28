@@ -23,7 +23,7 @@ namespace XRMultiplayer
         }
 
         private MiniGameManager miniGameManager; // Reference to MiniGameManager
-        [SerializeField]private HandOwnerManager handOwnerManager; // Reference to HandOwnerManager (parent object)
+        [SerializeField] private HandOwnerManager handOwnerManager; // Reference to HandOwnerManager (parent object)
         private Card card; // Reference to the Card component on this object
 
         [SerializeField] private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable; // Manually assign this in the Inspector
@@ -90,7 +90,8 @@ namespace XRMultiplayer
 
 
         // New method to set the card owner ID from the HandOwnerManager (parent)
-        public void SetCardOwnerId() {
+        public void SetCardOwnerId()
+        {
 
             SetCardOwnerId(handOwnerManager.HandOwnerId);
 

@@ -13,6 +13,7 @@ namespace XRMultiplayer
         private MiniGameManager miniGameManager;
         private bool playerInTrigger = false; // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
+        private ulong localClientID = 9999;
 
         private void Awake()
         {
@@ -33,6 +34,7 @@ namespace XRMultiplayer
             if (miniGameManager != null)
             {
                 localPlayerID = miniGameManager.GetLocalPlayerID();
+                localClientID = NetworkManager.Singleton.LocalClientId;
                 playerInTrigger = true;
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
@@ -46,14 +48,19 @@ namespace XRMultiplayer
                 Debug.Log($"Player with ID {localPlayerID} exited the trigger.");
                 playerInTrigger = false;
                 localPlayerID = -1;
+                localClientID = 9999;
             }
         }
 
         // Method to retrieve the current player ID
         public long GetLocalPlayerId()
         {
-            Debug.Log("Getting local player Id: " + NetworkManager.Singleton.LocalClientId);
             return localPlayerID;
+        }
+
+        public ulong GetClientID()
+        {
+            return localClientID;
         }
 
         // Method to check if a player is currently in the trigger
