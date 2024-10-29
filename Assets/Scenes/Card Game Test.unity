@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.20006242, g: 0.3921763, b: 0.7841449, a: 1}
+  m_IndirectSpecularColor: {r: 0.1998452, g: 0.39221776, b: 0.78463286, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4496,6 +4496,11 @@ PrefabInstance:
       propertyPath: activeHands.Array.data[1]
       value: 
       objectReference: {fileID: 2005783563}
+    - target: {fileID: 2772823479585448549, guid: 1168545f41604bf438a112291fd57ce0,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 230
+      objectReference: {fileID: 0}
     - target: {fileID: 3141148003358560530, guid: 1168545f41604bf438a112291fd57ce0,
         type: 3}
       propertyPath: m_SizeDelta.y
@@ -4565,6 +4570,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875041052348022206, guid: 1168545f41604bf438a112291fd57ce0,
+        type: 3}
+      propertyPath: m_text
+      value: "<b><u>Game Rules</u></b>\n\nMove to the start position to begin the
+        countdown. \n\nEach player starts with 5 cards. When it is your turn, you
+        can play a card that matches either the suit or value of the top card, ending
+        your turn. If you do not have a card to play, draw a card. If playable, you
+        can play that card before your turn ends.\n\nThe first player with an empty
+        hand or the player with the least cards wins"
       objectReference: {fileID: 0}
     - target: {fileID: 7886823367475966701, guid: 1168545f41604bf438a112291fd57ce0,
         type: 3}
