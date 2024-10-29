@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3768682112951319455}
   - component: {fileID: 1234423345059198217}
   m_Layer: 7
-  m_Name: Hook
+  m_Name: hook
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6354322094466972355}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 241dadca0c6f4b643955c47a6560ed8a, type: 3}
+  m_Script: {fileID: 11500000, guid: c72efdc73ab68ca4eb25e2e4782dd3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   caughtObject: {fileID: 0}

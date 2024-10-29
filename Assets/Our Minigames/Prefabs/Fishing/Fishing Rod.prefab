@@ -655,9 +655,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
-  m_InteractionLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -740,34 +737,8 @@ MonoBehaviour:
   m_StartingHoverFilters: []
   m_StartingSelectFilters: []
   m_StartingInteractionStrengthFilters: []
-  m_OnFirstHoverEntered:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnLastHoverExited:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnHoverEntered:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnHoverExited:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelectEntered:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelectExited:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelectCanceled:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
   m_Handle: {fileID: 7969168735872218684}
+  m_InteractorSnapTransform: {fileID: 0}
   m_Value: 1
   m_ClampedMotion: 0
   m_MaxAngle: 180
@@ -1270,11 +1241,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3055317000659248543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f8d526df4113524287f1992f788126a, type: 3}
+  m_Script: {fileID: 11500000, guid: 2e9b79bf6ae0072418e252fad7196042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   struggleFish: {fileID: 0}
-  player: {fileID: 0}
   progressBar: {fileID: 5810837397634388023}
   topPivot: {fileID: 1677903515004718061}
   bottomPivot: {fileID: 4831457627775865266}
@@ -1285,7 +1255,7 @@ MonoBehaviour:
   fishTimer: 0
   timerMultipier: 3
   smoothMotion: 1
-  rodDegredation: 0.5
+  rodDegredation: 0.05
   maxFailTimer: 10
   failTimer: 10
   maxWaitTime: 3
@@ -2167,7 +2137,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &6411817089435319947
@@ -2454,9 +2424,6 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders:
   - {fileID: 1572828566348132485}
-  m_InteractionLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -2515,33 +2482,6 @@ MonoBehaviour:
   m_StartingHoverFilters: []
   m_StartingSelectFilters: []
   m_StartingInteractionStrengthFilters: []
-  m_OnFirstHoverEntered:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnLastHoverExited:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnHoverEntered:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnHoverExited:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelectEntered:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelectExited:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelectCanceled:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
   m_AttachTransform: {fileID: 3615715821812839051}
   m_SecondaryAttachTransform: {fileID: 1853772581547817025}
   m_UseDynamicAttach: 0
@@ -2588,10 +2528,10 @@ MonoBehaviour:
   m_ThrowAngularVelocityScale: 1
   m_ForceGravityOnDetach: 0
   m_RetainTransformParent: 1
-  m_AttachPointCompatibilityMode: 0
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+  m_FarAttachMode: 0
 --- !u!114 &2828069414034837050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2601,28 +2541,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 6628261836878854170}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27d663883c39aa34d8206d2862778bfa, type: 3}
+  m_Script: {fileID: 11500000, guid: a348024e775bdc3419e085f74a5e0502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   user: {fileID: 0}
   water: {fileID: 0}
   hook: {fileID: 0}
-  rodTip: {fileID: 4308361475706200526}
+  rodTip: {fileID: 0}
   fishSpawnPoint: {fileID: 0}
-  miniGame: {fileID: 7360440040680416574}
+  miniGame: {fileID: 0}
   isUsing: 0
   thumbBarPressed: 0
   hookChambered: 0
   hookFlying: 0
-  powerBar: {fileID: 4762659584752246089}
+  powerBar: {fileID: 0}
   isCasting: 0
   castMultiplier: 5
   isReeling: 0
-  reelBox: {fileID: 5069091295241542272}
+  reelBox: {fileID: 0}
   reelPower: 0.5
   reelSize: 0.15
   caughtItem: {fileID: 0}
-  tutorial: {fileID: 0}
 --- !u!120 &6182265908053768628
 LineRenderer:
   serializedVersion: 2
@@ -3156,7 +3095,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4308361475706200526}
-  - component: {fileID: 7494292950935146819}
+  - component: {fileID: 7228428263471696872}
   m_Layer: 0
   m_Name: RodTip
   m_TagString: Untagged
@@ -3179,7 +3118,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6603052287853147593}
   m_LocalEulerAnglesHint: {x: -43.084, y: 0, z: 0}
---- !u!114 &7494292950935146819
+--- !u!114 &7228428263471696872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3188,7 +3127,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7245990288685569349}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 317e06d890ceb974394c664592dacd98, type: 3}
+  m_Script: {fileID: 11500000, guid: f4160de97dbccc4498d0a6dffaf23579, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   hook: {fileID: 0}

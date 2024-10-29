@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class FishingMiniGame : MonoBehaviour
 {
     public GameObject struggleFish = null;
-    public PlayerStats player;
     private FishingRod rod;
     public Slider progressBar;
 
@@ -85,7 +84,7 @@ public class FishingMiniGame : MonoBehaviour
         }
         else
         {
-            progressBar.value -= (rodDegredation - (rodDegredation/2  * (player.reelLevel/8))) * Time.deltaTime;
+            progressBar.value -= (rodDegredation - (rodDegredation/2  * (1/8))) * Time.deltaTime;
         }
         if(progressBar.value == 0.0f)
         {

@@ -11,7 +11,7 @@ public class FishingRod : MonoBehaviour
     public Transform rodTip;
     public Transform fishSpawnPoint;
 
-    private myFishingLine fishLine;
+    private FishingLine fishLine;
     private FishingHook fishHook;
     public FishingMiniGame miniGame;
 
@@ -40,8 +40,6 @@ public class FishingRod : MonoBehaviour
     public GameObject caughtItem = null;
     private Vector3 originalPos;
 
-    // For tutorial Events
-    public myEventsScripts tutorial;
 
 
     // Start is called before the first frame update
@@ -56,7 +54,7 @@ public class FishingRod : MonoBehaviour
         grabbable.activated.AddListener(Activated);
         grabbable.deactivated.AddListener(Deactivated);
 
-        fishLine = GetComponentInChildren<myFishingLine>();
+        fishLine = GetComponentInChildren<FishingLine>();
         fishHook = hook.GetComponent<FishingHook>();
 
         // Store the original position of the GameObject
@@ -73,10 +71,6 @@ public class FishingRod : MonoBehaviour
             {
                 miniGame.pause = true;
             }
-            else
-            {
-                tutorial.miniGameFirstActivated.Value = true;
-            }
 
             if (isCasting)
             {
@@ -86,7 +80,7 @@ public class FishingRod : MonoBehaviour
 
             if (isReeling)
             {
-                reelPosition += reelChange * (reelPower + (user.GetComponent<PlayerStats>().reelLevel + 1)/7);
+                reelPosition += reelChange * (reelPower + 1/7);
                 reelPosition = Mathf.Clamp(reelPosition, reelSize/2, 1-reelSize/2);
                 reelBox.position = Vector3.Lerp(miniGame.bottomPivot.position, miniGame.topPivot.position, reelPosition);
             }
@@ -121,7 +115,6 @@ public class FishingRod : MonoBehaviour
 
     public void Grabbed(SelectEnterEventArgs arg)
     {
-        tutorial.rodFirstPickedUp.Value = true;
 
 
         // The object is being grabbed
@@ -157,8 +150,6 @@ public class FishingRod : MonoBehaviour
     {
         if (isUsing)
         {
-            tutorial.rodFirstCasted.Value = true;
-
 
             // Store the power value when the object is being used
             castPower = powerBar.value;
@@ -167,7 +158,6 @@ public class FishingRod : MonoBehaviour
         {
             if (fishHook.caughtSomething && caughtItem.GetComponent<FishAI>().state == FishState.Caught)
             {
-                tutorial.caughtFirstFish.Value = true;
                 string caughtName = caughtItem.name;
                 caughtItem.transform.position = fishSpawnPoint.transform.position;
                 caughtItem.transform.rotation = fishSpawnPoint.transform.rotation;
@@ -187,7 +177,7 @@ public class FishingRod : MonoBehaviour
             hook.transform.position = rodTip.transform.position;
             hook.SetActive(true);
             hookFlying = true;
-            hookSpeed = castPower * castMultiplier * (user.GetComponent<PlayerStats>().castLevel+1);
+            hookSpeed = castPower * castMultiplier * (1);
             hook.GetComponent<Rigidbody>().velocity = rodTip.transform.forward * hookSpeed;
             hook.GetComponent<Rigidbody>().useGravity = true;
         }

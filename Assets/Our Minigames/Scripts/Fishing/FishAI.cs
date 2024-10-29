@@ -12,8 +12,6 @@ public class FishAI : MonoBehaviour
     public GameObject fishSpawnPoint;
     public Animator animator;
 
-    public myEventsScripts tutorial;
-
     public bool baited;
     public float baitChance;
     private float baitTimer;
@@ -191,7 +189,6 @@ public class FishAI : MonoBehaviour
     {
         if (other.gameObject.tag == "Cooler")
         {
-            tutorial.soldFirstFish.Value = true;
             other.gameObject.GetComponent<Cooler>().newFish = this;
             other.gameObject.GetComponent<Cooler>().OnFishCatch();
             Destroy(gameObject);
