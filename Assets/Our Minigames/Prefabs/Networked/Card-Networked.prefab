@@ -302,8 +302,8 @@ MonoBehaviour:
   m_InteractionCheckTime: 2
   m_IgnoreSocketSelectedCallback: 1
   m_ResetObjectOnDisconnect: 1
-  m_RelinquishOwnershipAfterTime: 1
-  m_RelinquishOwnershipTime: 5
+  m_RelinquishOwnershipAfterTime: 0
+  m_RelinquishOwnershipTime: 0
   m_UseInteractingChangedEvent: 0
   OnInteractingChanged:
     m_PersistentCalls:

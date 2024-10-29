@@ -86,9 +86,9 @@ namespace UnityEngine.XR.Content.Interaction
         [Tooltip("The object that is visually grabbed and manipulated")]
         Transform m_Handle = null;
 
-        [SerializeField]
-        [Tooltip("The transform to snap the interactor to when holding the lever")]
-        Transform m_InteractorSnapTransform = null;
+        //[SerializeField]
+        //[Tooltip("The transform to snap the interactor to when holding the lever")]
+        //Transform m_InteractorSnapTransform = null;
 
         [SerializeField]
         [Tooltip("The value of the knob")]
@@ -234,10 +234,10 @@ namespace UnityEngine.XR.Content.Interaction
             m_Interactor = null;
         }
 
-        public override Transform GetAttachTransform(IXRInteractor interactor)
-        {
-            return m_InteractorSnapTransform;
-        }
+        //public override Transform GetAttachTransform(IXRInteractor interactor)
+        //{
+        //    return m_InteractorSnapTransform;
+        //}
 
         public override void ProcessInteractable(XRInteractionUpdateOrder.UpdatePhase updatePhase)
         {

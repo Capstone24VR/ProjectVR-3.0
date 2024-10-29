@@ -12,7 +12,7 @@ namespace XRMultiplayer.MiniGames
     /// <summary>
     /// Represents a networked version of the Whack-A-Pig mini game.
     /// </summary>
-    public class NetworkedCards : NetworkBehaviour
+    public class NetworkedFishManager : NetworkBehaviour
     {
         /// <summary>
         /// The hands to use for playing.
@@ -481,6 +481,8 @@ namespace XRMultiplayer.MiniGames
                 cardNetworkObject.gameObject.transform.localPosition = Vector3.zero;
                 cardNetworkObject.gameObject.transform.localRotation = Quaternion.identity;
                 cardNetworkObject.gameObject.GetComponent<Card>().inHand = false;
+
+                Debug.Log($"Setting {cardNetworkObject.gameObject.name} false");
             }
             else
             {
@@ -557,7 +559,7 @@ namespace XRMultiplayer.MiniGames
             SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
 
             Debug.Log("First card drawn.");
-            UpdateCurrentIndexClientRpc(currentHandIndex, 0);
+            UpdateCurrentIndexClientRpc(currentHandIndex);
 
             gameStarted = true;
         }
@@ -706,7 +708,6 @@ namespace XRMultiplayer.MiniGames
                     {
                         NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
                         AddToPlayPileServer(cardReference);
-                        PlayCardClientRpc(cardReference.NetworkObjectId);
 
                         Debug.Log($"Checking {cardNetworkObject.gameObject.name} status. . . played: {cardNetworkObject.gameObject.GetComponent<Card>().played}\t parent: {cardNetworkObject.gameObject.transform.parent}\t position:{cardNetworkObject.gameObject.transform.localRotation}\t position:{cardNetworkObject.gameObject.transform.localRotation}");
 
@@ -716,17 +717,6 @@ namespace XRMultiplayer.MiniGames
                         UpdateCurrentIndexServerRpc();
                     }
                 }
-            }
-        }
-
-        [ClientRpc]
-        public void PlayCardClientRpc(ulong networkObjectId)
-        {
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (cardNetworkObject != null)
-            {
-                cardNetworkObject.GetComponent<Card>().SetPosition(Vector3.zero);
-                cardNetworkObject.GetComponent<Card>().ResetPosition();
             }
         }
 
@@ -762,11 +752,10 @@ namespace XRMultiplayer.MiniGames
         {
             if (IsServer)
             {
-                int prevHandIndex = currentHandIndex;
                 if (currentHandIndex == activeHands.Count - 1) { currentHandIndex = 0; }
                 else { currentHandIndex++; }
 
-                UpdateCurrentIndexClientRpc(currentHandIndex, prevHandIndex);
+                UpdateCurrentIndexClientRpc(currentHandIndex);
             }
             else
             {
@@ -776,10 +765,10 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ClientRpc]
-        private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
+        private void UpdateCurrentIndexClientRpc(int newIndex)
         {
-            Debug.Log($"Current Hand owner id: {activeHands[oldIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
-            if (activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            Debug.Log($"Current Hand owner id: {activeHands[currentHandIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -817,11 +806,6 @@ namespace XRMultiplayer.MiniGames
                     if (hand.isEmpty())
                     {
                         Debug.Log(hand.name + "is empty, calling courotine");
-                        if(m_CurrentMessageRoutine != null)
-                        {
-                            StopCoroutine (m_CurrentMessageRoutine);
-                        }
-
                         StartCoroutine(m_MiniGame.PlayerWonRoutine(hand.gameObject));
                     }
                 }

@@ -7,48 +7,48 @@ namespace XRMultiplayer.MiniGames
     /// <summary>
     /// Represents the base for a card mini-game.
     /// </summary>)]
-    public class MiniGame_Cards : MiniGameBase
+    public class MiniGame_Fish : MiniGameBase
     {
 
-        NetworkedCards m_NetworkedGameplay;
+        //NetworkedCards m_NetworkedGameplay;
 
         public override void Start()
         {
             base.Start();
 
-            TryGetComponent(out m_NetworkedGameplay);
+            //TryGetComponent(out m_NetworkedGameplay);
         }
 
         public override void SetupGame()
         {
             base.SetupGame();
-            m_NetworkedGameplay.ResetGame();
+            //m_NetworkedGameplay.ResetGame();
         }
 
         public override void StartGame()
         {
             base.StartGame();
 
-            if ((m_NetworkedGameplay.IsServer))
-            {
-                m_NetworkedGameplay.StartGame();
-            }
+            //if ((m_NetworkedGameplay.IsServer))
+            //{
+            //    m_NetworkedGameplay.StartGame();
+            //}
         }
 
         public override void UpdateGame(float deltaTime)
         {
             base.UpdateGame(deltaTime);
-            if (m_NetworkedGameplay.IsServer)
-            {
-                m_NetworkedGameplay.CheckForPlayerWin();
-            }
+            //if (m_NetworkedGameplay.IsServer)
+            //{
+            //    m_NetworkedGameplay.CheckForPlayerWin();
+            //}
         }
 
 
         public override void FinishGame(bool submitScore = true)
         {
             base.FinishGame(submitScore);
-            m_NetworkedGameplay.EndGame();
+            //m_NetworkedGameplay.EndGame();
         }
 
         public IEnumerator SendAllPlayersMessage(string message, int seconds)
@@ -84,13 +84,7 @@ namespace XRMultiplayer.MiniGames
                 PlayerHudNotification.Instance.ShowText($"Game Complete! " + winner.name + " has won.");
             }
 
-            //if(winner.GetComponent<HandOwnerManager>()) { }
-            //if (XRINetworkGameManager.Instance.GetPlayerByID(XRINetworkPlayer.LocalPlayer.OwnerClientId, out XRINetworkPlayer player))
-            //{
-            //    m_MiniGameManager.SubmitScoreServerRpc(m_MiniGameManager.currentPlayerDictionary[player].currentScore + 1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
-            //}
-
-
+            m_MiniGameManager.SubmitScoreServerRpc(1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
 
             if (m_MiniGameManager.IsServer && m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
                 m_MiniGameManager.StopGameServerRpc();

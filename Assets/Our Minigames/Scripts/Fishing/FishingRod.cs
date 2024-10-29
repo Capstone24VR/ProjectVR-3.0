@@ -5,7 +5,6 @@ using static FishAI;
 
 public class FishingRod : MonoBehaviour
 {
-    public GameObject user;
     public GameObject water;
     public GameObject hook;
     public Transform rodTip;

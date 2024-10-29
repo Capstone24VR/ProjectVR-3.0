@@ -49,7 +49,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8949849176137052741
 RectTransform:
   m_ObjectHideFlags: 0
@@ -692,7 +692,7 @@ MonoBehaviour:
   m_SelectExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2828069414034837050}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MyNewFishingRod, Assembly-CSharp
         m_MethodName: SetReelingFalse
         m_Mode: 1
@@ -749,8 +749,8 @@ MonoBehaviour:
   m_OnValueChange:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2828069414034837050}
-        m_TargetAssemblyTypeName: MyNewFishingRod, Assembly-CSharp
+      - m_Target: {fileID: 2538637643648785811}
+        m_TargetAssemblyTypeName: FishingRod, Assembly-CSharp
         m_MethodName: Reel
         m_Mode: 0
         m_Arguments:
@@ -1404,7 +1404,7 @@ RectTransform:
   m_Father: {fileID: 8507138480268588981}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1554,7 +1554,7 @@ Transform:
   m_GameObject: {fileID: 4290540369669666760}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: -0.49099997, z: 0.275}
+  m_LocalPosition: {x: 0, y: -0.49099997, z: 1.5219998}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1592,7 +1592,7 @@ Transform:
   m_GameObject: {fileID: 4755447688722720801}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -1.28, z: 0.033}
+  m_LocalPosition: {x: 0, y: -1.28, z: 1.28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1658,7 +1658,7 @@ RectTransform:
   m_Father: {fileID: 3686331005527014263}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1690,7 +1690,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 76d001b9144b6c64aa4d4d66d8a3d808, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3006310cd0605cc45b1c0c1b879bf8ba, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2129,15 +2129,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 76d001b9144b6c64aa4d4d66d8a3d808, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3006310cd0605cc45b1c0c1b879bf8ba, type: 3}
   m_Color: {r: 1, g: 0.422526, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 15.28, y: 11.53}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &6411817089435319947
@@ -2354,7 +2354,7 @@ GameObject:
   - component: {fileID: 6603052287853147593}
   - component: {fileID: 8871019172221253246}
   - component: {fileID: 8505780446947083829}
-  - component: {fileID: 2828069414034837050}
+  - component: {fileID: 2538637643648785811}
   - component: {fileID: 6182265908053768628}
   m_Layer: 0
   m_Name: Fishing Rod
@@ -2531,8 +2531,8 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
-  m_FarAttachMode: 0
---- !u!114 &2828069414034837050
+  m_FarAttachMode: 1
+--- !u!114 &2538637643648785811
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2544,21 +2544,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a348024e775bdc3419e085f74a5e0502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  user: {fileID: 0}
   water: {fileID: 0}
   hook: {fileID: 0}
-  rodTip: {fileID: 0}
+  rodTip: {fileID: 4308361475706200526}
   fishSpawnPoint: {fileID: 0}
-  miniGame: {fileID: 0}
+  miniGame: {fileID: 7360440040680416574}
   isUsing: 0
   thumbBarPressed: 0
   hookChambered: 0
   hookFlying: 0
-  powerBar: {fileID: 0}
+  powerBar: {fileID: 4762659584752246089}
   isCasting: 0
   castMultiplier: 5
   isReeling: 0
-  reelBox: {fileID: 0}
+  reelBox: {fileID: 5069091295241542272}
   reelPower: 0.5
   reelSize: 0.15
   caughtItem: {fileID: 0}
@@ -3095,7 +3094,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4308361475706200526}
-  - component: {fileID: 7228428263471696872}
+  - component: {fileID: 5282929821932798902}
   m_Layer: 0
   m_Name: RodTip
   m_TagString: Untagged
@@ -3112,13 +3111,13 @@ Transform:
   m_GameObject: {fileID: 7245990288685569349}
   serializedVersion: 2
   m_LocalRotation: {x: -0.36718607, y: -0, z: -0, w: 0.9301475}
-  m_LocalPosition: {x: 0, y: 2.185, z: -0.0013999939}
+  m_LocalPosition: {x: 0, y: 2.185, z: 1.2455999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6603052287853147593}
   m_LocalEulerAnglesHint: {x: -43.084, y: 0, z: 0}
---- !u!114 &7228428263471696872
+--- !u!114 &5282929821932798902
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3438,7 +3437,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8004231321201003254}
   m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: 0, y: 0, z: 1.63}
+  m_LocalPosition: {x: 0, y: 0, z: 2.8769999}
   m_LocalScale: {x: 0.049999997, y: 0.04999999, z: 0.049999997}
   m_ConstrainProportionsScale: 0
   m_Children:
