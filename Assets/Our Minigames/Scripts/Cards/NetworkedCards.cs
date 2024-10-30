@@ -570,11 +570,13 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            if (!_drawPile.Contains(card)) { return; }
+            if (!_drawPile.Contains(card.GetComponent<NetworkObject>())) {
+                Debug.Log($"Requesting to draw {card.name} not in pile");
+                return; 
+            }
 
-
-            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
 
             if (networkObject != null)
             {
@@ -796,7 +798,6 @@ namespace XRMultiplayer.MiniGames
 
             if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
             {
-                Debug.Log("AM here!");
                 if (m_CurrentMessageRoutine != null)
                 {
                     StopCoroutine(m_CurrentMessageRoutine);
