@@ -8,7 +8,7 @@ public class FishManager : MonoBehaviour
 
     public int maxFish = 30;
     public int currFish = 10;
-    public bool spawnNewFish = false;
+    public bool gameStart = false;
 
     public float spawnTimer = 0f;
     public float maxSpawnTime = 5f;

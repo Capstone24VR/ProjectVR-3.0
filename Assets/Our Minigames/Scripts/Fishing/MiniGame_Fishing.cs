@@ -7,10 +7,12 @@ namespace XRMultiplayer.MiniGames
     /// <summary>
     /// Represents the base for a card mini-game.
     /// </summary>)]
-    public class MiniGame_Fish : MiniGameBase
+    public class MiniGame_Fishing : MiniGameBase
     {
 
         //NetworkedCards m_NetworkedGameplay;
+        public FishManager fishManager;
+
 
         public override void Start()
         {
@@ -22,13 +24,19 @@ namespace XRMultiplayer.MiniGames
         public override void SetupGame()
         {
             base.SetupGame();
+            fishManager.enabled = false;
+            foreach (GameObject fish in fishManager.fish)
+            {
+                Destroy(fish);
+            }
+
             //m_NetworkedGameplay.ResetGame();
         }
 
         public override void StartGame()
         {
             base.StartGame();
-
+            fishManager.enabled = true;
             //if ((m_NetworkedGameplay.IsServer))
             //{
             //    m_NetworkedGameplay.StartGame();
@@ -48,6 +56,11 @@ namespace XRMultiplayer.MiniGames
         public override void FinishGame(bool submitScore = true)
         {
             base.FinishGame(submitScore);
+            fishManager.enabled = false;
+            foreach (GameObject fish in fishManager.fish)
+            {
+                Destroy(fish);
+            }
             //m_NetworkedGameplay.EndGame();
         }
 
