@@ -1,9 +1,12 @@
 using UnityEngine;
+using XRMultiplayer.MiniGames;
 
 public class FishAI : MonoBehaviour
 {
     public enum FishState { Wander, Baited, Struggle, Caught};
     public FishStats stats;
+
+    public MiniGame_Fishing m_MiniGame;
 
     public GameObject hook;
     public GameObject water;
@@ -191,6 +194,9 @@ public class FishAI : MonoBehaviour
         {
             other.gameObject.GetComponent<Cooler>().newFish = this;
             other.gameObject.GetComponent<Cooler>().OnFishCatch();
+
+            m_MiniGame.LocalPlayerScored((int)(stats.weight * stats.multiplier*100));
+
             Destroy(gameObject);
         }
     }

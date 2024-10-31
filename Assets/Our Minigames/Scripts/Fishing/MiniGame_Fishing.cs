@@ -16,6 +16,12 @@ namespace XRMultiplayer.MiniGames
         public FishManager fishManager;
         public GameObject Water;
 
+
+        /// <summary>
+        /// The current score of the mini-game.
+        /// </summary>
+        int m_CurrentScore = 0;
+
         public override void Start()
         {
             base.Start();
@@ -71,47 +77,15 @@ namespace XRMultiplayer.MiniGames
             //m_NetworkedGameplay.EndGame();
         }
 
-        public IEnumerator SendAllPlayersMessage(string message, int seconds)
+        /// <summary>
+        /// Updates the local player's score and submits it to the server.
+        /// </summary>
+        /// <param name="pointValue">The point value to add to the score.</param>
+        public void LocalPlayerScored(int pointValue)
         {
-            while (seconds > 0)
-            {
-                if (m_MiniGameManager.LocalPlayerInGame)
-                {
-                    PlayerHudNotification.Instance.ShowText(message);
-                }
-                yield return new WaitForSeconds(1.0f);
-                seconds--;
-            }
-        }
-
-        public IEnumerator SendPlayerMessage(string message, ulong localId, int seconds)
-        {
-            while (seconds > 0)
-            {
-                if (m_MiniGameManager.LocalPlayerInGame && (ulong)m_MiniGameManager.GetLocalPlayerID() == localId)
-                {
-                    PlayerHudNotification.Instance.ShowText(message);
-                }
-                yield return new WaitForSeconds(1.0f);
-                seconds--;
-            }
-        }
-
-        public IEnumerator PlayerWonRoutine(GameObject winner)
-        {
-            if (m_MiniGameManager.LocalPlayerInGame)
-            {
-                PlayerHudNotification.Instance.ShowText($"Game Complete! " + winner.name + " has won.");
-            }
-
-            m_MiniGameManager.SubmitScoreServerRpc(1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
-
-            if (m_MiniGameManager.IsServer && m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
-                m_MiniGameManager.StopGameServerRpc();
-
-            FinishGame();
-
-            yield return null;
+            m_CurrentScore += pointValue;
+            if (m_CurrentScore < 0) m_CurrentScore = 0;
+            m_MiniGameManager.SubmitScoreServerRpc(m_CurrentScore, XRINetworkPlayer.LocalPlayer.OwnerClientId);
         }
 
     }

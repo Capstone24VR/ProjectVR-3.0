@@ -407,6 +407,11 @@ PrefabInstance:
       objectReference: {fileID: 1088415914}
     - target: {fileID: 5410238687264959263, guid: dafefca9591c8e846b9273029b703cc0,
         type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
+    - target: {fileID: 5410238687264959263, guid: dafefca9591c8e846b9273029b703cc0,
+        type: 3}
       propertyPath: fishSpawnPoint
       value: 
       objectReference: {fileID: 459043766}
@@ -2183,6 +2188,11 @@ PrefabInstance:
       objectReference: {fileID: 1088415914}
     - target: {fileID: 7913681354847211333, guid: b69c6a9eb7c1acd4a8d936ff7b574b34,
         type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
+    - target: {fileID: 7913681354847211333, guid: b69c6a9eb7c1acd4a8d936ff7b574b34,
+        type: 3}
       propertyPath: fishSpawnPoint
       value: 
       objectReference: {fileID: 459043766}
@@ -2320,7 +2330,7 @@ PrefabInstance:
     - target: {fileID: 2104892051091369126, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2104892051091369126, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2390,7 +2400,7 @@ PrefabInstance:
     - target: {fileID: 4293411706219940244, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 45.89
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4293411706219940244, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2455,7 +2465,7 @@ PrefabInstance:
     - target: {fileID: 5481505350310966840, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5481505350310966840, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2500,7 +2510,7 @@ PrefabInstance:
     - target: {fileID: 7017205199212174714, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 55.15
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7017205199212174714, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2660,7 +2670,7 @@ PrefabInstance:
     - target: {fileID: 7931734656219179021, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 45.379997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7931734656219179021, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2705,7 +2715,7 @@ PrefabInstance:
     - target: {fileID: 8215425130334822731, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 45.379997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8215425130334822731, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2740,7 +2750,7 @@ PrefabInstance:
     - target: {fileID: 8264524102105252258, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8264524102105252258, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -2770,7 +2780,7 @@ PrefabInstance:
     - target: {fileID: 8796977001930958068, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8796977001930958068, guid: 77ac6b10722bcca4a8baf70e44d89e78,
         type: 3}
@@ -3140,6 +3150,11 @@ PrefabInstance:
       propertyPath: water
       value: 
       objectReference: {fileID: 1088415914}
+    - target: {fileID: 4375485743676115074, guid: 6d651e57921158141982d50dcac4139b,
+        type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
     - target: {fileID: 4375485743676115074, guid: 6d651e57921158141982d50dcac4139b,
         type: 3}
       propertyPath: fishSpawnPoint
@@ -5937,6 +5952,11 @@ PrefabInstance:
       objectReference: {fileID: 1088415914}
     - target: {fileID: 5794555189760018378, guid: b61da223aebd05c44b81fbc04b624abc,
         type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
+    - target: {fileID: 5794555189760018378, guid: b61da223aebd05c44b81fbc04b624abc,
+        type: 3}
       propertyPath: fishSpawnPoint
       value: 
       objectReference: {fileID: 459043766}
@@ -6870,6 +6890,11 @@ PrefabInstance:
       objectReference: {fileID: 1088415914}
     - target: {fileID: 2240909914902380163, guid: ec02414fb104f5742a1be3d5860ebc2b,
         type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
+    - target: {fileID: 2240909914902380163, guid: ec02414fb104f5742a1be3d5860ebc2b,
+        type: 3}
       propertyPath: fishSpawnPoint
       value: 
       objectReference: {fileID: 459043766}
@@ -7670,6 +7695,11 @@ PrefabInstance:
       objectReference: {fileID: 1088415914}
     - target: {fileID: 7348373321676559157, guid: f6e2c864a33e77d4f80c4458a1c286e8,
         type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
+    - target: {fileID: 7348373321676559157, guid: f6e2c864a33e77d4f80c4458a1c286e8,
+        type: 3}
       propertyPath: fishSpawnPoint
       value: 
       objectReference: {fileID: 459043766}
@@ -8233,6 +8263,11 @@ PrefabInstance:
       propertyPath: water
       value: 
       objectReference: {fileID: 1088415914}
+    - target: {fileID: 4161088050371042375, guid: 66c554818fdc3e040aaa5fc22c247c44,
+        type: 3}
+      propertyPath: m_MiniGame
+      value: 
+      objectReference: {fileID: 4694632164883171982}
     - target: {fileID: 4161088050371042375, guid: 66c554818fdc3e040aaa5fc22c247c44,
         type: 3}
       propertyPath: fishSpawnPoint
@@ -10318,6 +10353,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5314876605066841764}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4694632164883171982 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5314876605066841764}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7f5886d6d33ce649a71073a8958589e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5314876605066841764
 PrefabInstance:
   m_ObjectHideFlags: 0
