@@ -34,12 +34,12 @@ public class FishAI : MonoBehaviour
     public float minWanderDuration = 5f;
     public float maxWanderDuration = 20f;
     public float waitDuration = 2f; // Wait duration when reaching a destination
-    public float maxIdleTime = 5f; // Maximum idle time before choosing a new random localPosition
+    public float maxIdleTime = 5f; // Maximum idle time before choosing a new random position
     public float maxBaitTime = 3f; // Maximum time before bait procs again
 
     private void Awake()
     {
-        target = transform.localPosition;
+        target = transform.position;
         animator = GetComponentInChildren<Animator>();
         stats = GetComponent<FishStats>();
         hookSpot = transform.Find("HookSpot").gameObject;
@@ -55,7 +55,7 @@ public class FishAI : MonoBehaviour
             if(state != FishState.Wander)
             {
                 baited = false;
-                ChooseNewRandomlocalPosition();
+                ChooseNewRandomposition();
             }
             state = FishState.Wander;
         }
@@ -78,7 +78,7 @@ public class FishAI : MonoBehaviour
 
     void Wander()
     {
-        if (hook.activeSelf == true && hook.transform.localPosition.y <= water.transform.localPosition.y && !hook.GetComponent<FishingHook>().caughtSomething)
+        if (hook.activeSelf == true && hook.transform.position.y <= water.transform.position.y && !hook.GetComponent<FishingHook>().caughtSomething)
         {
             baitTimer += Time.deltaTime;
             if (baitTimer >= maxBaitTime)
@@ -92,24 +92,24 @@ public class FishAI : MonoBehaviour
                 baitTimer = 0f;
             }
         }
-        // Move towards the target localPosition
+        // Move towards the target position
         Move(target);
 
         wanderTimer += Time.deltaTime;
 
-        // Check if reached the target localPosition
-        if (Vector3.Distance(transform.localPosition, target) < 0.1f)
+        // Check if reached the target position
+        if (Vector3.Distance(transform.position, target) < 0.1f)
         {
             waitTimer += Time.deltaTime;
             if (waitTimer >= waitDuration)
             {
-                ChooseNewRandomlocalPosition();
+                ChooseNewRandomposition();
             }
         }
 
         if (wanderTimer > wanderDuration)
         {   
-            ChooseNewRandomlocalPosition();
+            ChooseNewRandomposition();
         }
     }
 
@@ -122,24 +122,24 @@ public class FishAI : MonoBehaviour
     {
         if (changePos)
         {
-            minX = transform.localPosition.x - distance;
-            maxX = transform.localPosition.x + distance;
-            minZ = transform.localPosition.z - distance/2;
-            maxZ = transform.localPosition.z + distance/2;
+            minX = transform.position.x - distance;
+            maxX = transform.position.x + distance;
+            minZ = transform.position.z - distance/2;
+            maxZ = transform.position.z + distance/2;
             changePos = false;
         }
         Move(target);
 
-        if (Vector3.Distance(transform.localPosition, target) < 0.1f)
+        if (Vector3.Distance(transform.position, target) < 0.1f)
         {
-            // Choose a new random nearby localPosition within specified x and z localPositions
-            target = new Vector3(Random.Range(minX, maxX), transform.localPosition.y, Random.Range(minZ, maxZ));
+            // Choose a new random nearby position within specified x and z positions
+            target = new Vector3(Random.Range(minX, maxX), transform.position.y, Random.Range(minZ, maxZ));
         }
     }
 
     bool isBaited()
     {
-        var distanceFromHook = Vector3.Distance(gameObject.transform.localPosition, hook.transform.localPosition);
+        var distanceFromHook = Vector3.Distance(gameObject.transform.position, hook.transform.position);
         var cap = 10 / distanceFromHook + stats.weight/2;
         var roll = Random.Range(0f, cap);
         return roll <= (cap / (stats.resistance+1)); 
@@ -149,19 +149,19 @@ public class FishAI : MonoBehaviour
     {
         if (hook.GetComponent<FishingHook>().caughtSomething && hook.GetComponent<FishingHook>().caughtObject != gameObject)
         {
-            ChooseNewRandomlocalPosition();
+            ChooseNewRandomposition();
             state = FishState.Wander;
         }
         else
         {
-            target = hook.transform.localPosition;
+            target = hook.transform.position;
             Move(target);
         }
     }
 
     void Startled()
     {
-        Vector3 direction = (hook.transform.localPosition - transform.localPosition).normalized;
+        Vector3 direction = (hook.transform.position - transform.position).normalized;
         target = target - direction;
         waitTimer = 0f;
         wanderTimer = 0f;
@@ -171,14 +171,14 @@ public class FishAI : MonoBehaviour
     private void Move(Vector3 target)
     {
         var step = stats.speed * Time.deltaTime;
-        gameObject.transform.localPosition = Vector3.MoveTowards(gameObject.transform.localPosition, target, step);
+        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, target, step);
         gameObject.transform.LookAt(target);
     }
 
-    private void ChooseNewRandomlocalPosition()
+    private void ChooseNewRandomposition()
     {
-        // Choose a new random localPosition within specified x and z localPositions
-        target = new Vector3(Random.Range(-22f, 22f), transform.localPosition.y, Random.Range(-22f, 22f));
+        // Choose a new random position within specified x and z positions
+        target = new Vector3(Random.Range(-20f, 25f), transform.position.y, Random.Range(-77f, -32f));
         wanderDuration = Random.Range(minWanderDuration, maxWanderDuration);
         waitTimer = 0f;
         wanderTimer = 0f;

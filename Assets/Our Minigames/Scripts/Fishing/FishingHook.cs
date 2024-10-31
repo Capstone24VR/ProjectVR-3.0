@@ -26,7 +26,8 @@ public class FishingHook : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == fishLayer)
+        Debug.Log(collision.gameObject.tag);
+        if (collision.gameObject.tag == "Fish")
         {
             if (!caughtSomething)
             {
