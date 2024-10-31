@@ -1,5 +1,7 @@
 
 using System.Collections;
+using System.Collections.Generic;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 namespace XRMultiplayer.MiniGames
@@ -12,7 +14,7 @@ namespace XRMultiplayer.MiniGames
 
         //NetworkedCards m_NetworkedGameplay;
         public FishManager fishManager;
-
+        public GameObject Water;
 
         public override void Start()
         {
@@ -25,7 +27,9 @@ namespace XRMultiplayer.MiniGames
         {
             base.SetupGame();
             fishManager.enabled = false;
-            foreach (GameObject fish in fishManager.fish)
+            List<GameObject> currentFish = new List<GameObject>();
+            Water.GetChildGameObjects(currentFish);
+            foreach (GameObject fish in currentFish)
             {
                 Destroy(fish);
             }
@@ -57,10 +61,13 @@ namespace XRMultiplayer.MiniGames
         {
             base.FinishGame(submitScore);
             fishManager.enabled = false;
-            foreach (GameObject fish in fishManager.fish)
+            List<GameObject> currentFish = new List<GameObject>();
+            Water.GetChildGameObjects(currentFish);
+            foreach (GameObject fish in currentFish)
             {
                 Destroy(fish);
             }
+
             //m_NetworkedGameplay.EndGame();
         }
 

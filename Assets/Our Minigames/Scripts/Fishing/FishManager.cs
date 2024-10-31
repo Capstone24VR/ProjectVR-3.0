@@ -80,7 +80,7 @@ public class FishManager : MonoBehaviour
 
                 int name = Random.Range(0, names.Count);
 
-                Vector3 spawnPoint = new Vector3(Random.Range(-25f, 25), transform.position.y, Random.Range(-25f, 25f));
+                Vector3 spawnPoint = new Vector3(Random.Range(-22f, 22f), transform.position.y, Random.Range(-22f, 22f));
                 fish[type].SetActive(true);
                 var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, this.transform);
                 spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
