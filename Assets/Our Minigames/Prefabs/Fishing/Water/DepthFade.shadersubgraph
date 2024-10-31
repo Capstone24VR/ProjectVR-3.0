@@ -221,10 +221,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -340.800048828125,
-            "y": 274.3999938964844,
-            "width": 107.20002746582031,
-            "height": 33.60003662109375
+            "x": -340.8000183105469,
+            "y": 274.4000244140625,
+            "width": 107.20001220703125,
+            "height": 33.5999755859375
         }
     },
     "m_Slots": [
@@ -322,7 +322,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "7343e72295034af9939e1bbba1a4abff",
     "m_Id": 0,
-    "m_DisplayName": "Depth",
+    "m_DisplayName": "Distance",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -477,10 +477,10 @@
     "m_Guid": {
         "m_GuidSerialized": "0a40b552-2691-4177-aae4-45689b91dbdf"
     },
-    "m_Name": "Depth",
+    "m_Name": "Distance",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "Depth",
-    "m_DefaultReferenceName": "_Depth",
+    "m_RefNameGeneratedByDisplayName": "Distance",
+    "m_DefaultReferenceName": "_Distance",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
