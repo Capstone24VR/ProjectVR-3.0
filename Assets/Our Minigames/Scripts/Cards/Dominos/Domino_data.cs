@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Domino_data : MonoBehaviour
@@ -24,60 +22,50 @@ public class Domino_data : MonoBehaviour
     {
         _localScale = transform.localScale;
 
-        // Optional: You can also extract values from the name or set values externally
-        // ExtractValuesFromName();
-
-        // Automatically assign the correct domino prefab based on the side values
-        AssignDominoPrefab();
+        // Optional: Assign modelParent if not set
+        if (modelParent == null)
+        {
+            modelParent = transform.Find("ModelParent");
+            if (modelParent == null)
+            {
+                Debug.LogError("ModelParent not found. Please assign it in the inspector or name the child object 'ModelParent'.");
+            }
+        }
     }
 
-    // Method to extract side values from the name if needed (Optional)
-    public void ExtractValuesFromName()
+    // Method to initialize the domino with custom side values
+    public void InitializeDomino(int newSide1, int newSide2)
     {
-        string name = gameObject.name;
+        side1 = newSide1;
+        side2 = newSide2;
 
-        string[] parts = name.Split('_', '-');  // Split the name to get the values
-        if (parts.Length == 3)
-        {
-            if (int.TryParse(parts[1], out int firstValue) && int.TryParse(parts[2], out int secondValue))
-            {
-                side1 = firstValue;
-                side2 = secondValue;
-                Debug.Log($"Domino sides set to [{side1}, {side2}] from name: {name}");
-            }
-            else
-            {
-                Debug.LogWarning($"Failed to parse side values from domino name: {name}");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"Invalid domino name format: {name}");
-        }
+        // Assign the correct domino prefab based on the side values
+        AssignDominoVisual();
     }
 
-    // Method to assign the correct domino prefab (visual representation) based on the side values
-    public void AssignDominoPrefab()
+    // Method to assign the correct domino visual based on the side values
+    public void AssignDominoVisual()
     {
         // Calculate the index of the correct prefab based on the side values
         int index = CalculatePrefabIndex(side1, side2);
 
         if (index >= 0 && index < dominoPrefabs.Length)
         {
-            // Destroy any existing child in modelParent to replace with the correct domino
+            // Destroy any existing child in modelParent to replace with the correct domino visual
             foreach (Transform child in modelParent)
             {
                 Destroy(child.gameObject);
             }
 
             // Instantiate the correct domino model as a child of modelParent
-            GameObject prefabInstance = Instantiate(dominoPrefabs[index], modelParent.position, modelParent.rotation, modelParent);
+            GameObject prefabInstance = Instantiate(dominoPrefabs[index], modelParent);
 
             // Optional: Adjust prefab's local position/scale if necessary
             prefabInstance.transform.localPosition = Vector3.zero;
+            prefabInstance.transform.localRotation = Quaternion.identity;
             prefabInstance.transform.localScale = Vector3.one;
 
-            Debug.Log($"Assigned prefab for domino [{side1}-{side2}]");
+            Debug.Log($"Assigned visual for domino [{side1}-{side2}]");
         }
         else
         {
@@ -111,52 +99,28 @@ public class Domino_data : MonoBehaviour
         return index;
     }
 
-    // Method to manually set the domino values and refresh its appearance
-    public void SetDominoValues(int newSide1, int newSide2)
+    // Optional: A method to be called externally to spawn and initialize the domino
+    public static Domino_data CreateDomino(GameObject dominoSamplePrefab, int side1, int side2, Vector3 position, Quaternion rotation, Transform parent, GameObject[] dominoPrefabsArray)
     {
-        side1 = newSide1;
-        side2 = newSide2;
+        // Instantiate the Domino Sample Prefab
+        GameObject dominoObject = Instantiate(dominoSamplePrefab, position, rotation, parent);
 
-        // Update the appearance based on the new values
-        AssignDominoPrefab();
-    }
+        // Get the Domino_data component
+        Domino_data dominoData = dominoObject.GetComponent<Domino_data>();
 
-    // Method to set the position of the domino
-    public void SetPosition(Vector3 position)
-    {
-        _position = position;
-    }
-
-    // Method to reset the domino to its original position
-    public void ResetPosition()
-    {
-        transform.localPosition = _position;
-        transform.localRotation = Quaternion.identity;
-    }
-
-    // Method to highlight the domino when hovered over
-    public void HoverSelect()
-    {
-        transform.localScale = _localScale * 1.25f;
-    }
-
-    // Method to return the domino to normal when hover is removed
-    public void HoverDeSelect()
-    {
-        transform.localScale = _localScale;
-    }
-
-    // Method to set the domino as "in hand"
-    public void SetInHand(bool isInHand)
-    {
-        inHand = isInHand;
-        if (inHand)
+        if (dominoData != null)
         {
-            Debug.Log($"Domino [{side1} | {side2}] is now in hand.");
+            // Assign the dominoPrefabs array
+            dominoData.dominoPrefabs = dominoPrefabsArray;
+
+            // Initialize the domino with the given sides
+            dominoData.InitializeDomino(side1, side2);
         }
         else
         {
-            Debug.Log($"Domino [{side1} | {side2}] is no longer in hand.");
+            Debug.LogError("Domino_data component not found on the instantiated prefab.");
         }
+
+        return dominoData;
     }
 }
