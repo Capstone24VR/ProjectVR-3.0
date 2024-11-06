@@ -379,14 +379,56 @@ namespace XRMultiplayer.MiniGames
                 _drawPile.Clear(); // Clear previous draw pile if any
 
                 // Copy shuffled deck into the draw pile
+                //float zHeight = 0;
                 foreach (var cardReference in deck)
                 {
+                    //ChangeCardZHeightClientRpc(cardReference.NetworkObjectId, zHeight);
                     AddToDrawPileServer(cardReference);
+
+                    //zHeight += 0.2f;
                 }
 
                 Debug.Log("Draw Pile created.");
             }
         }
+
+
+        [ClientRpc]
+        void ChangeCardZHeightClientRpc(ulong networkObjectId, float zHeight)
+        {
+            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
+            {
+                Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} zHeight to  {zHeight} on clients");
+                Vector3 position = new Vector3(0, 0, zHeight);
+                cardNetworkObject.gameObject.transform.localPosition = position;
+                cardNetworkObject.GetComponent<Card>().SetPosition(position);
+                Debug.Log($"{cardNetworkObject.gameObject.name} new position: " + cardNetworkObject.gameObject.transform.localPosition);
+            }
+            else
+            {
+                Debug.LogError("FATAL ERROR: Card not found on client.");
+            }
+        }
+
+        [ClientRpc]
+        void SetCardXRInteractableClientRpc(ulong networkObjectId, bool value)
+        {
+
+            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
+            {
+                Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} grabbable to {value} on clients");
+                cardNetworkObject.gameObject.GetComponent<XRGrabInteractable>().enabled = value;
+                Debug.Log($"{cardNetworkObject.gameObject.name} XR interactable status: {cardNetworkObject.gameObject.GetComponent<XRGrabInteractable>().enabled}");
+            }
+            else
+            {
+                Debug.LogError("FATAL ERROR: Card not found on client.");
+            }
+        }
+
+
 
         [ClientRpc]
         void SetCardActiveClientRpc(ulong networkObjectId, bool value)
@@ -397,7 +439,7 @@ namespace XRMultiplayer.MiniGames
             {
                 Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} active to {value} on clients");
                 cardNetworkObject.gameObject.SetActive(value);
-                Debug.Log($"Checking if card is active: " + cardNetworkObject.isActiveAndEnabled);
+                Debug.Log($"Checking if card is active: {cardNetworkObject.isActiveAndEnabled}");
             }
             else
             {
@@ -463,6 +505,7 @@ namespace XRMultiplayer.MiniGames
         {
             StartCoroutine(AddToPileOnClient(networkObjectId, isPlay));
             SetCardActiveClientRpc(networkObjectId, false);
+            //SetCardXRInteractable(networkObjectId, false);
         }
 
         IEnumerator AddToPileOnClient(ulong networkObjectId, bool isPlay)
@@ -578,6 +621,22 @@ namespace XRMultiplayer.MiniGames
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
 
+            // Check if it is said players turn to draw [Comment out if you want to play solo]
+            if (activeHands[currentHandIndex].ownerManager.ClientID != NetworkManager.Singleton.LocalClientId)
+            {
+                Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId} turn!");
+                string message = "It is not your turn to draw!";
+
+                if (m_CurrentMessageRoutine != null)
+                {
+                    StopCoroutine(m_CurrentMessageRoutine);
+                }
+                m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, NetworkManager.Singleton.LocalClientId, 3);
+                StartCoroutine(m_CurrentMessageRoutine);
+
+                return;
+            }
+
             if (networkObject != null)
             {
                 DrawTopCardServerRpc(networkObject.NetworkObjectId);
@@ -616,13 +675,15 @@ namespace XRMultiplayer.MiniGames
 
 
                         // ToDO: implement checking if card is valid don't skip turn
-                        //if (IsValidPlayCrazyEights(cardNetworkObject.gameObject))
-                        //{
+                        if (IsValidPlayCrazyEights(cardNetworkObject.gameObject))
+                        {
+                            Debug.Log("Card is active and can be played!");
+                        }
 
-                        //}
-
-
-                        UpdateCurrentIndexServerRpc();
+                        else
+                        {
+                            UpdateCurrentIndexServerRpc();
+                        }
 
                         if (_drawPile.Count > 0)
                         {
@@ -827,7 +888,6 @@ namespace XRMultiplayer.MiniGames
                     }
                 }
             }
-
         }
 
         private void OnDeckChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
