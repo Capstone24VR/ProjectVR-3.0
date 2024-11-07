@@ -5,17 +5,29 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit;
+using System;
 
 public class NewFishingRod : MonoBehaviour
 {
     public LineRenderer fishingLine;
     public Rigidbody hook; // Rigidbody on the hook or lure object
     public float castThreshold = 2.0f; // Threshold speed for casting
-    public Transform rodTip;
 
 
+    public Transform rodTipTransform;
+    public Transform rodBaseTransform;
+
+    private List<Vector3> basePositions = new List<Vector3>();
+    private List<Vector3> tipPositions = new List<Vector3>();
+    private float sampleInterval = 0.05f;
+    private float nextSampleTime;
+
+    private bool isGrabbed;
     private bool isCasting = false;
     private XRBaseInteractor currentInteractor;
+
+    private Vector3 lastPosition;
+    private float lastTime;
 
     private void Awake()
     {
@@ -50,53 +62,56 @@ public class NewFishingRod : MonoBehaviour
         isCasting = false;
     }
 
-    private void Update()
+    void Update()
     {
-        if (!isCasting)
+        if (currentInteractor == null) return;
+
+        if (Time.time >= nextSampleTime)
         {
-            hook.transform.position = rodTip.position;
+            SampleRodPositions();
+            nextSampleTime = Time.time + sampleInterval;
         }
 
-        // Ensure the rod is being held and we have a valid interactor
-        if (currentInteractor != null)
+        Debug.Log($"Casting Quality: {CalculateCastingQuality()}");
+    }
+
+    void SampleRodPositions()
+    {
+        if (basePositions.Count >= 5) basePositions.RemoveAt(0);
+        if (tipPositions.Count >= 5) tipPositions.RemoveAt(0);
+
+        // Assuming you have references to the base and tip of the rod
+        Vector3 basePosition = rodBaseTransform.position;
+        Vector3 tipPosition = rodTipTransform.position;
+
+        basePositions.Add(basePosition);
+        tipPositions.Add(tipPosition);
+    }
+
+    float CalculateCastingQuality()
+    {
+        if (tipPositions.Count < 5) return 0f;  // Not enough samples yet
+
+        // Calculate velocity (distance between oldest and newest tip position)
+        float velocity = Vector3.Distance(tipPositions[0], tipPositions[tipPositions.Count - 1]);
+
+        // Calculate planarity (for simplicity, using deviation from the mean plane)
+        Vector3 normal = Vector3.Cross(tipPositions[1] - tipPositions[0], tipPositions[2] - tipPositions[0]);
+        float planarity = CalculatePlanarity(normal);
+
+        // Calculate casting quality
+        return velocity * planarity;
+    }
+
+    float CalculatePlanarity(Vector3 normal)
+    {
+        float deviationSum = 0f;
+        foreach (var tipPosition in tipPositions)
         {
-            //// Access the InputDevice associated with the interactor
-            //InputDevice device = currentInteractor.;
-            //Vector3 velocity;
-
-            //if (device.TryGetFeatureValue(CommonUsages.deviceVelocity, out velocity))
-            //{
-            //    // Check if casting threshold is met
-            //    if (velocity.magnitude > castThreshold && !isCasting)
-            //    {
-            //        StartCoroutine(CastFishingLine(velocity));
-            //        isCasting = true;
-            //    }
-            //}
-
-            //// Check if the casting threshold is met
-            //if (velocity.magnitude > castThreshold && !isCasting)
-            //{
-            //    StartCoroutine(CastFishingLine(velocity));
-            //    isCasting = true;
-            //}
+            // Project each tip position onto the normal to measure deviation from plane
+            deviationSum += Vector3.Dot(tipPosition - tipPositions[0], normal);
         }
+        return 1f / (1f + Mathf.Abs(deviationSum));  // Higher planarity if deviation is low
     }
 
-    private IEnumerator CastFishingLine(Vector3 velocity)
-    {
-        Debug.Log("I am casting!");
-        hook.isKinematic = false;
-        hook.velocity = velocity * 1.5f; // Adjust multiplier for casting distance
-        yield return new WaitForSeconds(0.2f);
-        isCasting = false;
-    }
-
-    void LateUpdate()
-    {
-        // Update line renderer positions between rod tip and hook
-        fishingLine.positionCount = 2;
-        fishingLine.SetPosition(0, rodTip.position); // Rod tip position
-        fishingLine.SetPosition(1, hook.position);      // Hook position
-    }
 }

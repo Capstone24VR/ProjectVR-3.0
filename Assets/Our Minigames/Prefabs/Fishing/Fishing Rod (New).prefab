@@ -1484,7 +1484,8 @@ MonoBehaviour:
   fishingLine: {fileID: 0}
   hook: {fileID: 840637298867877347}
   castThreshold: 2
-  rodTip: {fileID: 4308361475706200526}
+  rodTipTransform: {fileID: 4308361475706200526}
+  rodBaseTransform: {fileID: 3615715821812839051}
 --- !u!1 &7222867781674643276
 GameObject:
   m_ObjectHideFlags: 0
