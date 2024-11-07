@@ -379,52 +379,12 @@ namespace XRMultiplayer.MiniGames
                 _drawPile.Clear(); // Clear previous draw pile if any
 
                 // Copy shuffled deck into the draw pile
-                //float zHeight = 0;
                 foreach (var cardReference in deck)
                 {
-                    //ChangeCardZHeightClientRpc(cardReference.NetworkObjectId, zHeight);
                     AddToDrawPileServer(cardReference);
-
-                    //zHeight += 0.2f;
                 }
 
                 Debug.Log("Draw Pile created.");
-            }
-        }
-
-
-        [ClientRpc]
-        void ChangeCardZHeightClientRpc(ulong networkObjectId, float zHeight)
-        {
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
-            {
-                Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} zHeight to  {zHeight} on clients");
-                Vector3 position = new Vector3(0, 0, zHeight);
-                cardNetworkObject.gameObject.transform.localPosition = position;
-                cardNetworkObject.GetComponent<Card>().SetPosition(position);
-                Debug.Log($"{cardNetworkObject.gameObject.name} new position: " + cardNetworkObject.gameObject.transform.localPosition);
-            }
-            else
-            {
-                Debug.LogError("FATAL ERROR: Card not found on client.");
-            }
-        }
-
-        [ClientRpc]
-        void SetCardXRInteractableClientRpc(ulong networkObjectId, bool value)
-        {
-
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
-            {
-                Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} grabbable to {value} on clients");
-                cardNetworkObject.gameObject.GetComponent<XRGrabInteractable>().enabled = value;
-                Debug.Log($"{cardNetworkObject.gameObject.name} XR interactable status: {cardNetworkObject.gameObject.GetComponent<XRGrabInteractable>().enabled}");
-            }
-            else
-            {
-                Debug.LogError("FATAL ERROR: Card not found on client.");
             }
         }
 
@@ -505,7 +465,6 @@ namespace XRMultiplayer.MiniGames
         {
             StartCoroutine(AddToPileOnClient(networkObjectId, isPlay));
             SetCardActiveClientRpc(networkObjectId, false);
-            //SetCardXRInteractable(networkObjectId, false);
         }
 
         IEnumerator AddToPileOnClient(ulong networkObjectId, bool isPlay)
