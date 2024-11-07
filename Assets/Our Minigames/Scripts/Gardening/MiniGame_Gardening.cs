@@ -6,32 +6,49 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace XRMultiplayer.MiniGames
 {
-    /// <summary>
-    /// Represents a mini-game called "Whack-A-Pig" where the player needs to hit pigs with a hammer.
-    /// </summary>
     public class MiniGame_Gardening : MiniGameBase
     {
+        int m_CurrentScore = 0;
+
         public override void Start()
         {
             base.Start();
         }
 
-        ///<inheritdoc/>
         public override void SetupGame()
         {
             base.SetupGame();
         }
 
-        ///<inheritdoc/>
         public override void StartGame()
         {
             base.StartGame();
+            m_CurrentScore = 0;
+            // Start game logic specific to gardening
         }
 
-        ///<inheritdoc/>
+        public override void UpdateGame(float deltaTime)
+        {
+            base.UpdateGame(deltaTime);
+        }
+
         public override void FinishGame(bool submitScore = true)
         {
             base.FinishGame(submitScore);
+            m_MiniGameManager.FinishGame();
+        }
+
+        /// <summary>
+        /// Called when the local player hits a target.
+        /// </summary>
+        /// <param name="targetValue"></param>
+        public void LocalPlayerCompletedJob(int targetValue)
+        {
+            if (m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
+            {
+                m_CurrentScore += targetValue;
+                m_MiniGameManager.SubmitScoreServerRpc(m_CurrentScore, XRINetworkPlayer.LocalPlayer.OwnerClientId);
+            }
         }
     }
 }

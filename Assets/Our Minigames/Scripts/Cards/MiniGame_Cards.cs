@@ -26,6 +26,7 @@ namespace XRMultiplayer.MiniGames
             public GameObject playArea;
             public int currCards = 0;
             public int maxCards = 0;
+            public bool active = true;
 
             [SerializeField] public List<GameObject> heldCards = new List<GameObject>();
 
@@ -58,12 +59,18 @@ namespace XRMultiplayer.MiniGames
                 SendCardData();
                 ConfigureChildPositions();
             }
+
+            public void Clear()
+            {
+                heldCards.Clear();
+                playArea.GetComponent<PlayArea>().cardData.Clear();
+                currCards = 0;
+            }
         }
 
         public enum game { Colors, Crazy_Eights};
 
         public GameObject card;
-        public bool allStartingHandsDrawn = false;
 
         public GameObject drawPileObj;
         public GameObject playPileObj;
@@ -79,9 +86,15 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] protected Hand hand1;
         [SerializeField] protected Hand hand2;
 
+        [SerializeField] protected List<Hand> activeHands =new List<Hand>();
+
         public override void SetupGame()
         {
             base.SetupGame();
+
+            if (hand1.active) { activeHands.Add(hand1); } else { hand1.playArea.SetActive(false); }
+            if (hand2.active) { activeHands.Add(hand2); } else { hand2.playArea.SetActive(false); }
+
             hand1.maxCards = 9999;
             hand2.maxCards = 9999;
             CreateDeckBasic();
@@ -92,10 +105,13 @@ namespace XRMultiplayer.MiniGames
         public override void StartGame()
         {
             base.StartGame();
+            Debug.Log(startingHand);
             for(int i = 0; i < startingHand; i++)
             {
-                if (hand1.canDraw()) { hand1.AutoDrawCard(_drawPile.Pop()); }
-                if (hand2.canDraw()) { hand2.AutoDrawCard(_drawPile.Pop()); }
+                foreach(Hand hand in activeHands)
+                {
+                    if (hand.canDraw()) { hand.AutoDrawCard(_drawPile.Pop()); }
+                }
             }
             _drawPile.Peek().SetActive(true);
         }
@@ -106,17 +122,6 @@ namespace XRMultiplayer.MiniGames
             hand1.SendCardData();
             hand2.SendCardData();
             CheckForPlayerWin();
-
-        }
-
-        public void CheckForPlayerWin()
-        {
-            Debug.Log("Am checking: " + hand1.currCards + "\t" + hand1.isEmpty());
-
-            if (hand1.isEmpty()) {
-                Debug.Log("Hand is empty calling courotine");
-                StartCoroutine(PlayerWonRoutine());
-            }
         }
 
 
@@ -194,18 +199,39 @@ namespace XRMultiplayer.MiniGames
         {
             Debug.Log(card.name);
             card.SetActive(false);
+            card.GetComponent<Card>().played = true;
+            card.GetComponent<XRGrabInteractable>().enabled = false;
+            
             hand1.heldCards.Remove(card);
             hand1.ConfigureChildPositions();
+            
             card.transform.parent = playPileObj.transform;
+            card.transform.localPosition = Vector3.zero;
+            card.transform.localRotation = Quaternion.identity;
+
+            if (_playPile.Count > 0) { _playPile.Peek().SetActive(false); }
             _playPile.Push(card);
+            _playPile.Peek().SetActive(true);
+
+        }
+
+        public void CheckForPlayerWin()
+        {
+           foreach(Hand hand in activeHands)
+            {
+                if (hand.isEmpty()){
+                    Debug.Log(hand.playArea.name + "is empty, calling courotine");
+                    StartCoroutine(PlayerWonRoutine(hand.playArea));
+                }
+            }
         }
 
 
-        IEnumerator PlayerWonRoutine()
+        IEnumerator PlayerWonRoutine(GameObject winner)
         {
             if (m_MiniGameManager.LocalPlayerInGame)
             {
-                PlayerHudNotification.Instance.ShowText($"Game Complete! Player 1 won.");
+                PlayerHudNotification.Instance.ShowText($"Game Complete! " + winner.name + " has won.");
             }
 
             if (m_MiniGameManager.IsServer && m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
@@ -218,10 +244,14 @@ namespace XRMultiplayer.MiniGames
 
         private void RemoveGeneratedCards()
         {
-            hand1.heldCards.Clear();
-            hand2.heldCards.Clear();
+            foreach(Hand hand in activeHands)
+            {
+                hand.Clear();
+            }
+
             _playPile.Clear();
             _drawPile.Clear();
+
             foreach (GameObject card in deck)
             {
                 Destroy(card);
@@ -229,79 +259,5 @@ namespace XRMultiplayer.MiniGames
             numCards = 0;
             deck.Clear();
         }
-
-        //private IEnumerator DelayedDraw(float time)
-        //{
-
-        //    yield return new WaitForSeconds(time);
-        //    if (hand1.canDraw()) { hand1.AutoDrawCard(_drawPile.Pop()); }
-
-        //    yield return new WaitForSeconds(time);
-        //    if (hand2.canDraw()) { hand2.AutoDrawCard(_drawPile.Pop()); }
-
-        //}
-
     }
 }
-
-//public enum Suit { Heart, Diamond, Club, Spade }
-//public enum Value
-//{
-//    Ace = 1,
-//    Two = 2,
-//    Three = 3,
-//    Four = 4,
-//    Five = 5,
-//    Six = 6,
-//    Seven = 7,
-//    Eight = 8,
-//    Nine = 9,
-//    Ten = 10,
-//    Jack = 11,
-//    Queen = 12,
-//    King = 13
-//}
-
-//public class Card
-//{
-//    public Suit suit;
-//    public Value value;
-//}
-
-//public static List<Card> CreateDeckBasic()
-//{
-//    List<Card> deck = new List<Card>();
-//    foreach (Suit suit in Enum.GetValues(typeof(Suit)))
-//    {
-//        foreach (Value val in Enum.GetValues(typeof(Value)))
-//        {
-//            Card newCard = new Card();
-//            newCard.suit = suit;
-//            newCard.value = val;
-//            deck.Add(newCard);
-//        }
-//    }
-//    return deck;
-//}
-
-//public static void ShuffleDeck(List<Card> deck)
-//{
-//    Random r = new Random();
-//    for (int n = deck.Count - 1; n > 0; --n)
-//    {
-//        int k = r.Next(n + 1);
-//        Card temp = deck[n];
-//        deck[n] = deck[k];
-//        deck[k] = temp;
-//    }
-//}
-
-//public static void Main(string[] args)
-//{
-//    List<Card> deck = CreateDeckBasic();
-//    ShuffleDeck(deck);
-//    foreach (Card card in deck)
-//    {
-//        Console.WriteLine(card.suit + " " + card.value);
-//    }
-//}

@@ -10,17 +10,15 @@ TagManager:
   - PlayerHand
   - Destroyer
   - Card
-  - Shovel
-  - Basket
   - Cucumber
+  - Tomato
+  - Shovel
   - Onion
   - Unplanted
-  - Tomato
-  - Water
   - Potato
+  - Basket
   - Carrot
-  - Cabbage
-  - Pumpkin
+  - Water
   layers:
   - Default
   - TransparentFX
