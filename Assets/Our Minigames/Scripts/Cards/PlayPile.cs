@@ -1,17 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using XRMultiplayer.MiniGames;
+
 
 public class PlayPile : MonoBehaviour
 {
-    [SerializeField] protected MiniGame_Cards mg_cards;
+    [SerializeField] protected NetworkedCards m_NetworkedGameplay;
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.GetComponent<Card>().played)
         {
-            mg_cards.PlayCard(other.gameObject);
+            m_NetworkedGameplay.RequestPlayCard(other.GetComponent<NetworkObject>().NetworkObjectId);
         }
     }
 }

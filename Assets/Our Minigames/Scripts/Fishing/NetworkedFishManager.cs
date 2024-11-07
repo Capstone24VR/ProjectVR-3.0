@@ -1,0 +1,271 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Netcode;
+
+namespace XRMultiplayer.MiniGames
+{
+    /// <summary>
+    /// Represents a networked version of the Whack-A-Pig mini game.
+    /// </summary>
+    public class NetworkedFishManager : NetworkBehaviour
+    {
+        /// <summary>
+        /// The hands to use for playing.
+        /// </summary>
+        [SerializeField] NetworkedHand[] m_hands;
+
+        /// <summary>
+        /// The card prefab to spawn.
+        /// </summary>
+        [SerializeField] GameObject card;
+
+        /// <summary>
+        /// The mini game to use for handling the mini game logic.
+        /// </summary>
+        MiniGame_Cards m_MiniGame;
+
+        /// <summary>
+        /// Whether the game has started
+        /// </summary>
+        [SerializeField] bool gameStarted = false;
+
+
+        public int maxFish = 30;
+        public int currFish = 10;
+        public bool gameStart = false;
+
+        public float spawnTimer = 0f;
+        public float maxSpawnTime = 5f;
+
+        public GameObject[] fish = new GameObject[3];
+
+        public List<string> names = new List<string>();
+        private float[] baitChanceArr = { .001f, .05f, .15f, .25f, .35f, .40f, .60f };
+        private float totalChance = 1.721f;
+
+
+        /// <summary>
+        /// The current message routine being played.
+        /// </summary>
+        IEnumerator m_CurrentMessageRoutine;
+
+        [SerializeField] protected List<GameObject> fishTemplate = new List<GameObject>();
+        [SerializeField] protected List<GameObject> spawnedFishObject = new List<GameObject>();
+
+        [SerializeField] protected NetworkList<NetworkObjectReference> _spawnedFish = new NetworkList<NetworkObjectReference>();
+
+        [SerializeField] private MiniGameManager miniManager;
+
+        void Start()
+        {
+            TryGetComponent(out m_MiniGame);
+            _spawnedFish.OnListChanged += OnSpawnedFishChanged;
+
+            totalChance = 0f;
+            foreach (var chance in baitChanceArr)
+            {
+                totalChance += chance;
+            }
+
+            names.Add("Selase");
+            names.Add("Tony");
+            names.Add("Jake");
+            names.Add("Pam");
+            names.Add("Rick");
+            names.Add("John");
+            names.Add("Farquad");
+            names.Add("Goku");
+            names.Add("Sturividant");
+            names.Add("Chauh");
+            names.Add("Thimble");
+            names.Add("Enyo");
+            names.Add("Rick");
+            names.Add("Chindog");
+            names.Add("Fabio");
+            names.Add("Nii");
+            names.Add("Sally");
+            names.Add("Trish");
+            names.Add("Dela");
+        }
+
+
+        IEnumerator WaitForClientConnection()
+        {
+            while (!NetworkManager.Singleton.IsClient || !NetworkManager.Singleton.IsConnectedClient)
+            {
+                Debug.Log("Waiting for client connection...");
+                yield return new WaitForSeconds(0.5f); // Wait until the client is connected
+            }
+
+            Debug.Log("Client is now connected.");
+            NotifyDeckReadyClientRpc(); // Notify clients once they are connected
+        }
+
+
+        [ClientRpc]
+        private void NotifyDeckReadyClientRpc()
+        {
+            Debug.Log("Deck is ready for interaction.");
+        }
+
+
+
+        public IEnumerator ResetGame()
+        {
+            StopAllCoroutines();
+            RemoveSpawnedFish();
+
+            yield return new WaitForSeconds(0.5f); // Give time for clients to catch up
+
+            if (IsServer)
+            {
+                StartCoroutine(WaitForClientConnection());
+            }
+        }
+
+        public void EndGame()
+        {
+            StopAllCoroutines();
+            RemoveSpawnedFish();
+        }
+
+
+        /// <summary>
+        /// Spawns a fish on the server.
+        /// </summary>
+        public void SpawnProcessServer()
+        {
+            if (IsServer)
+            {
+                currFish = this.transform.childCount;
+                if (currFish <= maxFish)
+                {
+
+                    float currentCheck = 0f;
+                    int type = 0;
+
+                    float roll = UnityEngine.Random.Range(0f, totalChance);
+                    foreach (float fishChance in baitChanceArr)
+                    {
+                        currentCheck += fishChance;
+
+                        if (roll <= currentCheck)
+                        {
+                            break;
+                        }
+
+                        else if (currentCheck == totalChance)
+                        {
+                            break;
+                        }
+                        type++;
+                    }
+
+                    int name = UnityEngine.Random.Range(0, names.Count);
+                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(-20f, 25f), transform.position.y, UnityEngine.Random.Range(-77f, -32f));
+
+
+                    fish[type].SetActive(true);
+                    var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, this.transform);
+                    spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
+                    fish[type].SetActive(false);
+
+
+                    spawn.name = names[name] + " the " + fish[type].name;
+                    spawn.SetActive(true);
+
+
+                    NetworkObject networkObject = spawn.GetComponent<NetworkObject>();
+
+                    if (networkObject != null)
+                    {
+                        networkObject.Spawn();
+                        Debug.Log($"{spawn.name} has been spawned with id of: {networkObject.NetworkObjectId}");
+                        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(networkObject.NetworkObjectId))
+                        {
+                            Debug.LogError($"Failed to register {spawn.name} with NetworkObjectId {networkObject.NetworkObjectId}");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("NetworkObject component is missing on the fish object.");
+                        return;
+                    }
+
+                    float waitTime = UnityEngine.Random.Range(3f, maxSpawnTime);
+                    SpawnProcessClientRpc(waitTime, spawnPoint, type, spawn.name, networkObject.NetworkObjectId);
+                }
+            }
+        }
+
+        [ClientRpc]
+        public void SpawnProcessClientRpc(float waitTime, Vector3 position, int type, string name, ulong networkObjectId)
+        {
+            StartCoroutine(SpawnNewFish(waitTime, position, type, name, networkObjectId));
+        }
+
+        IEnumerator SpawnNewFish(float time, Vector3 position, int type, string name, ulong networkObjectId)
+        {
+            yield return new WaitForSeconds(.25f);
+            //ShowTrickRoutine();
+            yield return new WaitForSeconds(time);
+
+        }
+
+        private void RemoveSpawnedFish()
+        {
+            if (IsServer)
+            {
+                // Notify clients to clear their hands and card visuals
+                ClearAllFishClientRpc();
+
+
+                // Clear the piles
+                spawnedFishObject.Clear();
+
+                foreach (NetworkObjectReference fishReference in _spawnedFish)
+                {
+                    if (fishReference.TryGet(out NetworkObject fish) && fish.IsSpawned)
+                    {
+                        fish.Despawn(true); // Despawn the card across the network
+                    }
+                }
+                _spawnedFish.Clear();
+            }
+        }
+
+
+        [ClientRpc]
+        private void ClearAllFishClientRpc()
+        {
+            _spawnedFish.Clear();
+            spawnedFishObject.Clear();
+        }
+        private void OnSpawnedFishChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
+        {
+            switch (changeEvent.Type)
+            {
+                case NetworkListEvent<NetworkObjectReference>.EventType.Add:
+                    // A new card was added to the draw pile
+                    Debug.Log($"Card added to draw pile: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noA))
+                    {
+                        spawnedFishObject.Add(noA.gameObject);
+                    }
+                    break;
+
+                case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
+                    // A card was removed from the draw pile
+                    Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
+                    if (changeEvent.Value.TryGet(out NetworkObject noR))
+                    {
+                        spawnedFishObject.Remove(noR.gameObject);
+                    }
+                    break;
+            }
+        }
+    }
+}
