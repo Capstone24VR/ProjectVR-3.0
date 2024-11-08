@@ -10,6 +10,7 @@ public class NewFishingRod : MonoBehaviour
 {
     public NewFishingLine fishingLine;
     public Rigidbody hook; // Rigidbody on the hook or lure object
+    public BuoyancyObject hookBO;
     public float castThreshold = 2.5f; // Threshold speed for casting
 
 
@@ -23,20 +24,25 @@ public class NewFishingRod : MonoBehaviour
 
     private int grabCount = 0;
 
+    [Header("Casting")]
     private bool castTrigger = false;
     public bool isCasting = false;
     public float castingMultiplier = 10f;
 
-    //private float reelPosition = 0.5f;
-    //private float oldReelChange = 0f;
-    //private float reelChange = 0f;
+    [Header("Hook Movement")]
+    public float hookShiftForceMultiplier = 5f;  // Multiplier to control how much force is applied to the hook
+    public float forceDamping = 0.1f;  // To reduce oscillation or overreaction of the hook
 
+    [Header("Reeling")]
+    public float prevReelChange = 0f;  // The previous value from reel (used to find the difference of reel change)
+    
     public XRBaseInteractor currentInteractor;
     public HapticImpulsePlayer hapticFeedback;
 
 
     private void Awake()
     {
+        hookBO = hook.GetComponent<BuoyancyObject>();
         fishingLine = GetComponent<NewFishingLine>();
     }
 
@@ -115,6 +121,13 @@ public class NewFishingRod : MonoBehaviour
             hook.transform.position = rodTipTransform.position;
             hook.transform.rotation = rodTipTransform.rotation;
         }
+        else
+        {
+            // Doesn't work idk why
+            if (IsHookFloating())
+                ApplyForceToHook();
+
+        }
 
         if (currentInteractor == null || hapticFeedback == null) return;
 
@@ -173,11 +186,32 @@ public class NewFishingRod : MonoBehaviour
         hook.isKinematic = true;
     }
 
+    bool IsHookFloating()
+    {
+        return (hookBO.waterHeight-.05) <= hook.position.y  &&  hook.position.y <= (hookBO.waterHeight+0.05);
+    }
+
+    void ApplyForceToHook()
+    {
+        // Calculate the rod's movement since the last frame
+        Vector3 rodMovement = tipPositions[tipPositions.Count - 1] - tipPositions[tipPositions.Count - 2];
+
+        // Only apply force in X and Z directions, ignore vertical movement
+        Vector3 force = new Vector3(rodMovement.x, 0f, rodMovement.z) * hookShiftForceMultiplier;
+
+        // Apply the force to the hook’s Rigidbody in the X and Z directions
+        hook.AddForce(force, ForceMode.Force);
+
+        // Optional: Damping to reduce excessive force or oscillations
+        hook.velocity *= (1f - forceDamping);
+
+    }
+
     public void Reel(float change)
     {
-        Debug.Log(change);
-        //reelChange = change - oldReelChange;
-        //oldReelChange = change;
+        var reelChange = change - prevReelChange;
+        prevReelChange = change;
+        Debug.Log(reelChange);
     }
 
     void SampleRodPositions()

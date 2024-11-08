@@ -1686,12 +1686,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rodTip: {fileID: 4308361475706200526}
-  hook: {fileID: 8390955008280419539}
+  hook: {fileID: 840637298867877347}
   lineRenderer: {fileID: 6182265908053768628}
   lineSegmentCount: 20
   segmentLength: 0.1
   gravity: -9.81
   hookMass: 0.2
+  hookShiftForceMultiplier: 5
+  forceDamping: 0.1
 --- !u!1 &7222867781674643276
 GameObject:
   m_ObjectHideFlags: 0

@@ -950,6 +950,21 @@ PrefabInstance:
       propertyPath: castingMultiplier
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 3778067272237247054, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1708084322}
+    - target: {fileID: 3778067272237247054, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Reel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3778067272237247054, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: NewFishingRod, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
       propertyPath: underwater
@@ -1019,6 +1034,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Fishing Rod (New)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6660875956966467766, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: lineSegmentCount
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4139,6 +4159,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1608205080}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1708084322 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1878764260375105505, guid: e66df282f2da2e547ad6082f3cd78715,
+    type: 3}
+  m_PrefabInstance: {fileID: 369660249}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ea12a6645c830849b688236fdd25018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1895681632 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 621406686114357959, guid: 3c7ef34d5d6343c478262d7d98f44ee5,

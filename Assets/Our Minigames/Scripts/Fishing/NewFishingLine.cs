@@ -4,7 +4,7 @@ using UnityEngine;
 public class NewFishingLine : MonoBehaviour
 {
     public Transform rodTip;
-    public Transform hook;
+    public Rigidbody hook;
     public LineRenderer lineRenderer;
 
     public int lineSegmentCount = 20;  // Number of points in the line
