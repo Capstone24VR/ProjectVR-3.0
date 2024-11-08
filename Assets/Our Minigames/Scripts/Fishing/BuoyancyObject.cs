@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class BoyouncyObject : MonoBehaviour
+public class BuoyancyObject : MonoBehaviour
 {
 
     public float underWaterDrag = 3f;
@@ -60,10 +60,5 @@ public class BoyouncyObject : MonoBehaviour
             rb.drag = airDrag;
             rb.angularDrag= airAngularDrag;
         }
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
