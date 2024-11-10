@@ -12,8 +12,7 @@ namespace XRMultiplayer.MiniGames
     public class MiniGame_Fishing : MiniGameBase
     {
 
-        //NetworkedCards m_NetworkedGameplay;
-        public FishManager fishManager;
+        public NetworkedFishManager m_NetworkedGameplay;
         public GameObject Water;
 
 
@@ -26,31 +25,31 @@ namespace XRMultiplayer.MiniGames
         {
             base.Start();
 
-            //TryGetComponent(out m_NetworkedGameplay);
+            TryGetComponent(out m_NetworkedGameplay);
         }
 
         public override void SetupGame()
         {
             base.SetupGame();
-            fishManager.enabled = false;
-            List<GameObject> currentFish = new List<GameObject>();
-            Water.GetChildGameObjects(currentFish);
-            foreach (GameObject fish in currentFish)
-            {
-                Destroy(fish);
-            }
+            //fishManager.enabled = false;
+            //List<GameObject> currentFish = new List<GameObject>();
+            //Water.GetChildGameObjects(currentFish);
+            //foreach (GameObject fish in currentFish)
+            //{
+            //    Destroy(fish);
+            //}
 
-            //m_NetworkedGameplay.ResetGame();
+            m_NetworkedGameplay.ResetGame();
         }
 
         public override void StartGame()
         {
             base.StartGame();
-            fishManager.enabled = true;
-            //if ((m_NetworkedGameplay.IsServer))
-            //{
-            //    m_NetworkedGameplay.StartGame();
-            //}
+            //fishManager.enabled = true;
+            if ((m_NetworkedGameplay.IsServer))
+            {
+                m_NetworkedGameplay.SpawnProcessServer();
+            }
         }
 
         public override void UpdateGame(float deltaTime)
@@ -66,15 +65,15 @@ namespace XRMultiplayer.MiniGames
         public override void FinishGame(bool submitScore = true)
         {
             base.FinishGame(submitScore);
-            fishManager.enabled = false;
-            List<GameObject> currentFish = new List<GameObject>();
-            Water.GetChildGameObjects(currentFish);
-            foreach (GameObject fish in currentFish)
-            {
-                Destroy(fish);
-            }
+            //fishManager.enabled = false;
+            //List<GameObject> currentFish = new List<GameObject>();
+            //Water.GetChildGameObjects(currentFish);
+            //foreach (GameObject fish in currentFish)
+            //{
+            //    Destroy(fish);
+            //}
 
-            //m_NetworkedGameplay.EndGame();
+            m_NetworkedGameplay.EndGame();
         }
 
         /// <summary>

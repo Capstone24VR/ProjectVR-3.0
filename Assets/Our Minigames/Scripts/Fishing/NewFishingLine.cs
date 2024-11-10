@@ -4,13 +4,13 @@ using UnityEngine;
 public class NewFishingLine : MonoBehaviour
 {
     public Transform rodTip;
-    public Rigidbody hook;
+    public Rigidbody floater;
     public LineRenderer lineRenderer;
 
     public int lineSegmentCount = 20;  // Number of points in the line
     public float segmentLength = 0.1f; // Distance between each segment point
     public float gravity = -9.81f;
-    public float hookMass = 0.2f;
+    public float floaterMass = 0.2f;
     public float verletDamping = 0.98f;
 
     private List<Vector3> linePoints;
@@ -52,10 +52,10 @@ public class NewFishingLine : MonoBehaviour
         {
             if (!ropeLengthLocked)
             {
-                var distanceToHook = Vector3.Distance(rodTip.position, hook.position);
-                if (!hook.GetComponent<BuoyancyObject>().underwater)
+                var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
+                if (!floater.GetComponent<BuoyancyObject>().underwater)
                 {
-                    currentRopeLength = Mathf.Min(distanceToHook, maxRopeLength);
+                    currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
                 }
                 else
                 {
@@ -64,8 +64,8 @@ public class NewFishingLine : MonoBehaviour
             }
             else
             {
-                if (!hook.GetComponent<BuoyancyObject>().underwater)
-                    hook.drag = 10f;
+                if (!floater.GetComponent<BuoyancyObject>().underwater)
+                    floater.drag = 10f;
             }
             
 
@@ -81,7 +81,7 @@ public class NewFishingLine : MonoBehaviour
 
     public void StartCasting()
     {
-        hook.drag = 0;
+        floater.drag = 0;
         isCasting = true;
         lineLocked = false;
         ropeLengthLocked = false;
@@ -89,7 +89,7 @@ public class NewFishingLine : MonoBehaviour
 
     public void StopCasting()
     {
-        hook.drag = 0;
+        floater.drag = 0;
         isCasting = false;
         lineLocked = true;
         ropeLengthLocked = false;
@@ -107,8 +107,8 @@ public class NewFishingLine : MonoBehaviour
         {
             Vector3 currentPoint = linePoints[i];
             Vector3 prevPoint = prevPoints[i];
-            float effectiveGravity = hook.GetComponent<BuoyancyObject>().underwater ? gravity : gravity * 0.5f;
-            Vector3 acceleration = new Vector3(0, effectiveGravity * hookMass, 0);
+            float effectiveGravity = floater.GetComponent<BuoyancyObject>().underwater ? gravity : gravity * 0.5f;
+            Vector3 acceleration = new Vector3(0, effectiveGravity * floaterMass, 0);
 
             // Verlet position update
             linePoints[i] += (currentPoint - prevPoint) * verletDamping + acceleration * Time.deltaTime * Time.deltaTime;
@@ -124,18 +124,18 @@ public class NewFishingLine : MonoBehaviour
         int constraintIterations = 5;
         for(int z  = 0; z < constraintIterations; z++)
         {
-            // Move hook closer to rod tip when length changes
-            Vector3 hookPosition = hook.position;
-            float distanceToRod = Vector3.Distance(rodTip.position, hookPosition);
+            // Move floater closer to rod tip when length changes
+            Vector3 floaterPosition = floater.position;
+            float distanceToRod = Vector3.Distance(rodTip.position, floaterPosition);
             if (distanceToRod > currentRopeLength)
             {
-                Vector3 direcitonToRod = (rodTip.position - hookPosition).normalized;
-                hookPosition = rodTip.position - direcitonToRod * currentRopeLength;
-                hook.MovePosition(hookPosition);
+                Vector3 direcitonToRod = (rodTip.position - floaterPosition).normalized;
+                floaterPosition = rodTip.position - direcitonToRod * currentRopeLength;
+                floater.MovePosition(floaterPosition);
             }
 
-            // Lock the last point to the hook's position
-            linePoints[lineSegmentCount - 1] = hook.position;
+            // Lock the last point to the floater's position
+            linePoints[lineSegmentCount - 1] = floater.position;
 
             // Apply distance constraints to maintain segment length
             for (int i = 0; i < lineSegmentCount - 1; i++)

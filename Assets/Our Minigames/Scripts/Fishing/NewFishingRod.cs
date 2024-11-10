@@ -9,7 +9,7 @@ using XRMultiplayer.MiniGames;
 public class NewFishingRod : MonoBehaviour
 {
     public NewFishingLine fishingLine;
-    public Rigidbody hook; // Rigidbody on the hook or lure object
+    public Rigidbody floater; // Rigidbody on the floater or lure object
     public float castThreshold = 2.5f; // Threshold speed for casting
 
 
@@ -27,10 +27,6 @@ public class NewFishingRod : MonoBehaviour
     private bool castTrigger = false;
     public bool isCasting = false;
     public float castingMultiplier = 10f;
-
-    [Header("Hook Movement")]
-    public float hookShiftForceMultiplier = 5f;  // Multiplier to control how much force is applied to the hook
-    public float forceDamping = 0.1f;  // To reduce oscillation or overreaction of the hook
 
     [Header("Reeling")]
     public float prevReelChange = 0f;  // The previous value from reel (used to find the difference of reel change)
@@ -88,7 +84,7 @@ public class NewFishingRod : MonoBehaviour
 
             basePositions.Clear();
             tipPositions.Clear();
-            ResetHook();
+            ResetCast();
         }
     }
 
@@ -102,7 +98,7 @@ public class NewFishingRod : MonoBehaviour
         }
         else if (isCasting)
         {
-            ResetHook();
+            ResetCast();
         }
     }
 
@@ -116,8 +112,8 @@ public class NewFishingRod : MonoBehaviour
     {
         if (!isCasting)
         {
-            hook.transform.position = rodTipTransform.position;
-            hook.transform.rotation = rodTipTransform.rotation;
+            floater.transform.position = rodTipTransform.position;
+            floater.transform.rotation = rodTipTransform.rotation;
         }
 
         if (currentInteractor == null || hapticFeedback == null) return;
@@ -137,44 +133,44 @@ public class NewFishingRod : MonoBehaviour
             else if (castingQuality < 2.5f)
             {
                 Debug.Log("Weak Cast");
-                LaunchHook(castingQuality);
+                LaunchCast(castingQuality);
             }
             else if (castingQuality >= 2.5f && castingQuality < 5.0f)
             {
                 Debug.Log("Medium Cast");
                 hapticFeedback.SendHapticImpulse(0.3f, 0.2f, 0.5f);
-                LaunchHook(castingQuality*2);
+                LaunchCast(castingQuality*2);
             }
             else if (castingQuality >= 5.0f)
             {
                 Debug.Log("Strong Cast");
                 hapticFeedback.SendHapticImpulse(0.6f, 0.4f, 1f);
-                LaunchHook(castingQuality*5);
+                LaunchCast(castingQuality*5);
             }
         }
     }
 
-    void LaunchHook(float castingQuality)
+    void LaunchCast(float castingQuality)
     {
-        hook.mass = 15;
-        hook.isKinematic = false;
-        hook.useGravity = true;
+        floater.mass = 15;
+        floater.isKinematic = false;
+        floater.useGravity = true;
 
         Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
 
         float launchForce = castingQuality * castingMultiplier;
-        hook.AddForce(castDirection * launchForce, ForceMode.Impulse);
+        floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
-    void ResetHook()
+    void ResetCast()
     {
-        hook.mass = 1;
+        floater.mass = 1;
         isCasting = false;
         fishingLine.StopCasting();
 
-        hook.position = rodTipTransform.position;
-        hook.useGravity = false;
-        hook.isKinematic = true;
+        floater.position = rodTipTransform.position;
+        floater.useGravity = false;
+        floater.isKinematic = true;
     }
     public void Reel(float change)
     {

@@ -1,5 +1,110 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &208009946358889665
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1249968698921456813}
+  - component: {fileID: 4793183976379369906}
+  - component: {fileID: 7530446901734762295}
+  - component: {fileID: 2689357526521548627}
+  m_Layer: 0
+  m_Name: Hook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1249968698921456813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208009946358889665}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.1, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8390955008280419539}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4793183976379369906
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208009946358889665}
+  m_Mesh: {fileID: -2498173409572999176, guid: c3fd9cb25403d064fb2c56a74bf7741a, type: 3}
+--- !u!23 &7530446901734762295
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208009946358889665}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &2689357526521548627
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208009946358889665}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.04, y: 0.04, z: 0.04}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &413425506858776196
 GameObject:
   m_ObjectHideFlags: 0
@@ -1665,12 +1770,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishingLine: {fileID: 0}
-  hook: {fileID: 840637298867877347}
+  floater: {fileID: 840637298867877347}
   castThreshold: 2
   rodTipTransform: {fileID: 4308361475706200526}
   rodBaseTransform: {fileID: 3615715821812839051}
   isCasting: 0
   castingMultiplier: 10
+  prevReelChange: 0
   currentInteractor: {fileID: 0}
   hapticFeedback: {fileID: 0}
 --- !u!114 &6660875956966467766
@@ -1686,14 +1792,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rodTip: {fileID: 4308361475706200526}
-  hook: {fileID: 840637298867877347}
+  floater: {fileID: 840637298867877347}
   lineRenderer: {fileID: 6182265908053768628}
   lineSegmentCount: 20
   segmentLength: 0.1
   gravity: -9.81
-  hookMass: 0.2
-  hookShiftForceMultiplier: 5
-  forceDamping: 0.1
+  floaterMass: 0.2
+  verletDamping: 0.98
+  maxRopeLength: 2
+  currentRopeLength: 0
+  ropeLengthLocked: 0
 --- !u!1 &7222867781674643276
 GameObject:
   m_ObjectHideFlags: 0
@@ -1825,7 +1933,7 @@ GameObject:
   - component: {fileID: 7701063755828338779}
   - component: {fileID: 5837867483857533252}
   m_Layer: 0
-  m_Name: The Hook
+  m_Name: Floater
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1843,7 +1951,8 @@ Transform:
   m_LocalPosition: {x: -0.0083, y: 3.4729989, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1249968698921456813}
   m_Father: {fileID: 6603052287853147593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2859400494519615948

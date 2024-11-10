@@ -39,7 +39,7 @@ namespace XRMultiplayer.MiniGames
         public float spawnTimer = 0f;
         public float maxSpawnTime = 5f;
 
-        public GameObject[] fish = new GameObject[3];
+        public GameObject[] fish = new GameObject[7];
 
         public List<string> names = new List<string>();
         private float[] baitChanceArr = { .001f, .05f, .15f, .25f, .35f, .40f, .60f };
@@ -51,7 +51,6 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         IEnumerator m_CurrentMessageRoutine;
 
-        [SerializeField] protected List<GameObject> fishTemplate = new List<GameObject>();
         [SerializeField] protected List<GameObject> spawnedFishObject = new List<GameObject>();
 
         [SerializeField] protected NetworkList<NetworkObjectReference> _spawnedFish = new NetworkList<NetworkObjectReference>();
@@ -201,6 +200,7 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
+
         [ClientRpc]
         public void SpawnProcessClientRpc(float waitTime, Vector3 position, int type, string name, ulong networkObjectId)
         {
@@ -214,6 +214,8 @@ namespace XRMultiplayer.MiniGames
             yield return new WaitForSeconds(time);
 
         }
+
+
 
         private void RemoveSpawnedFish()
         {
