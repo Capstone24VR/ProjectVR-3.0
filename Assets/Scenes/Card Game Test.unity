@@ -5453,6 +5453,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7692181615512578955, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Name
+      value: FishManager
+      objectReference: {fileID: 0}
     - target: {fileID: 7698505369250192658, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_Enabled
