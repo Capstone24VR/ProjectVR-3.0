@@ -24,8 +24,6 @@ namespace XRMultiplayer.MiniGames
         public override void Start()
         {
             base.Start();
-
-            TryGetComponent(out m_NetworkedGameplay);
         }
 
         public override void SetupGame()

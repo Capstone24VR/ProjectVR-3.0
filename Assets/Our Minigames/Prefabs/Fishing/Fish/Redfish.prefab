@@ -1314,12 +1314,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 793514956411310872}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3f1cbb7fb6497940af529d26255de3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: 0}
+  m_MiniGame: {fileID: 0}
   hook: {fileID: 0}
   water: {fileID: 0}
   hookSpot: {fileID: 8360937755342287745}

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using static UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation.XRDeviceSimulator;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -165,11 +166,8 @@ namespace XRMultiplayer.MiniGames
                     int name = UnityEngine.Random.Range(0, names.Count);
                     Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(-20f, 25f), transform.position.y, UnityEngine.Random.Range(-77f, -32f));
 
-
-                    fish[type].SetActive(true);
                     var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, this.transform);
                     spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
-                    fish[type].SetActive(false);
 
 
                     spawn.name = names[name] + " the " + fish[type].name;
@@ -210,7 +208,13 @@ namespace XRMultiplayer.MiniGames
         IEnumerator SpawnNewFish(float time, Vector3 position, int type, string name, ulong networkObjectId)
         {
             yield return new WaitForSeconds(.25f);
-            //ShowTrickRoutine();
+
+            NetworkObject spawn = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
+            spawn.transform.position = position;
+            spawn.gameObject.SetActive(true);
+            Debug.Log($"{spawn.name} has spawned on the clients");
+
             yield return new WaitForSeconds(time);
 
         }
