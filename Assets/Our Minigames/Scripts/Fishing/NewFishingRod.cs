@@ -10,7 +10,6 @@ public class NewFishingRod : MonoBehaviour
 {
     public NewFishingLine fishingLine;
     public Rigidbody hook; // Rigidbody on the hook or lure object
-    public BuoyancyObject hookBO;
     public float castThreshold = 2.5f; // Threshold speed for casting
 
 
@@ -42,7 +41,6 @@ public class NewFishingRod : MonoBehaviour
 
     private void Awake()
     {
-        hookBO = hook.GetComponent<BuoyancyObject>();
         fishingLine = GetComponent<NewFishingLine>();
     }
 
@@ -121,13 +119,6 @@ public class NewFishingRod : MonoBehaviour
             hook.transform.position = rodTipTransform.position;
             hook.transform.rotation = rodTipTransform.rotation;
         }
-        else
-        {
-            // Doesn't work idk why
-            if (IsHookFloating())
-                ApplyForceToHook();
-
-        }
 
         if (currentInteractor == null || hapticFeedback == null) return;
 
@@ -185,32 +176,11 @@ public class NewFishingRod : MonoBehaviour
         hook.useGravity = false;
         hook.isKinematic = true;
     }
-
-    bool IsHookFloating()
-    {
-        return (hookBO.waterHeight-.05) <= hook.position.y  &&  hook.position.y <= (hookBO.waterHeight+0.05);
-    }
-
-    void ApplyForceToHook()
-    {
-        // Calculate the rod's movement since the last frame
-        Vector3 rodMovement = tipPositions[tipPositions.Count - 1] - tipPositions[tipPositions.Count - 2];
-
-        // Only apply force in X and Z directions, ignore vertical movement
-        Vector3 force = new Vector3(rodMovement.x, 0f, rodMovement.z) * hookShiftForceMultiplier;
-
-        // Apply the force to the hook’s Rigidbody in the X and Z directions
-        hook.AddForce(force, ForceMode.Force);
-
-        // Optional: Damping to reduce excessive force or oscillations
-        hook.velocity *= (1f - forceDamping);
-
-    }
-
     public void Reel(float change)
     {
         var reelChange = change - prevReelChange;
         prevReelChange = change;
+        fishingLine.Reel(reelChange);
         Debug.Log(reelChange);
     }
 

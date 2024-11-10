@@ -945,6 +945,21 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 1940787104
       objectReference: {fileID: 0}
+    - target: {fileID: 840637298867877347, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 840637298867877347, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 840637298867877347, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1878764260375105505, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
       propertyPath: castingMultiplier
@@ -964,6 +979,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: NewFishingRod, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: airDrag
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
@@ -1034,6 +1054,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Fishing Rod (New)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6660875956966467766, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: maxRopeLength
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6660875956966467766, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
@@ -5256,8 +5281,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6449791313429374942, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
+      propertyPath: m_Size.x
+      value: 2.0324953
+      objectReference: {fileID: 0}
+    - target: {fileID: 6449791313429374942, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
       propertyPath: m_Size.y
       value: 1.05464
+      objectReference: {fileID: 0}
+    - target: {fileID: 6449791313429374942, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 0.7366868
+      objectReference: {fileID: 0}
+    - target: {fileID: 6449791313429374942, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.13127832
       objectReference: {fileID: 0}
     - target: {fileID: 6449791313429374942, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -5267,7 +5307,7 @@ PrefabInstance:
     - target: {fileID: 6449791313429374942, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_Center.z
-      value: -0
+      value: 0.032662917
       objectReference: {fileID: 0}
     - target: {fileID: 6533507770260192041, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
