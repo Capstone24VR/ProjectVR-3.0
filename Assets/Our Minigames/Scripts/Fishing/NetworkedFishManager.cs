@@ -193,25 +193,26 @@ namespace XRMultiplayer.MiniGames
                     }
 
                     float waitTime = UnityEngine.Random.Range(3f, maxSpawnTime);
-                    SpawnProcessClientRpc(waitTime, spawnPoint, type, spawn.name, networkObject.NetworkObjectId);
+                    SpawnProcessClientRpc(waitTime, spawnPoint, spawn.name, networkObject.NetworkObjectId);
                 }
             }
         }
 
 
         [ClientRpc]
-        public void SpawnProcessClientRpc(float waitTime, Vector3 position, int type, string name, ulong networkObjectId)
+        public void SpawnProcessClientRpc(float waitTime, Vector3 position, string name, ulong networkObjectId)
         {
-            StartCoroutine(SpawnNewFish(waitTime, position, type, name, networkObjectId));
+            StartCoroutine(SpawnNewFish(waitTime, position, name, networkObjectId));
         }
 
-        IEnumerator SpawnNewFish(float time, Vector3 position, int type, string name, ulong networkObjectId)
+        IEnumerator SpawnNewFish(float time, Vector3 position, string name, ulong networkObjectId)
         {
             yield return new WaitForSeconds(.25f);
 
             NetworkObject spawn = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
             spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
             spawn.transform.position = position;
+            spawn.name = name;
             spawn.gameObject.SetActive(true);
             Debug.Log($"{spawn.name} has spawned on the clients");
 
