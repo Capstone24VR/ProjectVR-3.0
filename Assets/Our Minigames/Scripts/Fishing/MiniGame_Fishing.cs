@@ -46,7 +46,7 @@ namespace XRMultiplayer.MiniGames
             //fishManager.enabled = true;
             if ((m_NetworkedGameplay.IsServer))
             {
-                m_NetworkedGameplay.SpawnProcessServer();
+                m_NetworkedGameplay.StartSpawningFish();
             }
         }
 

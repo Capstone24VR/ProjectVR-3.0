@@ -128,9 +128,34 @@ namespace XRMultiplayer.MiniGames
         public void EndGame()
         {
             StopAllCoroutines();
+            StopSpawningFish();
             RemoveSpawnedFish();
         }
 
+        public IEnumerator SpawnFishLoop()
+        {
+            while(gameStart && currFish < maxFish)
+            {
+                SpawnProcessServer();
+                float newSpawnTime = UnityEngine.Random.Range(2f, maxSpawnTime);
+                yield return new WaitForSeconds(newSpawnTime);
+            }
+        }
+
+        public void StartSpawningFish()
+        {
+            if (IsServer)
+            {
+                gameStart = true;
+                StartCoroutine(SpawnFishLoop());
+            }
+        }
+
+        public void StopSpawningFish()
+        {
+            gameStart = false;
+            StopCoroutine(SpawnFishLoop());
+        }
 
         /// <summary>
         /// Spawns a fish on the server.
