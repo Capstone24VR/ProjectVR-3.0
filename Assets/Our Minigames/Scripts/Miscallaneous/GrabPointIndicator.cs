@@ -7,11 +7,10 @@ public class GrabPointIndicator : MonoBehaviour
     public GameObject[] grabPointDots; // Assign your dot GameObjects here
     private int grabCount = 0;
 
-    private XRBaseInteractable interactable;
+    public XRBaseInteractable interactable;
 
     void Awake()
     {
-        interactable = GetComponent<XRBaseInteractable>();
         interactable.hoverEntered.AddListener(OnHoverEntered);
         interactable.hoverExited.AddListener(OnHoverExited);
         interactable.selectEntered.AddListener(OnSelectEntered);
