@@ -235,6 +235,7 @@ namespace XRMultiplayer.MiniGames
             yield return new WaitForSeconds(.25f);
 
             NetworkObject spawn = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            spawn.transform.parent = transform;
             spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
             spawn.transform.position = position;
             spawn.name = name;
