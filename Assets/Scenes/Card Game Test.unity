@@ -980,6 +980,11 @@ PrefabInstance:
       propertyPath: castingMultiplier
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 3032965849986453105, guid: e66df282f2da2e547ad6082f3cd78715,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1191907562
+      objectReference: {fileID: 0}
     - target: {fileID: 3778067272237247054, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
       propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -2534,6 +2539,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4297729397071455516, guid: 208c2548f5e1da646af2d1b9e3cf4cf9,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4600651287617470809, guid: 208c2548f5e1da646af2d1b9e3cf4cf9,
+        type: 3}
+      propertyPath: m_Mass
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4719646798650747941, guid: 208c2548f5e1da646af2d1b9e3cf4cf9,
         type: 3}
@@ -5208,6 +5223,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 1.8
       objectReference: {fileID: 0}
+    - target: {fileID: 5303500520006720939, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1073630001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5303500520006720939, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1806902339
+      objectReference: {fileID: 0}
     - target: {fileID: 5401779964009447346, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_Enabled
@@ -5237,6 +5262,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555915432310845831, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1246341250
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555915432310845831, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1806902339
       objectReference: {fileID: 0}
     - target: {fileID: 5586656515085936652, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
