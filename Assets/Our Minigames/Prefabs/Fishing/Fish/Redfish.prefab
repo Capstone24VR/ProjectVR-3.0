@@ -1260,10 +1260,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ae8957c6e423336448324b2040286ad0,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7913681354847211333}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ae8957c6e423336448324b2040286ad0,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1176168347589956530}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ae8957c6e423336448324b2040286ad0,
         type: 3}
@@ -1273,6 +1269,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: -1303047172387609933}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ae8957c6e423336448324b2040286ad0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3395039791994869806}
   m_SourcePrefab: {fileID: 100100000, guid: ae8957c6e423336448324b2040286ad0, type: 3}
 --- !u!4 &20531226098747810 stripped
 Transform:
@@ -1307,35 +1307,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7913681354847211333
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 793514956411310872}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3f1cbb7fb6497940af529d26255de3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stats: {fileID: 0}
-  m_MiniGame: {fileID: 0}
-  hook: {fileID: 0}
-  water: {fileID: 0}
-  hookSpot: {fileID: 8360937755342287745}
-  fishSpawnPoint: {fileID: 0}
-  animator: {fileID: 0}
-  baited: 0
-  baitChance: 0
-  wanderDuration: 0
-  target: {x: 0, y: 0, z: 0}
-  state: 0
-  minWanderDuration: 5
-  maxWanderDuration: 20
-  waitDuration: 2
-  maxIdleTime: 5
-  maxBaitTime: 3
 --- !u!114 &1176168347589956530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1409,6 +1380,40 @@ MonoBehaviour:
   Interpolate: 1
   SlerpPosition: 0
   isServerAuthoritative: 0
+--- !u!114 &3395039791994869806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793514956411310872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc952cd16d0c4345b7758be24984db9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stats: {fileID: 1176168347589956530}
+  m_MiniGame: {fileID: 0}
+  hooks:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  hookSpot: {fileID: 0}
+  waterHeight: 0.88
+  animator: {fileID: 0}
+  baited: 0
+  baitChance: 0
+  wanderDuration: 0
+  target: {x: 0, y: 0, z: 0}
+  state: 0
+  networkedState:
+    m_InternalValue: 0
+  minWanderDuration: 5
+  maxWanderDuration: 20
+  waitDuration: 2
+  maxIdleTime: 5
+  maxBaitTime: 3
 --- !u!1001 &1154981131703726481
 PrefabInstance:
   m_ObjectHideFlags: 0

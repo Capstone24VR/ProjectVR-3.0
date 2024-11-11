@@ -13,16 +13,6 @@ namespace XRMultiplayer.MiniGames
     public class NetworkedFishManager : NetworkBehaviour
     {
         /// <summary>
-        /// The hands to use for playing.
-        /// </summary>
-        [SerializeField] NetworkedHand[] m_hands;
-
-        /// <summary>
-        /// The card prefab to spawn.
-        /// </summary>
-        [SerializeField] GameObject card;
-
-        /// <summary>
         /// The mini game to use for handling the mini game logic.
         /// </summary>
         MiniGame_Cards m_MiniGame;
@@ -32,6 +22,11 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         [SerializeField] bool gameStarted = false;
 
+
+        /// <summary>
+        /// The parent object with the height where all fish spawn
+        /// </summary>
+        [SerializeField] Transform fishPool;
 
         public int maxFish = 30;
         public int currFish = 10;
@@ -189,10 +184,10 @@ namespace XRMultiplayer.MiniGames
                     }
 
                     int name = UnityEngine.Random.Range(0, names.Count);
-                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(-20f, 25f), transform.position.y, UnityEngine.Random.Range(-77f, -32f));
+                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(-20f, 25f), fishPool.position.y, UnityEngine.Random.Range(-77f, -32f));
 
-                    var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, this.transform);
-                    spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
+                    var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, fishPool);
+                    spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishStats>().weight;
 
 
                     spawn.name = names[name] + " the " + fish[type].name;
@@ -235,8 +230,8 @@ namespace XRMultiplayer.MiniGames
             yield return new WaitForSeconds(.25f);
 
             NetworkObject spawn = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            spawn.transform.parent = transform;
-            spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishAI>().stats.weight;
+            spawn.TrySetParent(fishPool, false);
+            spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishStats>().weight;
             spawn.transform.position = position;
             spawn.name = name;
             spawn.gameObject.SetActive(true);
@@ -283,7 +278,7 @@ namespace XRMultiplayer.MiniGames
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                     // A new card was added to the draw pile
-                    Debug.Log($"Card added to draw pile: {changeEvent.Value}");
+                    Debug.Log($"Fish added: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noA))
                     {
                         spawnedFishObject.Add(noA.gameObject);
@@ -292,7 +287,7 @@ namespace XRMultiplayer.MiniGames
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                     // A card was removed from the draw pile
-                    Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
+                    Debug.Log($"Fish removed: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noR))
                     {
                         spawnedFishObject.Remove(noR.gameObject);

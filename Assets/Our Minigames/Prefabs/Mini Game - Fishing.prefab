@@ -3875,6 +3875,7 @@ GameObject:
   - component: {fileID: 4713586297179578718}
   - component: {fileID: 5692098045852700068}
   - component: {fileID: 5794879609507435599}
+  - component: {fileID: 8138416516428890460}
   m_Layer: 0
   m_Name: Mini Game - Fishing
   m_TagString: Untagged
@@ -3986,9 +3987,40 @@ MonoBehaviour:
   gameName: Fishing
   m_GameType: 0
   m_GameLength: 180
-  m_GameInteractables: []
-  m_NetworkedGameplay: {fileID: 0}
+  m_GameInteractables:
+  - {fileID: 1590511189373017437}
+  m_NetworkedGameplay: {fileID: 8138416516428890460}
   Water: {fileID: 7692181615512578955}
+--- !u!114 &8138416516428890460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3018292195406216019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe164d0c35506e54eabd7edd79787f8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameStarted: 0
+  fishPool: {fileID: 7496957026006800209}
+  maxFish: 30
+  currFish: 10
+  gameStart: 0
+  spawnTimer: 0
+  maxSpawnTime: 5
+  fish:
+  - {fileID: 6738344743892243817, guid: b61da223aebd05c44b81fbc04b624abc, type: 3}
+  - {fileID: 7563564218733751094, guid: ec02414fb104f5742a1be3d5860ebc2b, type: 3}
+  - {fileID: 793514956411310872, guid: b69c6a9eb7c1acd4a8d936ff7b574b34, type: 3}
+  - {fileID: 8979760116350508608, guid: 66c554818fdc3e040aaa5fc22c247c44, type: 3}
+  - {fileID: 2716000534392060195, guid: f6e2c864a33e77d4f80c4458a1c286e8, type: 3}
+  - {fileID: 8644317899358669692, guid: 6d651e57921158141982d50dcac4139b, type: 3}
+  - {fileID: 8537042319701818380, guid: dafefca9591c8e846b9273029b703cc0, type: 3}
+  names: []
+  spawnedFishObject: []
+  miniManager: {fileID: 0}
 --- !u!1 &3021765525104863894
 GameObject:
   m_ObjectHideFlags: 0
@@ -5815,7 +5847,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5185616797082147187}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FishSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6953,7 +6985,7 @@ GameObject:
   - component: {fileID: 641454700906886443}
   - component: {fileID: 8664921466976597968}
   - component: {fileID: 7075137529654228763}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8522,8 +8554,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1.05464, z: 1}
-  m_Center: {x: 0, y: 0.027320027, z: -0}
+  m_Size: {x: 2.0324953, y: 1.05464, z: 0.7366868}
+  m_Center: {x: 0.13127832, y: 0.027320027, z: 0.032662917}
 --- !u!1 &5477288422058249986
 GameObject:
   m_ObjectHideFlags: 0
@@ -8714,7 +8746,7 @@ GameObject:
   - component: {fileID: 1729551241632793460}
   - component: {fileID: 4522066789812841826}
   - component: {fileID: 5598946198833551686}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9040,7 +9072,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -9462,7 +9494,7 @@ GameObject:
   - component: {fileID: 5015644403161817026}
   - component: {fileID: 3759401311718895371}
   - component: {fileID: 3824672204329841332}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10863,9 +10895,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7496957026006800209}
-  - component: {fileID: 2690975217032741408}
+  - component: {fileID: 1173366578716163335}
   m_Layer: 0
-  m_Name: --------Spawned Fish---------
+  m_Name: Fish Pool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10886,7 +10918,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2548453718943525130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2690975217032741408
+--- !u!114 &1173366578716163335
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10895,23 +10927,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 7692181615512578955}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0640ef69a870678469e03fa2a7e971bc, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxFish: 30
-  currFish: 10
-  gameStart: 0
-  spawnTimer: 0
-  maxSpawnTime: 5
-  fish:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  names: []
+  GlobalObjectIdHash: 1452568196
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &7756537894746435135
 GameObject:
   m_ObjectHideFlags: 0
@@ -12294,7 +12321,7 @@ GameObject:
   - component: {fileID: 4410626167306588246}
   - component: {fileID: 4089480850907717502}
   - component: {fileID: 3076466129188331525}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13280,7 +13307,7 @@ GameObject:
   - component: {fileID: 3239974544997542462}
   - component: {fileID: 2686818477651264622}
   - component: {fileID: 1274163589832316441}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13386,6 +13413,11 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 1452568196
       objectReference: {fileID: 0}
+    - target: {fileID: 4443380480849731963, guid: cea3f4b1b580da245833a14978440ae6,
+        type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1806902339
+      objectReference: {fileID: 0}
     - target: {fileID: 6603052287853147593, guid: cea3f4b1b580da245833a14978440ae6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -13446,6 +13478,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cea3f4b1b580da245833a14978440ae6, type: 3}
+--- !u!114 &1590511189373017437 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 359311137270872440, guid: cea3f4b1b580da245833a14978440ae6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1364070535029580837}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ad34abafad169848a38072baa96cdb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &5281851545062920684 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6603052287853147593, guid: cea3f4b1b580da245833a14978440ae6,
@@ -13613,6 +13657,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 226250553863815651, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 395372021308143477, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 536010597076728827, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1363656354739255621, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 2268883384793774344, guid: a3b0bc822ee75a84681dae040666ccb3,
         type: 3}
       propertyPath: m_Size.x
@@ -13648,6 +13712,21 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3907832112397040201, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126545765863384633, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4377055047695767474, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5192776697609818030, guid: a3b0bc822ee75a84681dae040666ccb3,
         type: 3}
       propertyPath: m_Name
@@ -13655,8 +13734,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5192776697609818030, guid: a3b0bc822ee75a84681dae040666ccb3,
         type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5192776697609818030, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
       propertyPath: m_TagString
       value: Cooler
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963013904791567569, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6988675802566432616, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7130818954273493662, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8615653244005943455, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8713493552596758801, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942516367145843216, guid: a3b0bc822ee75a84681dae040666ccb3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13780,6 +13894,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bucket
+      objectReference: {fileID: 0}
+    - target: {fileID: 5743101958979822734, guid: e34d04392ae1dd6409f76fd81c20e5fc,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
