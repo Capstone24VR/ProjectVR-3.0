@@ -95,14 +95,14 @@ namespace XRMultiplayer.MiniGames
             }
 
             Debug.Log("Client is now connected.");
-            NotifyDeckReadyClientRpc(); // Notify clients once they are connected
+            NotifyFishReadyClientRpc(); // Notify clients once they are connected
         }
 
 
         [ClientRpc]
-        private void NotifyDeckReadyClientRpc()
+        private void NotifyFishReadyClientRpc()
         {
-            Debug.Log("Deck is ready for interaction.");
+            Debug.Log("Fish Pool is ready for interaction.");
         }
 
 
@@ -212,6 +212,8 @@ namespace XRMultiplayer.MiniGames
                         return;
                     }
 
+                    _spawnedFish.Add(networkObject);
+
                     float waitTime = UnityEngine.Random.Range(3f, maxSpawnTime);
                     SpawnProcessClientRpc(waitTime, spawnPoint, spawn.name, networkObject.NetworkObjectId);
                 }
@@ -269,9 +271,9 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void ClearAllFishClientRpc()
         {
-            _spawnedFish.Clear();
             spawnedFishObject.Clear();
         }
+
         private void OnSpawnedFishChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
         {
             switch (changeEvent.Type)
