@@ -233,6 +233,7 @@ namespace XRMultiplayer.MiniGames
 
             NetworkObject spawn = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
             spawn.TrySetParent(fishPool, false);
+            spawn.transform.parent = fishPool;
             spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishStats>().weight;
             spawn.transform.position = position;
             spawn.name = name;

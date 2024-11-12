@@ -26,8 +26,8 @@ public class NetworkedFishAI : NetworkBehaviour
     private float wanderTimer;
     public float wanderDuration;
     public Vector3 target;
-    public FishState state;
-    public NetworkVariable<FishState> networkedState = new NetworkVariable<FishState>();
+    //public FishState state.Value;
+    public NetworkVariable<FishState> state = new NetworkVariable<FishState>();
     private bool changePos = true;
 
     // For Erratic Movement
@@ -60,7 +60,7 @@ public class NetworkedFishAI : NetworkBehaviour
         stats = GetComponent<FishStats>();
         hookSpot = transform.Find("HookSpot").gameObject;
         gameObject.transform.localScale = Vector3.one * stats.weight;
-        state = FishState.Wander;
+        state.Value = FishState.Wander;
     }
 
     // Update is called once per fraame
@@ -75,16 +75,16 @@ public class NetworkedFishAI : NetworkBehaviour
     private void ServerUpdate()
     {
 
-        if (activeHooks.Count == 0 && state != FishState.Caught)
+        if (activeHooks.Count == 0 && state.Value != FishState.Caught)
         {
-            if (state != FishState.Wander)
+            if (state.Value != FishState.Wander)
             {
                 baited = false;
                 ChooseNewRandomposition();
             }
             SetFishStateServerRpc(FishState.Wander);
         }
-        switch (state)
+        switch (state.Value)
         {
             case FishState.Wander:
                 Wander();
@@ -207,16 +207,16 @@ public class NetworkedFishAI : NetworkBehaviour
     void Baited()
     {
         activeHooks = GetActiveHooks();
-        //if (hooks[hookIndex].GetComponent<FishingHook>().caughtSomething.Value && hooks[hookIndex].GetComponent<FishingHook>().caughtObject != this)
-        //{
-        //    ChooseNewRandomposition();
-        //    SetFishStateServerRpc(FishState.Wander);
-        //}
-        //else
-        //{
-        //    target = hooks[hookIndex].transform.position;
-        //    MoveServerRpc(target);
-        //}
+        if (activeHooks[hookIndex].GetComponent<FishingHook>().caughtSomething.Value && activeHooks[hookIndex].GetComponent<FishingHook>().caughtObject != this)
+        {
+            ChooseNewRandomposition();
+            SetFishStateServerRpc(FishState.Wander);
+        }
+        else
+        {
+            target = activeHooks[hookIndex].transform.position;
+            MoveServerRpc(target);
+        }
     }
 
     private void SortHooksByDistance(List<Transform> list)
@@ -235,7 +235,7 @@ public class NetworkedFishAI : NetworkBehaviour
     //    target = target - direction;
     //    waitTimer = 0f;
     //    wanderTimer = 0f;
-    //    state = FishState.Wander;
+    //    state.Value = FishState.Wander;
     //}
 
     [ServerRpc]
@@ -257,9 +257,9 @@ public class NetworkedFishAI : NetworkBehaviour
     [ServerRpc]
     public void SetFishStateServerRpc(FishState newState)
     {
-        state = newState;
-        networkedState.Value = newState;
+        state.Value = newState;
     }
+
 
     private void ChooseNewRandomposition()
     {
