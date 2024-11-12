@@ -1,24 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.XR.CoreUtils;
+using Unity.Netcode;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI.Table;
 
-public class FishingHook : MonoBehaviour
+public class FishingHook : NetworkBehaviour
 {
-    private int fishLayer;
+
     public GameObject caughtObject = null;
-    public FishingMiniGame miniGame;
-    public bool caughtSomething = false;
-
-    private void Awake()
-    {
-        fishLayer = LayerMask.NameToLayer("Fish");
-    }
-
+    public NetworkVariable<bool> caughtSomething = new NetworkVariable<bool>(false);
     private void Update()
     {
-        if (caughtSomething)
+        if (caughtSomething.Value)
         {
             gameObject.transform.position = caughtObject.transform.Find("HookSpot").transform.position;
         }
@@ -29,16 +19,11 @@ public class FishingHook : MonoBehaviour
         Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Fish")
         {
-            if (!caughtSomething)
+            if (!caughtSomething.Value)
             {
-                caughtObject = collision.gameObject.transform.parent.gameObject;
-                caughtObject.GetComponent<FishAI>().state = FishAI.FishState.Struggle;
-                miniGame.ResetBar();
-                miniGame.struggleFish = caughtObject;
-                miniGame.maxFailTimer = 3f * caughtObject.GetComponent<FishStats>().baitChance;
-                miniGame.pause = false;
-                miniGame.gameObject.SetActive(true);
-                caughtSomething = true;
+                caughtObject = collision.transform.parent.gameObject;
+                caughtObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
+                caughtSomething.Value = true;
                 Debug.Log("I baited: " + collision.gameObject.transform.parent.name);
             }
         }

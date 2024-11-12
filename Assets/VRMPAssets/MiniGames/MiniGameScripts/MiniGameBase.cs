@@ -54,7 +54,7 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         [SerializeField] protected float m_GameLength = 90.0f;
 
-        [SerializeField] protected XRBaseInteractable[] m_GameInteractables;
+        [SerializeField] public XRBaseInteractable[] m_GameInteractables;
 
         /// <summary>
         /// Manager for the mini-game.

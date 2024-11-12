@@ -9,7 +9,7 @@ public class Cooler : MonoBehaviour
     //public TimeAttack timeAttack;
     public GameObject fishStatCanvas;
 
-    public FishAI newFish;
+    public NetworkedFishAI newFish;
 
     public void OnFishCatch()
     {

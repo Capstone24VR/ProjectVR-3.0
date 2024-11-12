@@ -19,6 +19,11 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] float m_RodResetTime = .25f;
 
         /// <summary>
+        /// Hooks for Fish to use
+        /// </summary>
+        [SerializeField] public Transform[] m_Hooks = new Transform[4];
+
+        /// <summary>
         /// The networked gameplay to use for handling the networked gameplay logic.
         /// </summary>
         public NetworkedFishManager m_NetworkedGameplay;

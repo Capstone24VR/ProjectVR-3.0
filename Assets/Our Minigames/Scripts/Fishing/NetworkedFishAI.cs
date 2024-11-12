@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using XRMultiplayer.MiniGames;
@@ -9,7 +10,10 @@ public class NetworkedFishAI : NetworkBehaviour
 
     public MiniGame_Fishing m_MiniGame;
 
-    public Transform[] hooks = new Transform[4];
+    public List<Transform> hooks = new List<Transform>();
+    public List<Transform> activeHooks;
+    public int hookIndex;
+
     public GameObject hookSpot;
     public float waterHeight = 0.25f;
 
@@ -43,6 +47,14 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void Awake()
     {
+        m_MiniGame = FindAnyObjectByType<MiniGame_Fishing>();
+
+        Debug.Log(m_MiniGame.name);
+        foreach (var hook in m_MiniGame.m_Hooks)
+        {
+            hooks.Add(hook);
+        }
+
         target = transform.position;
         animator = GetComponentInChildren<Animator>();
         stats = GetComponent<FishStats>();
@@ -65,22 +77,21 @@ public class NetworkedFishAI : NetworkBehaviour
 
         //if (!hook.activeSelf && state != FishState.Caught)
         //{
-            if (state != FishState.Wander)
-            {
-                baited = false;
-                ChooseNewRandomposition();
-            }
-            state = FishState.Wander;
-            SyncFishStateServerRpc(state);
+        if (state != FishState.Wander)
+        {
+            baited = false;
+            ChooseNewRandomposition();
+        }
+        SetFishStateServerRpc(FishState.Wander);
         //}
         switch (state)
         {
             case FishState.Wander:
                 Wander();
                 break;
-            //case FishState.Baited:
-            //    Baited();
-            //    break;
+            case FishState.Baited:
+                //Baited();
+                break;
             case FishState.Struggle:
                 Struggle();
                 break;
@@ -92,21 +103,25 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Wander()
     {
-        //if (hook.activeSelf == true && hook.transform.position.y <= waterHeight && !hook.GetComponent<FishingHook>().caughtSomething)
-        //{
-        //    baitTimer += Time.deltaTime;
-        //    if (baitTimer >= maxBaitTime)
-        //    {
-        //        baited = isBaited();
-        //        if (baited)
-        //        {
-        //            Debug.Log(gameObject.name + " has been baited to the rod");
-        //            state = FishState.Baited;
-        //            SyncFishStateServerRpc(state);
-        //        }
-        //        baitTimer = 0f;
-        //    }
-        //}
+        activeHooks = GetActiveHooks();
+        if (activeHooks.Count > 0)
+        {
+            baitTimer += Time.deltaTime;
+            if (baitTimer >= maxBaitTime)
+            {
+                hookIndex = isBaited(activeHooks);
+                if (hookIndex > -1)
+                {
+                    baited = true;
+                }
+                if (baited)
+                {
+                    Debug.Log($"{name} has been baited to rod: {hookIndex}");
+                    SetFishStateServerRpc(FishState.Baited);
+                }
+                baitTimer = 0f;
+            }
+        }
         //// Move towards the target position
         MoveServerRpc(target);
 
@@ -151,28 +166,66 @@ public class NetworkedFishAI : NetworkBehaviour
         }
     }
 
-    //bool isBaited()
-    //{
-    //    //var distanceFromHook = Vector3.Distance(gameObject.transform.position, hook.transform.position);
-    //    //var cap = 10 / distanceFromHook + stats.weight / 2;
-    //    //var roll = Random.Range(0f, cap);
-    //    //return roll <= (cap / (stats.resistance + 1));
-    //}
+    int isBaited(List<Transform> activeHooks)
+    {
+        SortHooksByDistance(activeHooks);
+
+        int index = -1;
+        foreach (var hook in activeHooks)
+        {
+            index++;
+            if (hook.transform.position.y <= waterHeight && hook.GetComponent<FishingHook>().caughtSomething.Value)
+            {
+                var distanceFromHook = Vector3.Distance(gameObject.transform.position, hook.transform.position);
+                var cap = 10 / distanceFromHook + stats.weight / 2;
+                var roll = Random.Range(0f, cap);
+                if (roll <= cap / (stats.resistance + 1))
+                {
+                    return index;
+                }
+            }
+        }
+
+        return index;
+    }
+
+    List<Transform> GetActiveHooks()
+    {
+        var res = new List<Transform>(hooks);
+
+        for(int i = res.Count-1; i >= 0; i--)
+        {
+            if (res[i].transform.position.y > waterHeight)
+            {
+                res.Remove(res[i]);
+            }
+        }
+        return res;
+    }
+
 
     void Baited()
     {
-        //    if (hook.GetComponent<FishingHook>().caughtSomething && hook.GetComponent<FishingHook>().caughtObject != gameObject)
-        //    {
-        //        ChooseNewRandomposition();
-        //        state = FishState.Wander;
-        //        SyncFishStateServerRpc(state);
-        //    }
-        //    else
-        //    {
-        //        target = hook.transform.position;
-        //        networkedTarget.Value = target;
-        //        MoveServerRpc(target);
-        //    }
+        if (hooks[hookIndex].GetComponent<FishingHook>().caughtSomething.Value && hooks[hookIndex].GetComponent<FishingHook>().caughtObject != this)
+        {
+            ChooseNewRandomposition();
+            SetFishStateServerRpc(FishState.Wander);
+        }
+        else
+        {
+            target = hooks[hookIndex].transform.position;
+            MoveServerRpc(target);
+        }
+    }
+
+    private void SortHooksByDistance(List<Transform> list)
+    {
+        list.Sort((hook1, hook2) =>
+        {
+            float distanceToHook1 = Vector3.Distance(hook1.position, transform.position);
+            float distanceToHook2 = Vector3.Distance(hook1.position, transform.position);
+            return distanceToHook1.CompareTo(distanceToHook2);
+        });
     }
 
     //void Startled()
@@ -201,8 +254,9 @@ public class NetworkedFishAI : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void SyncFishStateServerRpc(FishState newState)
+    public void SetFishStateServerRpc(FishState newState)
     {
+        state = newState;
         networkedState.Value = newState;
     }
 
@@ -222,6 +276,8 @@ public class NetworkedFishAI : NetworkBehaviour
         {
             //other.gameObject.GetComponent<Cooler>().newFish = this;
             other.gameObject.GetComponent<Cooler>().OnFishCatch();
+
+            MiniGame_Fishing m_MiniGame = FindAnyObjectByType<MiniGame_Fishing>();
 
             m_MiniGame.LocalPlayerScored((int)(stats.weight * stats.multiplier * 100));
 

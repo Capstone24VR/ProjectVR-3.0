@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4793183976379369906}
   - component: {fileID: 7530446901734762295}
   - component: {fileID: 2689357526521548627}
+  - component: {fileID: 4032883733478250068}
   m_Layer: 0
   m_Name: Hook
   m_TagString: Untagged
@@ -105,6 +106,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.04, y: 0.04, z: 0.04}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4032883733478250068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208009946358889665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72efdc73ab68ca4eb25e2e4782dd3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  caughtObject:
+    m_InternalValue: {fileID: 0}
+  caughtSomething:
+    m_InternalValue: 0
 --- !u!1 &413425506858776196
 GameObject:
   m_ObjectHideFlags: 0
@@ -384,7 +401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
   m_Colliders:
-  - {fileID: 1572828566348132485}
+  - {fileID: 7255949213923916457}
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -521,7 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1452568196
+  GlobalObjectIdHash: 1198963429
   InScenePlacedSourceGlobalObjectIdHash: 1806902339
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1340,7 +1357,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3536757399511796050}
-  - component: {fileID: 1572828566348132485}
+  - component: {fileID: 7255949213923916457}
   m_Layer: 0
   m_Name: Rod
   m_TagString: Untagged
@@ -1370,8 +1387,8 @@ Transform:
   - {fileID: 1853772581547817025}
   m_Father: {fileID: 8777607294882702466}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1572828566348132485
-BoxCollider:
+--- !u!136 &7255949213923916457
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1388,9 +1405,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.052176487, y: 3.448353, z: 0.054189183}
-  m_Center: {x: 0.037203547, y: 1.749694, z: -8.460509e-17}
+  serializedVersion: 2
+  m_Radius: 0.04941724
+  m_Height: 3.4917047
+  m_Direction: 1
+  m_Center: {x: 0.03544771, y: 1.7379413, z: -0.00042308134}
 --- !u!1 &5047484517017577021
 GameObject:
   m_ObjectHideFlags: 0
@@ -1922,7 +1941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1452568196
+  GlobalObjectIdHash: 1198963429
   InScenePlacedSourceGlobalObjectIdHash: 1806902339
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2056,7 +2075,6 @@ GameObject:
   - component: {fileID: 8390955008280419539}
   - component: {fileID: 2859400494519615948}
   - component: {fileID: 985139847974072137}
-  - component: {fileID: 4645720972158289709}
   - component: {fileID: 840637298867877347}
   - component: {fileID: 5837867483857533252}
   - component: {fileID: 153185392741603967}
@@ -2134,27 +2152,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4645720972158289709
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7478386638205023423}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 256
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.04, y: 0.04, z: 0.04}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &840637298867877347
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2214,7 +2211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1452568196
+  GlobalObjectIdHash: 1198963429
   InScenePlacedSourceGlobalObjectIdHash: 1806902339
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

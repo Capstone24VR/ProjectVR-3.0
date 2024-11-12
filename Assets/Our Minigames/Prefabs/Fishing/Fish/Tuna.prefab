@@ -918,11 +918,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stats: {fileID: 4463895739402373262}
   m_MiniGame: {fileID: 0}
-  hooks:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  hooks: []
+  activeHooks: []
+  hookIndex: 0
   hookSpot: {fileID: 0}
   waterHeight: 0.88
   animator: {fileID: 0}

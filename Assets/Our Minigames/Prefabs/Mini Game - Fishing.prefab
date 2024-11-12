@@ -4272,7 +4272,7 @@ MonoBehaviour:
   - {fileID: 8537042319701818380, guid: dafefca9591c8e846b9273029b703cc0, type: 3}
   names: []
   spawnedFishObject: []
-  miniManager: {fileID: 0}
+  miniManager: {fileID: 5692098045852700068}
 --- !u!1 &3021765525104863894
 GameObject:
   m_ObjectHideFlags: 0
