@@ -23,6 +23,7 @@ TagManager:
   - Cabbage
   - Pumpkin
   - Cooler
+  - Hook
   layers:
   - Default
   - TransparentFX

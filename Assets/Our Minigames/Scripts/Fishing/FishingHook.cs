@@ -16,6 +16,7 @@ public class FishingHook : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log(collision.gameObject.name);
         Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Fish")
         {

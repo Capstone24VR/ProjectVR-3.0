@@ -26,7 +26,6 @@ public class NetworkedFishAI : NetworkBehaviour
     private float wanderTimer;
     public float wanderDuration;
     public Vector3 target;
-    //public FishState state.Value;
     public NetworkVariable<FishState> state = new NetworkVariable<FishState>();
     private bool changePos = true;
 
@@ -49,7 +48,6 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         m_MiniGame = FindAnyObjectByType<MiniGame_Fishing>();
 
-        Debug.Log(m_MiniGame.name);
         foreach (var hook in m_MiniGame.m_Hooks)
         {
             hooks.Add(hook);
@@ -206,15 +204,32 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Baited()
     {
+        Transform currentHook = null;
         activeHooks = GetActiveHooks();
-        if (activeHooks[hookIndex].GetComponent<FishingHook>().caughtSomething.Value && activeHooks[hookIndex].GetComponent<FishingHook>().caughtObject != this)
+
+        int count = activeHooks.Count;
+        if(activeHooks.Count != count)
         {
+            hookIndex = -1;
+            ChooseNewRandomposition();
+            SetFishStateServerRpc(FishState.Wander);
+            return;
+        }
+        else
+        {
+            currentHook = activeHooks[hookIndex];
+        }
+
+
+        if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
+        {
+            hookIndex = -1;
             ChooseNewRandomposition();
             SetFishStateServerRpc(FishState.Wander);
         }
         else
         {
-            target = activeHooks[hookIndex].transform.position;
+            target = currentHook.transform.position;
             MoveServerRpc(target);
         }
     }
@@ -254,7 +269,7 @@ public class NetworkedFishAI : NetworkBehaviour
         transform.LookAt(lookAt);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership=false)]
     public void SetFishStateServerRpc(FishState newState)
     {
         state.Value = newState;
@@ -271,14 +286,22 @@ public class NetworkedFishAI : NetworkBehaviour
     }
 
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Hook")
+        {
+            Debug.Log($"{name} has touched the {collision.transform.parent.name}");
+            SetFishStateServerRpc(FishState.Caught);
+        }
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Cooler")
         {
             //other.gameObject.GetComponent<Cooler>().newFish = this;
             other.gameObject.GetComponent<Cooler>().OnFishCatch();
-
-            MiniGame_Fishing m_MiniGame = FindAnyObjectByType<MiniGame_Fishing>();
 
             m_MiniGame.LocalPlayerScored((int)(stats.weight * stats.multiplier * 100));
 

@@ -384,8 +384,7 @@ MonoBehaviour:
   baitChance: 0
   wanderDuration: 0
   target: {x: 0, y: 0, z: 0}
-  state: 0
-  networkedState:
+  state:
     m_InternalValue: 0
   minWanderDuration: 5
   maxWanderDuration: 20
@@ -1397,6 +1396,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 83504c2ed6d6f6a45a81e6eacb504826,
+        type: 3}
+      propertyPath: m_TagString
+      value: Fish
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

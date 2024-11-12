@@ -199,6 +199,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1348ef7f4951d814a97c7fc66ae7289e,
+        type: 3}
+      propertyPath: m_TagString
+      value: Fish
+      objectReference: {fileID: 0}
     - target: {fileID: 1061764831542504962, guid: 1348ef7f4951d814a97c7fc66ae7289e,
         type: 3}
       propertyPath: m_Layer
@@ -464,6 +469,10 @@ PrefabInstance:
     - target: {fileID: 100072, guid: b8054f1201b0b450dbfef64dcd0c200b, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100072, guid: b8054f1201b0b450dbfef64dcd0c200b, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: b8054f1201b0b450dbfef64dcd0c200b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1422,8 +1431,7 @@ MonoBehaviour:
   baitChance: 0
   wanderDuration: 0
   target: {x: 0, y: 0, z: 0}
-  state: 0
-  networkedState:
+  state:
     m_InternalValue: 0
   minWanderDuration: 5
   maxWanderDuration: 20

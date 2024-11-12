@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4032883733478250068}
   m_Layer: 0
   m_Name: Hook
-  m_TagString: Untagged
+  m_TagString: Hook
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,8 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72efdc73ab68ca4eb25e2e4782dd3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  caughtObject:
-    m_InternalValue: {fileID: 0}
+  caughtObject: {fileID: 0}
   caughtSomething:
     m_InternalValue: 0
 --- !u!1 &413425506858776196
