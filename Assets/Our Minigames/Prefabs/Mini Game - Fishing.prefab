@@ -14577,21 +14577,6 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 1806902339
       objectReference: {fileID: 0}
-    - target: {fileID: 478361723959670355, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 511124171
-      objectReference: {fileID: 0}
-    - target: {fileID: 478361723959670355, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 904568948
-      objectReference: {fileID: 0}
-    - target: {fileID: 840637298867877347, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: m_Constraints
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 840637298867877347, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
       propertyPath: m_Interpolate
@@ -14624,33 +14609,8 @@ PrefabInstance:
       objectReference: {fileID: 7572573222465876441}
     - target: {fileID: 3778067272237247054, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
-      propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Reel
-      objectReference: {fileID: 0}
-    - target: {fileID: 3778067272237247054, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
       propertyPath: m_OnValueChange.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: NewFishingRod, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: airDrag
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: underwater
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: waterHeight
-      value: 0.88
-      objectReference: {fileID: 0}
-    - target: {fileID: 5837867483857533252, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: floatingPower
-      value: 220
       objectReference: {fileID: 0}
     - target: {fileID: 6603052287853147593, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}
@@ -14731,11 +14691,6 @@ PrefabInstance:
         type: 3}
       propertyPath: lineSegmentCount
       value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7424843393431278081, guid: e66df282f2da2e547ad6082f3cd78715,
-        type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 2199426555
       objectReference: {fileID: 0}
     - target: {fileID: 7595150710947733812, guid: e66df282f2da2e547ad6082f3cd78715,
         type: 3}

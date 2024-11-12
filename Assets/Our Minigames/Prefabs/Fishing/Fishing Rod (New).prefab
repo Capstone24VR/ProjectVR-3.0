@@ -521,8 +521,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1198963429
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1452568196
+  InScenePlacedSourceGlobalObjectIdHash: 1806902339
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -892,8 +892,8 @@ MonoBehaviour:
   m_OnValueChange:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: FishingRod, Assembly-CSharp
+      - m_Target: {fileID: 1878764260375105505}
+        m_TargetAssemblyTypeName: NewFishingRod, Assembly-CSharp
         m_MethodName: Reel
         m_Mode: 0
         m_Arguments:
@@ -1754,7 +1754,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 0.5999999, y: 0.5999999, z: 0.59999985}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8390955008280419539}
@@ -1883,7 +1883,7 @@ MonoBehaviour:
   rodTipTransform: {fileID: 4308361475706200526}
   rodBaseTransform: {fileID: 3615715821812839051}
   isCasting: 0
-  castingMultiplier: 10
+  castingMultiplier: 20
   prevReelChange: 0
   currentInteractor: {fileID: 0}
   hapticFeedback: {fileID: 0}
@@ -1902,12 +1902,12 @@ MonoBehaviour:
   rodTip: {fileID: 4308361475706200526}
   floater: {fileID: 840637298867877347}
   lineRenderer: {fileID: 6182265908053768628}
-  lineSegmentCount: 20
+  lineSegmentCount: 10
   segmentLength: 0.1
   gravity: -9.81
   floaterMass: 0.2
   verletDamping: 0.98
-  maxRopeLength: 2
+  maxRopeLength: 10
   currentRopeLength: 0
   ropeLengthLocked: 0
 --- !u!114 &7595150710947733812
@@ -1922,8 +1922,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1198963429
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1452568196
+  InScenePlacedSourceGlobalObjectIdHash: 1806902339
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -2179,9 +2179,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &5837867483857533252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2214,8 +2214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1198963429
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1452568196
+  InScenePlacedSourceGlobalObjectIdHash: 1806902339
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
