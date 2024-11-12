@@ -75,22 +75,22 @@ public class NetworkedFishAI : NetworkBehaviour
     private void ServerUpdate()
     {
 
-        //if (!hook.activeSelf && state != FishState.Caught)
-        //{
-        if (state != FishState.Wander)
+        if (activeHooks.Count == 0 && state != FishState.Caught)
         {
-            baited = false;
-            ChooseNewRandomposition();
+            if (state != FishState.Wander)
+            {
+                baited = false;
+                ChooseNewRandomposition();
+            }
+            SetFishStateServerRpc(FishState.Wander);
         }
-        SetFishStateServerRpc(FishState.Wander);
-        //}
         switch (state)
         {
             case FishState.Wander:
                 Wander();
                 break;
             case FishState.Baited:
-                //Baited();
+                Baited();
                 break;
             case FishState.Struggle:
                 Struggle();
@@ -116,7 +116,7 @@ public class NetworkedFishAI : NetworkBehaviour
                 }
                 if (baited)
                 {
-                    Debug.Log($"{name} has been baited to rod: {hookIndex}");
+                    Debug.Log($"{name} has been baited to rod: {activeHooks[hookIndex].parent.parent.name}");
                     SetFishStateServerRpc(FishState.Baited);
                 }
                 baitTimer = 0f;
@@ -206,16 +206,17 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Baited()
     {
-        if (hooks[hookIndex].GetComponent<FishingHook>().caughtSomething.Value && hooks[hookIndex].GetComponent<FishingHook>().caughtObject != this)
-        {
-            ChooseNewRandomposition();
-            SetFishStateServerRpc(FishState.Wander);
-        }
-        else
-        {
-            target = hooks[hookIndex].transform.position;
-            MoveServerRpc(target);
-        }
+        activeHooks = GetActiveHooks();
+        //if (hooks[hookIndex].GetComponent<FishingHook>().caughtSomething.Value && hooks[hookIndex].GetComponent<FishingHook>().caughtObject != this)
+        //{
+        //    ChooseNewRandomposition();
+        //    SetFishStateServerRpc(FishState.Wander);
+        //}
+        //else
+        //{
+        //    target = hooks[hookIndex].transform.position;
+        //    MoveServerRpc(target);
+        //}
     }
 
     private void SortHooksByDistance(List<Transform> list)

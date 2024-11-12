@@ -50,7 +50,6 @@ public class BuoyancyObject : MonoBehaviour
 
     void SwitchState(bool isUnderwater)
     {
-        Debug.Log($"Switch State: {isUnderwater}");
         if(isUnderwater)
         {
             rb.drag = underWaterDrag;
