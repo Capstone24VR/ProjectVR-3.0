@@ -1738,7 +1738,7 @@ GameObject:
   - component: {fileID: 6660875956966467766}
   - component: {fileID: 7595150710947733812}
   m_Layer: 0
-  m_Name: Fishing Rod (New)
+  m_Name: Fishing Rod (Networked) 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
