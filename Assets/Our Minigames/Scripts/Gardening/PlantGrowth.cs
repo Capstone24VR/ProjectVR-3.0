@@ -4,61 +4,56 @@ using UnityEngine.UI;
 public class PlantGrowth : MonoBehaviour
 {
     [Header("Plant Stages")]
-    public GameObject[] growthStages;
-    public Slider wateringSlider;
-    public Slider timerSlider;  // Slider to show time until the next stage or death
+    public GameObject[] growthStages; // Array of plant stage prefabs to visualize growth stages
+    public Slider wateringSlider; // UI slider to display watering progress
+    public Slider timerSlider; // UI slider to display time left until next growth stage or death
 
     [Header("Stage Configurations")]
-    public float wateringTimeRequired = 5f;
-    public float[] stageDurations;
+    public float wateringTimeRequired = 5f; // Time required to water the plant sufficiently
+    public float[] stageDurations; // Duration of each growth stage
 
-    private float wateringTime = 0f;
-    private float showWateringSliderTime;
-    private float stageTimer = 0f;
-    private int currentStage = 0;
-    private bool isWatered = false;
+    private float wateringTime = 0f; // Tracks accumulated watering time
+    private float stageTimer = 0f; // Timer for the current growth stage
+    private int currentStage = 0; // Index of the current plant stage
+    private bool isWatered = false; // Flag to track if the plant has been watered adequately
 
-    public GameObject[] dropItems;
-    public GameObject plantBed;
-
+    public GameObject[] dropItems; // Items to drop when the plant is harvested
+    public GameObject plantBed; // Reference to the plant bed containing this plant
 
     void Awake()
     {
-        SetActiveStage(currentStage);
-        wateringSlider.gameObject.SetActive(currentStage < 3);
-        timerSlider.gameObject.SetActive(false);  // Initially disable the timer slider
-        UpdateWateringSlider();
+        SetActiveStage(currentStage); // Initialize the plant's current stage at start
+        wateringSlider.gameObject.SetActive(currentStage < 3); // Show watering slider if in early stages
+        timerSlider.gameObject.SetActive(false); // Hide timer slider initially
+        UpdateWateringSlider(); // Initialize the watering slider display
         Debug.Log("Awake: Initial stage set.");
     }
+
     void Update()
     {
-        if (currentStage == 3)
-        {
-
-        }
+        // Increment timers if the plant is in a growth stage
         if (currentStage > 0)
         {
             stageTimer += Time.deltaTime;
-            //Debug.Log($"Update: Stage {currentStage} timer updated to {stageTimer}.");
         }
 
+        // Check if it's time to move to the next stage or if the plant dies
         if (currentStage > 0 && currentStage < 3)
         {
             if (stageTimer >= stageDurations[currentStage - 1])
             {
                 if (!isWatered)
                 {
-                    Debug.Log("Update: Timer exceeded without sufficient watering, plant will die.");
-                    Die();
+                    Die(); // Kill the plant if it wasn't watered enough
                 }
                 else
                 {
-                    Debug.Log("Update: Timer exceeded, plant has been watered, advancing stage.");
-                    AdvanceStage();
+                    AdvanceStage(); // Move to the next growth stage
                 }
             }
         }
 
+        // Manage the watering slider visibility and updates
         if (currentStage < 3 && !isWatered)
         {
             wateringSlider.gameObject.SetActive(true);
@@ -75,6 +70,7 @@ public class PlantGrowth : MonoBehaviour
             }
         }
 
+        // Manage the timer slider visibility and updates
         if (currentStage > 0 && currentStage < 3)
         {
             timerSlider.gameObject.SetActive(true);
@@ -86,6 +82,7 @@ public class PlantGrowth : MonoBehaviour
         }
     }
 
+    // Advances the growth stage of the plant
     private void AdvanceStage()
     {
         if (currentStage < 3)
@@ -99,15 +96,17 @@ public class PlantGrowth : MonoBehaviour
         }
     }
 
+    // Handles the plant dying due to neglect
     void Die()
     {
-        currentStage = 4;
+        currentStage = 4; // Set to a 'dead' stage
         SetActiveStage(currentStage);
         timerSlider.gameObject.SetActive(false);
         wateringSlider.gameObject.SetActive(false);
         Debug.Log("Die: Plant has died due to neglect.");
     }
 
+    // Updates the UI timer slider based on time remaining in the current stage
     private void UpdateTimerSlider()
     {
         if (currentStage < 3)
@@ -123,6 +122,7 @@ public class PlantGrowth : MonoBehaviour
         }
     }
 
+    // Sets the active visual stage for the plant
     void SetActiveStage(int stage)
     {
         for (int i = 0; i < growthStages.Length; i++)
@@ -132,39 +132,40 @@ public class PlantGrowth : MonoBehaviour
         Debug.Log($"SetActiveStage: Active stage set to {stage}.");
     }
 
+    // Updates the UI watering slider based on the current watering progress
     void UpdateWateringSlider()
     {
         wateringSlider.value = wateringTime / wateringTimeRequired;
-        // Debug.Log($"UpdateWateringSlider: Watering slider updated to {wateringSlider.value}.");
     }
 
+    // Handles collisions with a shovel for harvesting or destroying the plant
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Shovel" && currentStage == 3)
         {
-            Debug.Log("OnCollisionEnter: Shovel detected, harvesting plant.");
-            Harvest();
+            Harvest(); // Harvest the plant if mature
         }
         else if (collision.gameObject.tag == "Shovel")
         {
             if (plantBed != null)
             {
-                plantBed.tag = "Unplanted";
+                plantBed.tag = "Unplanted"; // Reset the bed tag if plant is destroyed before maturity
             }
-            Destroy(gameObject);
+            Destroy(gameObject); // Destroy the plant
             Debug.Log("Destroyed plant");
         }
     }
 
+    // Handles water particle collisions for watering the plant
     void OnParticleCollision(GameObject other)
     {
         if (other.tag == "Water" && currentStage < 3)
         {
-            wateringTime += Time.deltaTime;
-            // Debug.Log($"OnParticleCollision: Plant being watered, total watering time {wateringTime}.");
+            wateringTime += Time.deltaTime; // Increment watering time when hit by water particles
         }
     }
 
+    // Handles the harvesting process, creating drop items and cleaning up
     void Harvest()
     {
         foreach (GameObject item in dropItems)
@@ -176,13 +177,9 @@ public class PlantGrowth : MonoBehaviour
 
         if (plantBed != null)
         {
-            plantBed.tag = "Unplanted";
+            plantBed.tag = "Unplanted"; // Reset the plant bed's tag
         }
-        Destroy(gameObject);
+        Destroy(gameObject); // Destroy the plant after harvesting
         Debug.Log("Harvest: Plant harvested and object destroyed.");
-
     }
 }
-
-
-

@@ -10,9 +10,16 @@ namespace XRMultiplayer.MiniGames
     {
         int m_CurrentScore = 0;
 
+        public JobOrders[] m_JobOrders = new JobOrders[2];
+
         public override void Start()
         {
             base.Start();
+            // Start game logic specific to gardening
+            for (int i = 0; i < m_JobOrders.Length; i++)
+            {
+                m_JobOrders[i].CreateNewJob();
+            }
         }
 
         public override void SetupGame()
@@ -25,6 +32,10 @@ namespace XRMultiplayer.MiniGames
             base.StartGame();
             m_CurrentScore = 0;
             // Start game logic specific to gardening
+            for (int i = 0; i < m_JobOrders.Length; i++)
+            {
+                m_JobOrders[i].CreateNewJob();
+            }
         }
 
         public override void UpdateGame(float deltaTime)
@@ -38,10 +49,6 @@ namespace XRMultiplayer.MiniGames
             m_MiniGameManager.FinishGame();
         }
 
-        /// <summary>
-        /// Called when the local player hits a target.
-        /// </summary>
-        /// <param name="targetValue"></param>
         public void LocalPlayerCompletedJob(int targetValue)
         {
             if (m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
