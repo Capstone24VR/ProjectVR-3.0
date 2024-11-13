@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [System.Serializable]
-public class NetworkedHand : NetworkBehaviour
+public class NetworkedHandDomino : NetworkBehaviour
 {
     /// <summary>
     /// The max number of cards a player can hold.
