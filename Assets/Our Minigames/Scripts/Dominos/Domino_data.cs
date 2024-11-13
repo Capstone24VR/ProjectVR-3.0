@@ -3,8 +3,8 @@ using UnityEngine;
 public class Domino_data : MonoBehaviour
 {
     // The two sides of the domino (e.g., 0-4)
-    public int side1;
-    public int side2;
+    public int Top_side;
+    public int But_side;
 
     public bool inHand = false;
 
@@ -26,18 +26,14 @@ public class Domino_data : MonoBehaviour
         if (modelParent == null)
         {
             modelParent = transform.Find("ModelParent");
-            if (modelParent == null)
-            {
-                Debug.LogError("ModelParent not found. Please assign it in the inspector or name the child object 'ModelParent'.");
-            }
         }
     }
 
     // Method to initialize the domino with custom side values
     public void InitializeDomino(int newSide1, int newSide2)
     {
-        side1 = newSide1;
-        side2 = newSide2;
+        Top_side = newSide1;
+        But_side = newSide2;
 
         // Assign the correct domino prefab based on the side values
         AssignDominoVisual();
@@ -47,7 +43,7 @@ public class Domino_data : MonoBehaviour
     public void AssignDominoVisual()
     {
         // Calculate the index of the correct prefab based on the side values
-        int index = CalculatePrefabIndex(side1, side2);
+        int index = CalculatePrefabIndex(Top_side, But_side);
 
         if (index >= 0 && index < dominoPrefabs.Length)
         {
@@ -65,7 +61,7 @@ public class Domino_data : MonoBehaviour
             prefabInstance.transform.localRotation = Quaternion.identity;
             prefabInstance.transform.localScale = Vector3.one;
 
-            Debug.Log($"Assigned visual for domino [{side1}-{side2}]");
+            Debug.Log($"Assigned visual for domino [{But_side}-{Top_side}]");
         }
         else
         {

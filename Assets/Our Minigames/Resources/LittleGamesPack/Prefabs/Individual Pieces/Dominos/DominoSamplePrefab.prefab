@@ -120,6 +120,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isUsed: 0
+  hitboxSide: 1
+  sideValue: 0
 --- !u!54 &3303317391985916134
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -267,6 +269,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isUsed: 0
+  hitboxSide: 0
+  sideValue: 0
 --- !u!54 &8045242020901677672
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -414,6 +418,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isUsed: 0
+  hitboxSide: 1
+  sideValue: 0
 --- !u!54 &5898527748409275113
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -644,6 +650,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isUsed: 0
+  hitboxSide: 0
+  sideValue: 0
 --- !u!54 &6957306659642497647
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -782,8 +790,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47624880e1cd3c040b315e398c7e6167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  side1: 0
-  side2: 0
+  Top_side: 0
+  But_side: 0
   inHand: 1
   dominoPrefabs:
   - {fileID: 7596677248850878953, guid: 1aee00ac14bccd84e8ba00f48ae7b1a5, type: 3}
@@ -1046,7 +1054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3109077947
+  GlobalObjectIdHash: 3351388489
   InScenePlacedSourceGlobalObjectIdHash: 1503632336
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1299,6 +1307,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isUsed: 0
+  hitboxSide: 0
+  sideValue: 0
 --- !u!54 &5570121157185706181
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1446,6 +1456,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isUsed: 0
+  hitboxSide: 1
+  sideValue: 0
 --- !u!54 &2745663992519319434
 Rigidbody:
   m_ObjectHideFlags: 0
