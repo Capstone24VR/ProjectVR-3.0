@@ -204,22 +204,8 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Baited()
     {
-        Transform currentHook = null;
+        Transform currentHook = activeHooks[hookIndex];
         activeHooks = GetActiveHooks();
-
-        int count = activeHooks.Count;
-        if(activeHooks.Count != count)
-        {
-            hookIndex = -1;
-            ChooseNewRandomposition();
-            SetFishStateServerRpc(FishState.Wander);
-            return;
-        }
-        else
-        {
-            currentHook = activeHooks[hookIndex];
-        }
-
 
         if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
         {
