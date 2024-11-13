@@ -1,33 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Cooler : MonoBehaviour
+public class Cooler : NetworkBehaviour
 {
     //public PlayerStats user;
     //public TimeAttack timeAttack;
     public GameObject fishStatCanvas;
 
-    public NetworkedFishAI newFish;
-
-    public void OnFishCatch()
+    public void OnFishCatch(ulong networkObjectId)
     {
-        //timeAttack.AddScore(Mathf.FloorToInt(newFish.stats.weight * 100));
-        //timeAttack.AddTime(newFish.stats.weight*20);
+        Debug.Log("Here!");
+        NetworkObject newFish = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
 
+        if(newFish != null)
+        {
+            FishStats newFishStats = newFish.GetComponent<FishStats>();
+            fishStatCanvas.transform.Find("Caught").GetComponent<TextMeshProUGUI>().text = "You Caught: " + newFish.gameObject.name;
+            fishStatCanvas.transform.Find("Weight").GetComponent<TextMeshProUGUI>().text = "Weight " + System.Math.Round(newFishStats.weight, 2) + " lb";
+            fishStatCanvas.transform.Find("Worth").GetComponent<TextMeshProUGUI>().text = "Worth: " + System.Math.Round(newFishStats.weight * newFishStats.multiplier, 2) + "$";
+            fishStatCanvas.SetActive(true);
+        }
 
-        //user.money += newFish.stats.multiplier * newFish.stats.weight;
-        //user.totalCaughtFish += 1;
-        //if (newFish.stats.weight > user.biggestWeight)
-        //{
-        //    user.biggestWeight = newFish.stats.GetComponent<FishStats>().weight;
-        //    user.biggestFish = newFish.stats.name;
-        //}
-
-        fishStatCanvas.transform.Find("Caught").GetComponent<TextMeshProUGUI>().text = "You Caught: " + newFish.gameObject.name;
-        fishStatCanvas.transform.Find("Weight").GetComponent<TextMeshProUGUI>().text = "Weight " + System.Math.Round(newFish.stats.weight, 2) + " lb";
-        fishStatCanvas.transform.Find("Worth").GetComponent<TextMeshProUGUI>().text = "Worth: " + System.Math.Round(newFish.stats.weight * newFish.stats.multiplier, 2) + "$";
-        fishStatCanvas.SetActive(true);
     }
 }

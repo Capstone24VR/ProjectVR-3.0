@@ -9,6 +9,7 @@ using XRMultiplayer.MiniGames;
 public class NewFishingRod : MonoBehaviour
 {
     public NewFishingLine fishingLine;
+    public FishingHook hook;
     public Rigidbody floater; // Rigidbody on the floater or lure object
     public float castThreshold = 2.5f; // Threshold speed for casting
 
@@ -37,6 +38,7 @@ public class NewFishingRod : MonoBehaviour
 
     private void Awake()
     {
+        hook = GetComponentInChildren<FishingHook>();
         fishingLine = GetComponent<NewFishingLine>();
     }
 
@@ -156,6 +158,8 @@ public class NewFishingRod : MonoBehaviour
         floater.isKinematic = false;
         floater.useGravity = true;
 
+        hook.rodDropped.Value = false;
+
         Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
 
         float launchForce = castingQuality * castingMultiplier;
@@ -171,6 +175,8 @@ public class NewFishingRod : MonoBehaviour
         floater.position = rodTipTransform.position;
         floater.useGravity = false;
         floater.isKinematic = true;
+
+        hook.rodDropped.Value = true;
     }
     public void Reel(float change)
     {

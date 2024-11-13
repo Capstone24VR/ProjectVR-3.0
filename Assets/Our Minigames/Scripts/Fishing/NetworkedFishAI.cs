@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRMultiplayer.MiniGames;
 
 public class NetworkedFishAI : NetworkBehaviour
 {
-    public enum FishState { Wander, Baited, Struggle, Caught };
+    public enum FishState { Wander, Baited, Struggle, OnHook, Caught };
     public FishStats stats;
 
     public MiniGame_Fishing m_MiniGame;
@@ -13,11 +15,15 @@ public class NetworkedFishAI : NetworkBehaviour
     public List<Transform> hooks = new List<Transform>();
     public List<Transform> activeHooks;
     public int hookIndex;
+    public Transform currentHook = null;
 
     public GameObject hookSpot;
+    private float ogHeight = 0f;
     public float waterHeight = 0.25f;
 
     public Animator animator;
+    private XRGrabInteractable _xrInteract;
+    private Rigidbody rb;
 
     public bool baited;
     public float baitChance;
@@ -53,12 +59,31 @@ public class NetworkedFishAI : NetworkBehaviour
             hooks.Add(hook);
         }
 
+        ogHeight = transform.position.y;
         target = transform.position;
+        _xrInteract = GetComponent<XRGrabInteractable>();
+        rb = GetComponent<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
         stats = GetComponent<FishStats>();
         hookSpot = transform.Find("HookSpot").gameObject;
         gameObject.transform.localScale = Vector3.one * stats.weight;
         state.Value = FishState.Wander;
+    }
+
+     private void OnEnable()
+    {
+        if (_xrInteract != null)
+        {
+            _xrInteract.selectEntered.AddListener(OnGrab);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_xrInteract != null)
+        {
+            _xrInteract.selectEntered.RemoveListener(OnGrab);
+        }
     }
 
     // Update is called once per fraame
@@ -140,29 +165,6 @@ public class NetworkedFishAI : NetworkBehaviour
             ChooseNewRandomposition();
         }
     }
-    void Struggle()
-    {
-        ErraticMove(3f);
-    }
-
-    void ErraticMove(float distance)
-    {
-        if (changePos)
-        {
-            minX = transform.position.x - distance;
-            maxX = transform.position.x + distance;
-            minZ = transform.position.z - distance / 2;
-            maxZ = transform.position.z + distance / 2;
-            changePos = false;
-        }
-        MoveServerRpc(target);
-
-        if (Vector3.Distance(transform.position, target) < 0.1f)
-        {
-            // Choose a new random nearby position within specified x and z positions
-            target = new Vector3(Random.Range(minX, maxX), transform.position.y, Random.Range(minZ, maxZ));
-        }
-    }
 
     int isBaited(List<Transform> activeHooks)
     {
@@ -204,7 +206,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Baited()
     {
-        Transform currentHook = activeHooks[hookIndex];
+        currentHook = activeHooks[hookIndex];
         activeHooks = GetActiveHooks();
 
         if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
@@ -220,6 +222,7 @@ public class NetworkedFishAI : NetworkBehaviour
         }
     }
 
+
     private void SortHooksByDistance(List<Transform> list)
     {
         list.Sort((hook1, hook2) =>
@@ -229,6 +232,61 @@ public class NetworkedFishAI : NetworkBehaviour
             return distanceToHook1.CompareTo(distanceToHook2);
         });
     }
+
+    void Struggle()
+    {
+        if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
+        {
+            currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+            currentHook.GetComponent<FishingHook>().caughtObject = null;
+            currentHook = null;
+            SetFishStateServerRpc(FishState.Wander);
+        }
+        else
+        {
+            if (transform.position.y >= waterHeight)
+            {
+                _xrInteract.enabled = true;
+            }
+            else
+            {
+                _xrInteract.enabled = false;
+            }
+            MoveServerRpc(currentHook.position);
+        }
+        //ErraticMove(3f);
+    }
+
+    void ErraticMove(float distance)
+    {
+        if (changePos)
+        {
+            minX = transform.position.x - distance;
+            maxX = transform.position.x + distance;
+            minZ = transform.position.z - distance / 2;
+            maxZ = transform.position.z + distance / 2;
+            changePos = false;
+        }
+        MoveServerRpc(target);
+
+        if (Vector3.Distance(transform.position, target) < 0.1f)
+        {
+            // Choose a new random nearby position within specified x and z positions
+            target = new Vector3(Random.Range(minX, maxX), ogHeight, Random.Range(minZ, maxZ));
+        }
+    }
+
+    void Caught()
+    {
+        if(transform.position.y < waterHeight)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = false;
+            _xrInteract.enabled = false;
+            SetFishStateServerRpc(FishState.Wander);
+        }
+    }
+
 
     //void Startled()
     //{
@@ -265,12 +323,27 @@ public class NetworkedFishAI : NetworkBehaviour
     private void ChooseNewRandomposition()
     {
         // Choose a new random position within specified x and z positions
-        target = new Vector3(Random.Range(-20f, 25f), transform.position.y, Random.Range(-77f, -32f));
+        target = new Vector3(Random.Range(-20f, 25f), ogHeight, Random.Range(-77f, -32f));
         wanderDuration = Random.Range(minWanderDuration, maxWanderDuration);
         waitTimer = 0f;
         wanderTimer = 0f;
     }
 
+    private void OnGrab(SelectEnterEventArgs args)
+    {
+        currentHook.GetComponent<FishingHook>().caughtObject = null;
+        currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+        currentHook = null;
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        SetFishStateServerRpc(FishState.Caught);   
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void DestroyServerRpc()
+    {
+        GetComponent<NetworkObject>().Despawn(true);
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -287,11 +360,11 @@ public class NetworkedFishAI : NetworkBehaviour
         if (other.gameObject.tag == "Cooler")
         {
             //other.gameObject.GetComponent<Cooler>().newFish = this;
-            other.gameObject.GetComponent<Cooler>().OnFishCatch();
+            other.gameObject.GetComponent<Cooler>().OnFishCatch(NetworkObjectId);
 
             m_MiniGame.LocalPlayerScored((int)(stats.weight * stats.multiplier * 100));
 
-            Destroy(gameObject);
+            DestroyServerRpc();
         }
     }
 }
