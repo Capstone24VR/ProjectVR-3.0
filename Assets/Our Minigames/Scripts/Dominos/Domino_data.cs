@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using Domino;
 
 public class Domino_data : MonoBehaviour
 {
@@ -11,8 +13,8 @@ public class Domino_data : MonoBehaviour
     // Array to store all the domino models/prefabs (with specific meshes)
     public GameObject[] dominoPrefabs;
 
-    // Reference to the container where the domino prefab will be instantiated
-    public Transform modelParent;
+    private List<HitboxComponent> hitboxComponents = new List<HitboxComponent>();
+
 
     // Local position and scale of the domino
     [SerializeField] protected Vector3 _position = Vector3.zero;
@@ -20,13 +22,24 @@ public class Domino_data : MonoBehaviour
 
     private void Awake()
     {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = false;  // Ensure gravity is disabled
+            rb.isKinematic = true;  // Make the Rigidbody kinematic to ignore all physical forces
+        }
         _localScale = transform.localScale;
 
-        // Optional: Assign modelParent if not set
-        if (modelParent == null)
+        // Save references to the hitboxes so they’re not destroyed
+        foreach (Transform child in transform)
         {
-            modelParent = transform.Find("ModelParent");
+            var hitbox = child.GetComponent<HitboxComponent>();
+            if (hitbox != null)
+            {
+                hitboxComponents.Add(hitbox);
+            }
         }
+
     }
 
     // Method to initialize the domino with custom side values
@@ -34,6 +47,19 @@ public class Domino_data : MonoBehaviour
     {
         Top_side = newSide1;
         But_side = newSide2;
+
+        foreach (Transform child in transform)
+        {
+            var hitbox = child.GetComponent<HitboxComponent>();
+            if (hitbox != null)
+            {
+                hitboxComponents.Add(hitbox);
+            }
+            else
+            {
+                Debug.LogWarning($"Child {child.name} does not have a HitboxComponent.");
+            }
+        }
     }
 
     // Method to assign the correct domino visual based on the side values
@@ -44,28 +70,84 @@ public class Domino_data : MonoBehaviour
 
         if (index >= 0 && index < dominoPrefabs.Length)
         {
-            // Destroy any existing child in modelParent to replace with the correct domino visual
-            foreach (Transform child in modelParent)
+            // Destroy any existing LOD models in the transform, except for hitboxes
+            foreach (Transform child in transform)
             {
-                Destroy(child.gameObject);
+                // Only destroy the child if it's part of the LOD model, not the hitboxes
+                if (!hitboxComponents.Exists(hitbox => hitbox.transform == child))
+                {
+                    Destroy(child.gameObject);
+                }
             }
 
-            // Instantiate the correct domino model as a child of modelParent
-            GameObject prefabInstance = Instantiate(dominoPrefabs[index], modelParent);
+            // Instantiate the correct prefab to access its LOD models
+            GameObject prefabInstance = Instantiate(dominoPrefabs[index]);
 
-            // Optional: Adjust prefab's local position/scale if necessary
-            prefabInstance.transform.localPosition = Vector3.zero;
-            prefabInstance.transform.localRotation = Quaternion.identity;
-            prefabInstance.transform.localScale = Vector3.one;
+            // Find the LODGroup in the prefabInstance
+            LODGroup prefabLODGroup = prefabInstance.GetComponent<LODGroup>();
 
-            Debug.Log($"Assigned visual for domino [{But_side}-{Top_side}]");
+            if (prefabLODGroup != null)
+            {
+                // Get the LODs from the prefab's LODGroup
+                LOD[] lods = prefabLODGroup.GetLODs();
+
+                // Create a new LODGroup on the current Domino object if it doesn't have one
+                LODGroup lodGroup = GetComponent<LODGroup>();
+                if (lodGroup == null)
+                {
+                    lodGroup = gameObject.AddComponent<LODGroup>();
+                }
+
+                // Prepare a list of LODs to assign to the current LODGroup
+                List<LOD> newLODs = new List<LOD>();
+
+                // Iterate through each LOD level in the prefab's LODGroup
+                for (int i = 0; i < lods.Length; i++)
+                {
+                    // Create an empty list for the renderers in this LOD level
+                    List<Renderer> lodRenderers = new List<Renderer>();
+
+                    foreach (Renderer renderer in lods[i].renderers)
+                    {
+                        // Instantiate the renderer's GameObject as a child of this Domino object
+                        GameObject lodObject = Instantiate(renderer.gameObject, transform);
+                        lodObject.transform.localPosition = Vector3.zero;
+                        lodObject.transform.localRotation = Quaternion.identity;
+                        lodObject.transform.localScale = Vector3.one;
+
+                        // Add the renderer from the instantiated object to the list
+                        Renderer lodRenderer = lodObject.GetComponent<Renderer>();
+                        if (lodRenderer != null)
+                        {
+                            lodRenderers.Add(lodRenderer);
+                        }
+                    }
+
+                    // Create a new LOD and add it to the new LOD list
+                    newLODs.Add(new LOD(lods[i].screenRelativeTransitionHeight, lodRenderers.ToArray()));
+                }
+
+                // Apply the new LODs to the Domino's LODGroup
+                lodGroup.SetLODs(newLODs.ToArray());
+                lodGroup.RecalculateBounds(); // Recalculate bounds for accurate LOD switching
+
+                // Destroy the temporary prefabInstance after copying its LOD data
+                Destroy(prefabInstance);
+
+                Debug.Log($"Assigned visual for domino [{But_side}-{Top_side}] with LODs.");
+            }
+            else
+            {
+                Debug.LogError("No LODGroup found on the selected prefab.");
+                Destroy(prefabInstance);  // Clean up if no LODGroup is found
+                return;
+            }
         }
         else
         {
             Debug.LogError("Invalid prefab index calculated.");
         }
     }
-
     // Custom logic to calculate the prefab index from the side values
     public int CalculatePrefabIndex(int side1, int side2)
     {

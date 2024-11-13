@@ -122,10 +122,10 @@ namespace XRMultiplayer.MiniGames
         public void StartGame()
         {
             CreateDeckServer();
-            //ShuffleDeckServer();
-            //InstantiateDrawPileServer();
+            ShuffleDeckServer();
+            InstantiateDrawPileServer();
 
-            //StartCoroutine(WaitForClientsToCreateDeck());
+            StartCoroutine(WaitForClientsToCreateDeck());
         }
 
         private IEnumerator WaitForClientsToCreateDeck()
@@ -167,7 +167,7 @@ namespace XRMultiplayer.MiniGames
             }
 
             currentHandIndex = 0;
-            StartCrazyEights();
+            StartDomino();
         }
 
         public void EndGame()
@@ -505,14 +505,14 @@ namespace XRMultiplayer.MiniGames
         }
 
 
-        protected void StartCrazyEights()
+        protected void StartDomino()
         {
             NetworkObjectReference firstReference = _drawPile[_drawPile.Count - 1];
             if (firstReference.TryGet(out NetworkObject networkCardDraw))
             {
                 _drawPile.Remove(firstReference);
                 GameObject firstCard = networkCardDraw.gameObject;
-                Debug.Log("Drawing First card(" + firstCard.name + ") for Crazy Eights . . . ");
+                Debug.Log("Drawing First card(" + firstCard.name + ") for Domino . . . ");
                 AddToPlayPileServer(firstCard);
                 SetCardActiveClientRpc(firstReference.NetworkObjectId, true);
             }

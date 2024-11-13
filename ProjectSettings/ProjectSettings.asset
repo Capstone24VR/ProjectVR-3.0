@@ -55,7 +55,7 @@ PlayerSettings:
   m_SpriteBatchVertexThreshold: 300
   m_MTRendering: 1
   mipStripping: 1
-  numberOfMipsStripped: 0
+  numberOfMipsStripped: 3
   numberOfMipsStrippedPerMipmapLimitGroup: {}
   m_StackTraceTypes: 010000000100000001000000010000000100000001000000
   iosShowActivityIndicatorOnLoading: -1
@@ -942,8 +942,8 @@ PlayerSettings:
   cloudProjectId: 5fb3d2cf-0257-4830-8dc9-740ba02decdc
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: ProjectVR-3.0
-  organizationId: capstone24vrteam
+  projectName: Multiplayer Demo (1)
+  organizationId: wts2840603644
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
