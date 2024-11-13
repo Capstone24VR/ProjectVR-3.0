@@ -11,6 +11,8 @@ using XRMultiplayer.MiniGames;
 
 public class Card : NetworkBehaviour
 {
+
+
     public enum Suit { Heart, Diamond, Club, Spades }
     public enum Value
     {
