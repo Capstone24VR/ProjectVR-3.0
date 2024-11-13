@@ -6,14 +6,14 @@ using XRMultiplayer.MiniGames; // Import the MiniGameManager namespace
 namespace XRMultiplayer
 {
     [RequireComponent(typeof(Collider))]
-    public class SubTrigger : MonoBehaviour
+    public class SeatHandler : MonoBehaviour
     {
-        public Action<Collider, bool> OnTriggerAction;
         public Collider subTriggerCollider;
 
         private MiniGameManager miniGameManager;
         private bool playerInTrigger = false; // Tracks if player is in the trigger
-        private long currentPlayerId = -1; // Stores the current player's ID
+        private long localPlayerID = -1; // Stores the current player's ID
+        private ulong localClientID = 9999;
 
         private void Awake()
         {
@@ -30,34 +30,37 @@ namespace XRMultiplayer
 
         private void OnTriggerEnter(Collider other)
         {
-            OnTriggerAction?.Invoke(other, true);
-
             // Get the player ID from the MiniGameManager and set the playerInTrigger flag to true
             if (miniGameManager != null)
             {
-                currentPlayerId = miniGameManager.GetLocalPlayerID ();
+                localPlayerID = miniGameManager.GetLocalPlayerID();
+                localClientID = NetworkManager.Singleton.LocalClientId;
                 playerInTrigger = true;
-                Debug.Log($"Player with ID {currentPlayerId} entered the trigger.");
+                Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            OnTriggerAction?.Invoke(other, false);
-
             // When the player exits, reset the flag and player ID
             if (miniGameManager != null)
             {
-                Debug.Log($"Player with ID {currentPlayerId} exited the trigger.");
+                Debug.Log($"Player with ID {localPlayerID} exited the trigger.");
                 playerInTrigger = false;
-                currentPlayerId = -1;
+                localPlayerID = -1;
+                localClientID = 9999;
             }
         }
 
         // Method to retrieve the current player ID
-        public long GetCurrentPlayerId()
+        public long GetLocalPlayerId()
         {
-            return currentPlayerId;
+            return localPlayerID;
+        }
+
+        public ulong GetClientID()
+        {
+            return localClientID;
         }
 
         // Method to check if a player is currently in the trigger

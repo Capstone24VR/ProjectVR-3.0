@@ -5,7 +5,7 @@ public class Domino_data : MonoBehaviour
     // The two sides of the domino (e.g., 0-4)
     public int Top_side;
     public int But_side;
-
+    public bool played = false;
     public bool inHand = false;
 
     // Array to store all the domino models/prefabs (with specific meshes)
@@ -34,9 +34,6 @@ public class Domino_data : MonoBehaviour
     {
         Top_side = newSide1;
         But_side = newSide2;
-
-        // Assign the correct domino prefab based on the side values
-        AssignDominoVisual();
     }
 
     // Method to assign the correct domino visual based on the side values
@@ -70,7 +67,7 @@ public class Domino_data : MonoBehaviour
     }
 
     // Custom logic to calculate the prefab index from the side values
-    private int CalculatePrefabIndex(int side1, int side2)
+    public int CalculatePrefabIndex(int side1, int side2)
     {
         // Ensure that side1 is always the smaller or equal value
         if (side1 > side2)
