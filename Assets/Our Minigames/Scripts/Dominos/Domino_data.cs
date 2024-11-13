@@ -179,16 +179,15 @@ public class Domino_data : NetworkBehaviour
         Top_side = newSide1;
         But_side = newSide2;
 
-        foreach (Transform child in transform)
+        foreach (var hitbox in hitboxComponents)
         {
-            var hitbox = child.GetComponent<HitboxComponent>();
             if (hitbox != null)
             {
-                hitboxComponents.Add(hitbox);
+                hitbox.SetSideValue(Top_side, But_side);
             }
             else
             {
-                Debug.LogWarning($"Child {child.name} does not have a HitboxComponent.");
+                Debug.LogWarning("HitboxComponent is null in hitboxComponents list.");
             }
         }
     }

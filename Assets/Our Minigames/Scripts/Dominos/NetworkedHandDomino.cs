@@ -96,7 +96,7 @@ public class NetworkedHandDomino : NetworkBehaviour
             card.gameObject.SetActive(true);
             ConfigureChildPositions();  // Update positions of cards
             
-            Card cardComponent = card.GetComponent<Card>();
+            Domino_data cardComponent = card.GetComponent<Domino_data>();
             if (cardComponent != null)
             {
                 cardComponent.SetInHand(true);
@@ -146,7 +146,7 @@ public class NetworkedHandDomino : NetworkBehaviour
             cards[i].transform.localRotation = Quaternion.identity;
             Vector3 newPosition = new Vector3(startingPos * bunching, 0, 0);
             cards[i].transform.localPosition = newPosition;
-            cards[i].GetComponent<Card>().SetPosition(newPosition);
+            cards[i].GetComponent<Domino_data>().SetPosition(newPosition);
 
             startingPos++;
         }
@@ -169,7 +169,7 @@ public class NetworkedHandDomino : NetworkBehaviour
                 card.transform.localRotation = Quaternion.identity;
                 Vector3 newPosition = new Vector3(startingPos * bunching, 0, 0);
                 card.transform.localPosition = newPosition;
-                card.GetComponent<Card>().SetPosition(newPosition);
+                card.GetComponent<Domino_data>().SetPosition(newPosition);
 
                 startingPos++;
             }

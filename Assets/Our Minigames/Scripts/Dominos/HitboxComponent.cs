@@ -33,8 +33,6 @@ namespace Domino
                 transparentColor.a = 0f; // Fully transparent
                 hitboxRenderer.material.color = transparentColor;
             }
-
-            SetSideValue();
         }
 
         private void OnTriggerStay(Collider other)
@@ -50,6 +48,8 @@ namespace Domino
                     // Check if sideValue matches the Top_side or But_side of the colliding domino
                     if (sideValue == otherDominoData.Top_side || sideValue == otherDominoData.But_side)
                     {
+
+                        Debug.Log("collide domino");
                         SetColor(Color.green); // Highlight green for matching value
                     }
                     else
@@ -77,16 +77,9 @@ namespace Domino
         }
 
         // Method to set the side's value based on the enum selection
-        public void SetSideValue()
+        public void SetSideValue(int topSide, int bottomSide)
         {
-            if (hitboxSide == Side.Top)
-            {
-                sideValue = GetComponentInParent<Domino_data>().Top_side;
-            }
-            else
-            {
-                sideValue = GetComponentInParent<Domino_data>().But_side;
-            }
+            sideValue = (hitboxSide == Side.Top) ? topSide : bottomSide;
         }
 
         public void SnapDomino(Transform domino)

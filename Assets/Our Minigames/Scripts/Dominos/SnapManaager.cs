@@ -2,6 +2,7 @@ using UnityEngine;
 
 using System.Collections.Generic;
 using Domino;
+using XRMultiplayer.MiniGames;
 
 public class SnapManager : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class SnapManager : MonoBehaviour
 
     private HitboxComponent activeHitbox = null; // The hitbox currently being highlighted
     private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable currentDomino; // The specific domino currently in the hitbox
-
+    private NetworkedDomino currentNetwork;
     private void Start()
     {
         // Initialize all hitbox colors to default at start
@@ -19,6 +20,11 @@ public class SnapManager : MonoBehaviour
         {
             hitbox.SetColor(defaultColor);
         }
+    }
+
+    private void Awake()
+    {
+       currentNetwork  = FindAnyObjectByType<NetworkedDomino>();
     }
 
     public void HighlightHitbox(HitboxComponent hitbox, UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable domino)
@@ -74,5 +80,6 @@ public class SnapManager : MonoBehaviour
         currentDomino = null;
 
         Debug.Log("Domino has been snapped and marked as played.");
+        currentNetwork.GetNewDomino();
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 using static Domino_data;
 using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using Newtonsoft.Json;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -16,7 +17,7 @@ namespace XRMultiplayer.MiniGames
         /// <summary>
         /// The hands to use for playing.
         /// </summary>
-        [SerializeField] NetworkedHand[] m_hands;
+        [SerializeField] NetworkedHandDomino[] m_hands;
 
         /// <summary>
         /// The card prefab to spawn.
@@ -536,6 +537,18 @@ namespace XRMultiplayer.MiniGames
             gameStarted = true;
         }
 
+        public void GetNewDomino()
+        {
+            GetNewDominoServerRpc();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void GetNewDominoServerRpc()
+        {
+            StartDomino();
+        }
+
+
         [ClientRpc]
         public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, int index)
         {
@@ -772,9 +785,11 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
-            Debug.Log($"Current Hand owner id: {activeHands[oldIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
-            if (activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            Debug.Log($"{newIndex} {oldIndex}");
+            if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
+                Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.ClientID}");
+
                 if (m_CurrentMessageRoutine != null)
                 {
                     StopCoroutine(m_CurrentMessageRoutine);
@@ -783,24 +798,30 @@ namespace XRMultiplayer.MiniGames
                 StartCoroutine(m_CurrentMessageRoutine);
             }
 
-            currentHandIndex = newIndex;
-
-
-            Debug.Log($"New Hand owner id: {activeHands[currentHandIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
-
-            if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
+            // Update the current hand index only if it's within bounds
+            Debug.Log($"{newIndex} {oldIndex} {activeHands.Count}");
+            if (newIndex >= 0 && newIndex < activeHands.Count)
             {
-                if (m_CurrentMessageRoutine != null)
+                currentHandIndex = newIndex;
+                Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerManager.ClientID}");
+
+                if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
                 {
-                    StopCoroutine(m_CurrentMessageRoutine);
+                    if (m_CurrentMessageRoutine != null)
+                    {
+                        StopCoroutine(m_CurrentMessageRoutine);
+                    }
+                    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("It's your turn!", NetworkManager.Singleton.LocalClientId, 3);
+                    StartCoroutine(m_CurrentMessageRoutine);
                 }
-                m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("Its your turn!", NetworkManager.Singleton.LocalClientId, 3);
-                StartCoroutine(m_CurrentMessageRoutine);
+            }
+            else
+            {
+                Debug.LogError("New index is out of bounds for activeHands.");
             }
 
-            Debug.Log("Server has set current hand to " + activeHands[currentHandIndex].name);
+            Debug.Log("Server has set current hand to " + (currentHandIndex < activeHands.Count ? activeHands[currentHandIndex].name : "Invalid Index"));
         }
-
         public void CheckForPlayerWin()
         {
             if (gameStarted)
@@ -882,5 +903,7 @@ namespace XRMultiplayer.MiniGames
                     break;
             }
         }
+
+        
     }
 }
