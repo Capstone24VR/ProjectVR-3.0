@@ -5,7 +5,6 @@ using UnityEngine;
 using static Card;
 using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEditor.PackageManager;
 
 namespace XRMultiplayer.MiniGames
 {

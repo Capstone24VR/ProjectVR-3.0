@@ -6,6 +6,7 @@ using static Domino_data;
 using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using Newtonsoft.Json;
+using Domino;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -37,7 +38,7 @@ namespace XRMultiplayer.MiniGames
         /// <summary>
         /// The mini game to use for handling the mini game logic.
         /// </summary>
-        MiniGame_Cards m_MiniGame;
+        MiniGame_Domino m_MiniGame;
 
         /// <summary>
         /// Whether the game has started
@@ -69,7 +70,7 @@ namespace XRMultiplayer.MiniGames
 
         [SerializeField] protected int currentHandIndex;
 
-        [SerializeField] protected List<NetworkedHand> activeHands = new List<NetworkedHand>();
+        [SerializeField] protected List<NetworkedHandDomino> activeHands = new List<NetworkedHandDomino>();
 
         [SerializeField] private MiniGameManager miniManager;
 
@@ -143,7 +144,7 @@ namespace XRMultiplayer.MiniGames
 
             for (int i = 0; i < startingHand; i++)
             {
-                foreach (NetworkedHand hand in activeHands)
+                foreach (NetworkedHandDomino hand in activeHands)
                 {
                     if (hand.canDraw())
                     {
@@ -473,7 +474,7 @@ namespace XRMultiplayer.MiniGames
                 // Notify clients to clear their hands and card visuals
                 ClearAllClientHandsClientRpc();
 
-                foreach (NetworkedHand hand in activeHands)
+                foreach (NetworkedHandDomino hand in activeHands)
                 {
                     hand.Clear();  // Clear the server-side hands
                 }
@@ -499,7 +500,7 @@ namespace XRMultiplayer.MiniGames
         {
             drawObject.Clear();
             playObject.Clear();
-            foreach (NetworkedHand hand in activeHands)
+            foreach (NetworkedHandDomino hand in activeHands)
             {
                 hand.Clear();  // Clients also clear their hands
             }
@@ -519,14 +520,14 @@ namespace XRMultiplayer.MiniGames
             }
             else
             {
-                Debug.Log("FATAL ERROR: Card not found at drawPiile(STARTCRZY8s)");
+                Debug.Log("FATAL ERROR: Card not found at drawPiile(Domino)");
                 return;
             }
 
-            NetworkObjectReference cardReference = _drawPile[_playPile.Count - 1];
+            NetworkObjectReference cardReference = _drawPile[_drawPile.Count - 1];
             if (!cardReference.TryGet(out NetworkObject res))
             {
-                Debug.Log("FATAL ERROR: Card not found at playPile(STARTCRZY8s)");
+                Debug.Log("FATAL ERROR: Card not found at playPile(Domino)");
                 return;
             }
             SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
@@ -647,30 +648,31 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        public void RequestPlayCard(ulong networkObjectId)
+        public void RequestPlayCard(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox)
         {
-            NetworkObject networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            NetworkObject networkObjectsnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
+            NetworkObject networkObjectstill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
 
-            if (networkObject.IsSpawned)
+            if (networkObjectsnap.IsSpawned && networkObjectstill.IsSpawned)
             {
-                Debug.Log($"Network Object({networkObject.name}) is Spawned and ready for use.");
+                Debug.Log($"Network Object({networkObjectsnap.name}, {networkObjectstill.name}) is Spawned and ready for use.");
             }
             else
             {
-                Debug.Log($"Fatal Error! Network Object({networkObject.name}) is not spawned");
+                Debug.Log($"Fatal Error! Network Object({networkObjectsnap.name}{networkObjectstill.name}) is not spawned");
                 return;
             }
 
-            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {networkObject.gameObject.name}");
-            if (!activeHands[currentHandIndex].heldCards.Contains(networkObject)) // Card from wrong hand do not accept
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {networkObjectsnap.gameObject.name}");
+            if (!activeHands[currentHandIndex].heldCards.Contains(networkObjectsnap)) // Card from wrong hand do not accept
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId}'s turn!");
                 return;
             }
 
-            if (networkObject != null)
+            if (networkObjectsnap != null && networkObjectstill != null)
             {
-                PlayCardServerRpc(networkObjectId);
+                PlayCardServerRpc(networkObjectIdsnap, networkObjectIdstill, hitbox);
             }
             else
             {
@@ -679,46 +681,47 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void PlayCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
+        public void PlayCardServerRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox,ServerRpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
             Debug.Log($"Server processing card play request from client {clientId}.");
 
             if (IsServer)
             {
-                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-                if (cardNetworkObject != null)
+                NetworkObject cardNetworkObjectsnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
+                NetworkObject cardNetworkObjectstill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
+                if (cardNetworkObjectsnap != null && cardNetworkObjectstill != null)
                 {
 
-                    if (!IsValidPlayCrazyEights(cardNetworkObject.gameObject))
-                    {
-                        string message = cardNetworkObject.gameObject.name + "is not a valid play!";
+                    //if (!IsValidPlayCrazyEights(cardNetworkObject.gameObject))
+                    //{
+                    //    string message = cardNetworkObject.gameObject.name + "is not a valid play!";
 
-                        if (m_CurrentMessageRoutine != null)
-                        {
-                            StopCoroutine(m_CurrentMessageRoutine);
-                        }
-                        m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, clientId, 3);
-                        StartCoroutine(m_CurrentMessageRoutine);
-                        return;
-                    }
+                    //    if (m_CurrentMessageRoutine != null)
+                    //    {
+                    //        StopCoroutine(m_CurrentMessageRoutine);
+                    //    }
+                    //    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, clientId, 3);
+                    //    StartCoroutine(m_CurrentMessageRoutine);
+                    //    return;
+                    //}
 
 
-                    cardNetworkObject.gameObject.GetComponent<Domino_data>().played = true;
-                    NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
+                    cardNetworkObjectsnap.gameObject.GetComponent<Domino_data>().played = true;
+                    NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObjectsnap);
 
                     activeHands[currentHandIndex].RemoveCardServerRpc(cardReference.NetworkObjectId);
 
                     if (_playPile.Count > 0) // Get Old Top Card Reference
                     {
-                        NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
+                        //NetworkObjectReference oldTopCardReference = _playPile[_playPile.Count - 1];
                         AddToPlayPileServer(cardReference);
-                        PlayCardClientRpc(cardReference.NetworkObjectId);
+                        PlayCardClientRpc(cardReference.NetworkObjectId,networkObjectIdstill, hitbox);
 
-                        Debug.Log($"Checking {cardNetworkObject.gameObject.name} status. . . played: {cardNetworkObject.gameObject.GetComponent<Domino_data>().played}\t parent: {cardNetworkObject.gameObject.transform.parent}\t position:{cardNetworkObject.gameObject.transform.localRotation}\t position:{cardNetworkObject.gameObject.transform.localRotation}");
+                        //Debug.Log($"Checking {cardNetworkObject.gameObject.name} status. . . played: {cardNetworkObject.gameObject.GetComponent<Domino_data>().played}\t parent: {cardNetworkObject.gameObject.transform.parent}\t position:{cardNetworkObject.gameObject.transform.localRotation}\t position:{cardNetworkObject.gameObject.transform.localRotation}");
 
-                        SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
-                        SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);
+                        //SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
+                        //SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);
 
                         UpdateCurrentIndexServerRpc();
                     }
@@ -727,13 +730,33 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ClientRpc]
-        public void PlayCardClientRpc(ulong networkObjectId)
+        public void PlayCardClientRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox)
         {
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (cardNetworkObject != null)
+            NetworkObject cardNetworkObjectsnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
+            NetworkObject cardNetworkObjectstill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
+
+
+            if (cardNetworkObjectsnap != null && cardNetworkObjectstill != null)
             {
-                cardNetworkObject.GetComponent<Card>().SetPosition(Vector3.zero);
-                cardNetworkObject.GetComponent<Card>().ResetPosition();
+                cardNetworkObjectsnap.transform.position = cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].transform.position;
+                cardNetworkObjectsnap.transform.rotation = cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].transform.rotation;
+
+                // Mark this hitbox as used
+                cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().isUsed = true;
+
+                // Disable grab functionality on the domino
+                var grabInteractable = cardNetworkObjectsnap.GetComponent<XRGrabInteractable>();
+                if (grabInteractable != null)
+                {
+                    grabInteractable.enabled = false; // Disable the grab interactable to prevent further grabbing
+                }
+                else
+                {
+                    Debug.LogWarning("XRGrabInteractable component is missing on the snapped domino.");
+                }
+
+                // Reset the color to transparent after snapping
+                cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().SetColor(new Color(1, 1, 1, 0));
             }
         }
 
@@ -826,7 +849,7 @@ namespace XRMultiplayer.MiniGames
         {
             if (gameStarted)
             {
-                foreach (NetworkedHand hand in activeHands)
+                foreach (NetworkedHandDomino hand in activeHands)
                 {
                     if (hand.isEmpty())
                     {

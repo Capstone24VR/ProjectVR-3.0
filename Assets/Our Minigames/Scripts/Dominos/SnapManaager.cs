@@ -1,85 +1,64 @@
 using UnityEngine;
-
 using System.Collections.Generic;
 using Domino;
 using XRMultiplayer.MiniGames;
 
 public class SnapManager : MonoBehaviour
 {
-    public List<HitboxComponent> hitboxes; // List of hitbox components for snap detection
-    public Color highlightColor = new Color(0, 0, 1, 0.5f); // Color to highlight when a grabbed domino is detected
-    public Color defaultColor = Color.clear; // Default color for the hitbox
+    public List<HitboxComponent> hitboxes; // List of all hitbox components in the scene
+    public Color highlightColor = new Color(0, 0, 1, 0.5f); // Color for highlighting active hitboxes
+    public Color defaultColor = Color.clear; // Default transparent color for hitboxes
 
-    private HitboxComponent activeHitbox = null; // The hitbox currently being highlighted
-    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable currentDomino; // The specific domino currently in the hitbox
+    private HitboxComponent activeHitbox = null; // The currently active hitbox being highlighted
+    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable currentDomino; // Domino being grabbed
     private NetworkedDomino currentNetwork;
+
+    private void Awake()
+    {
+        // Initialize the networking component if applicable
+        currentNetwork = FindAnyObjectByType<NetworkedDomino>();
+        if (currentNetwork == null)
+        {
+            Debug.LogError("NetworkedDomino component not found. Multiplayer functionality might be affected.");
+        }
+    }
+
     private void Start()
     {
-        // Initialize all hitbox colors to default at start
+        // Set all hitboxes to the default color at the start
         foreach (var hitbox in hitboxes)
         {
             hitbox.SetColor(defaultColor);
         }
     }
 
-    private void Awake()
-    {
-       currentNetwork  = FindAnyObjectByType<NetworkedDomino>();
-    }
-
     public void HighlightHitbox(HitboxComponent hitbox, UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable domino)
     {
-        // Highlight this hitbox if a domino is detected
+        // Highlight the hitbox only if it's not the currently active one
         if (activeHitbox != hitbox)
         {
             if (activeHitbox != null)
             {
-                activeHitbox.SetColor(defaultColor); // Reset previous hitbox color
+                // Reset the previous hitbox's color
+                activeHitbox.SetColor(defaultColor);
             }
+
             activeHitbox = hitbox;
             currentDomino = domino;
+
+            // Highlight the new active hitbox
             activeHitbox.SetColor(highlightColor);
         }
     }
 
     public void ResetHighlight(HitboxComponent hitbox)
     {
-        // Reset the highlight if the active hitbox is exited
+        // Reset the color of the hitbox when it is no longer active
         if (activeHitbox == hitbox)
         {
             activeHitbox.SetColor(defaultColor);
             activeHitbox = null;
             currentDomino = null;
         }
-    }
-
-    private void FixedUpdate()
-    {
-        // Check if the domino was released within an active hitbox area
-        if (activeHitbox != null && currentDomino != null && !currentDomino.isSelected)
-        {
-            SnapToHitbox(activeHitbox, currentDomino);
-        }
-    }
-
-    public void SnapToHitbox(HitboxComponent hitbox, UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable releasedDomino)
-    {
-        // Snap the released domino to match the position and rotation of the hitbox
-        releasedDomino.transform.position = hitbox.transform.position;
-        releasedDomino.transform.rotation = hitbox.transform.rotation;
-
-        // Mark this hitbox as used
-        hitbox.isUsed = true;
-
-        // Disable the grab interactable on the released domino to prevent further grabbing
-        releasedDomino.enabled = false;
-
-        // Reset the hitbox color and clear the active hitbox
-        hitbox.SetColor(defaultColor);
-        activeHitbox = null;
-        currentDomino = null;
-
-        Debug.Log("Domino has been snapped and marked as played.");
-        currentNetwork.GetNewDomino();
     }
 }
