@@ -53,7 +53,7 @@ public class Card : NetworkBehaviour
 
     public void SetPosition(Vector3 position)
     {
-        _position = position;
+        if (IsSpawned) _position = position;
     }
 
     public void ResetPosition()
@@ -61,6 +61,7 @@ public class Card : NetworkBehaviour
         GetComponent<Rigidbody>().isKinematic = true;
         transform.localPosition = _position;
         transform.localRotation = Quaternion.identity;
+
     }
 
     // Hover select effect
@@ -136,24 +137,30 @@ public class Card : NetworkBehaviour
     // Use XR Interaction Toolkit's hover callbacks to trigger hover effects
     protected virtual void OnHoverEntered(HoverEnterEventArgs args)
     {
-        HoverSelect(); // Trigger hover select effect
+        if(IsSpawned)
+            HoverSelect(); // Trigger hover select effect
     }
 
     protected virtual void OnHoverExited(HoverExitEventArgs args)
     {
-        HoverDeSelect(); // Trigger hover deselect effect
+        if(IsSpawned)
+            HoverDeSelect(); // Trigger hover deselect effect
     }
 
     protected virtual void OnSelectEntered(SelectEnterEventArgs args)
     {
-        HoverDeSelect();
+        if(IsSpawned)
+            HoverDeSelect();
     }
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)
     {
-        ResetPosition();
-        HoverDeSelect();
-        _cardManager.RequestDrawCard(gameObject);
+        if (IsSpawned)
+        {
+            ResetPosition();
+            HoverDeSelect();
+            _cardManager.RequestDrawCard(gameObject);
+        }
     }
 
     private void OnEnable()

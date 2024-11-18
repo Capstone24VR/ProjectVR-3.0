@@ -122,12 +122,46 @@ namespace XRMultiplayer.MiniGames
 
         public void StartGame()
         {
+            GetActiveHandsServer();
             CreateDeckServer();
             ShuffleDeckServer();
             InstantiateDrawPileServer();
 
             StartCoroutine(WaitForClientsToCreateDeck());
         }
+
+        public void EndGame()
+        {
+            StopAllCoroutines();
+            RemoveGeneratedCardsServer();
+        }
+
+        private void GetActiveHandsServer()
+        {
+            List<int> activeIndex = new List<int>();
+            for (int i = 0; i < m_hands.Length; i++)
+            {
+                if (m_hands[i].GetComponent<HandOwnerManager>().seatHandler.IsPlayerInTrigger())
+                {
+                    activeHands.Add(m_hands[i]);
+                    activeIndex.Add(i);
+                }
+            }
+
+            //SyncActiveHandsClientRpc(activeIndex.ToArray());
+        }
+
+        //[ClientRpc]
+        //private void SyncActiveHandsClientRpc(int[] index)
+        //{
+        //    List<NetworkedHand> duplicate = new List<NetworkedHand>(index.Length);
+        //    for (int i = 0; i < index.Length; i++)
+        //    {
+        //        duplicate.Add(activeHands[index[i]]);
+        //    }
+
+        //    activeHands = duplicate;
+        //}
 
         private IEnumerator WaitForClientsToCreateDeck()
         {
@@ -169,12 +203,6 @@ namespace XRMultiplayer.MiniGames
 
             currentHandIndex = 0;
             StartCrazyEights();
-        }
-
-        public void EndGame()
-        {
-            StopAllCoroutines();
-            RemoveGeneratedCardsServer();
         }
 
 
@@ -505,6 +533,8 @@ namespace XRMultiplayer.MiniGames
                     hand.Clear();  // Clear the server-side hands
                 }
 
+                activeHands.Clear();
+
                 // Clear the piles
                 _playPile.Clear();
                 _drawPile.Clear();
@@ -513,6 +543,7 @@ namespace XRMultiplayer.MiniGames
                 {
                     if (cardRef.TryGet(out NetworkObject networkCard) && networkCard.IsSpawned)
                     {
+                        networkCard.gameObject.SetActive(true);
                         networkCard.Despawn(true); // Despawn the card across the network
                     }
                 }
