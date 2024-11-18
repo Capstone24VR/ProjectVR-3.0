@@ -12,13 +12,17 @@ namespace XRMultiplayer
         public Action<bool> toggleTriggerState;
 
         private MiniGameManager miniGameManager;
-        public bool playerInTrigger = false; // Tracks if player is in the trigger
+        public NetworkVariable<bool> playerInTrigger = new NetworkVariable<bool>(false); // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
         private ulong localClientID = 9999;
 
         public void Start()
         {
             toggleTriggerState += SetTriggerState;
+            playerInTrigger.OnValueChanged += (oldValue, newValue) =>
+            {
+                Debug.Log($"Trigger State changed: {newValue}");
+            };
         }
 
         private void Awake()
@@ -44,7 +48,7 @@ namespace XRMultiplayer
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
 
-            toggleTriggerState?.Invoke(true);
+            SetTriggerState(true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -57,7 +61,7 @@ namespace XRMultiplayer
                 localClientID = 9999;
             }
 
-            toggleTriggerState?.Invoke(false);
+            SetTriggerState(false);
         }
 
         public void SetTriggerState(bool entered)
@@ -69,15 +73,16 @@ namespace XRMultiplayer
         void SetTriggerStateServerRpc(bool isReady)
         {
             Debug.Log("Server has recieved message");
-            SetTriggerStateClientRpc(isReady);
+            playerInTrigger.Value = isReady;
+            //SetTriggerStateClientRpc(isReady);
         }
 
-        [ClientRpc]
-        void SetTriggerStateClientRpc(bool isReady)
-        {
-            Debug.Log($"Synching Trigger state to {isReady} for {transform.parent.name}");
-            playerInTrigger = isReady;
-        }
+        //[ClientRpc]
+        //void SetTriggerStateClientRpc(bool isReady)
+        //{
+        //    Debug.Log($"Synching Trigger state to {isReady} for {transform.parent.name}");
+        //    playerInTrigger = isReady;
+        //}
 
         // Method to retrieve the current player ID
         public long GetLocalPlayerId()
