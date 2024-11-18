@@ -144,20 +144,20 @@ namespace XRMultiplayer.MiniGames
                 }
             }
 
-            //SyncActiveHandsClientRpc(activeIndex.ToArray());
+            SyncActiveHandsClientRpc(activeIndex.ToArray());
         }
 
-        //[ClientRpc]
-        //private void SyncActiveHandsClientRpc(int[] index)
-        //{
-        //    List<NetworkedHand> duplicate = new List<NetworkedHand>(index.Length);
-        //    for (int i = 0; i < index.Length; i++)
-        //    {
-        //        duplicate.Add(activeHands[index[i]]);
-        //    }
+        [ClientRpc]
+        private void SyncActiveHandsClientRpc(int[] index)
+        {
+            List<NetworkedHand> duplicate = new List<NetworkedHand>(index.Length);
+            for (int i = 0; i < index.Length; i++)
+            {
+                duplicate.Add(activeHands[index[i]]);
+            }
 
-        //    activeHands = duplicate;
-        //}
+            activeHands = duplicate;
+        }
 
         private IEnumerator WaitForClientsToCreateDeck()
         {
@@ -526,7 +526,7 @@ namespace XRMultiplayer.MiniGames
 
                 foreach (NetworkedHand hand in activeHands)
                 {
-                    hand.ownerManager.seatHandler.playerInTrigger.Value = false;
+                    hand.ownerManager.seatHandler.SetTriggerState(false);
                     hand.Clear();  // Clear the server-side hands
                 }
 

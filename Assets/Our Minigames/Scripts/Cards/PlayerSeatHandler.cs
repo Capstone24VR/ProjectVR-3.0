@@ -6,14 +6,15 @@ using XRMultiplayer.MiniGames; // Import the MiniGameManager namespace
 namespace XRMultiplayer
 {
     [RequireComponent(typeof(Collider))]
-    public class SeatHandler : NetworkBehaviour
+    public class SeatHandler : MonoBehaviour
     {
         public Collider subTriggerCollider;
 
         private MiniGameManager miniGameManager;
-        public NetworkVariable<bool> playerInTrigger = new NetworkVariable<bool>(false); // Tracks if player is in the trigger
+        public bool playerInTrigger = false; // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
         private ulong localClientID = 9999;
+
 
         private void Awake()
         {
@@ -35,9 +36,10 @@ namespace XRMultiplayer
             {
                 localPlayerID = miniGameManager.GetLocalPlayerID();
                 localClientID = NetworkManager.Singleton.LocalClientId;
-                playerInTrigger.Value = true;
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
+
+            SetTriggerState(true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -46,10 +48,28 @@ namespace XRMultiplayer
             if (miniGameManager != null)
             {
                 Debug.Log($"Player with ID {localPlayerID} exited the trigger.");
-                playerInTrigger.Value = false;
                 localPlayerID = -1;
                 localClientID = 9999;
             }
+
+            SetTriggerState(false);
+        }
+
+        public void SetTriggerState(bool entered)
+        {
+            SetTriggerStateServerRpc(entered);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        void SetTriggerStateServerRpc(bool isReady)
+        {
+            SetTriggerStateClientRpc(isReady);
+        }
+
+        [ClientRpc]
+        void SetTriggerStateClientRpc(bool isReady)
+        {
+            playerInTrigger = isReady;
         }
 
         // Method to retrieve the current player ID
@@ -66,7 +86,7 @@ namespace XRMultiplayer
         // Method to check if a player is currently in the trigger
         public bool IsPlayerInTrigger()
         {
-            return playerInTrigger.Value;
+            return playerInTrigger;
         }
     }
 }
