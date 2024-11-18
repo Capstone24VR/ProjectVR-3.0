@@ -9,12 +9,17 @@ namespace XRMultiplayer
     public class SeatHandler : MonoBehaviour
     {
         public Collider subTriggerCollider;
+        public Action<bool> toggleTriggerState;
 
         private MiniGameManager miniGameManager;
         public bool playerInTrigger = false; // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
         private ulong localClientID = 9999;
 
+        public void Start()
+        {
+            toggleTriggerState += SetTriggerState;
+        }
 
         private void Awake()
         {
@@ -39,7 +44,7 @@ namespace XRMultiplayer
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
 
-            SetTriggerState(true);
+            toggleTriggerState?.Invoke(true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -52,7 +57,7 @@ namespace XRMultiplayer
                 localClientID = 9999;
             }
 
-            SetTriggerState(false);
+            toggleTriggerState?.Invoke(false);
         }
 
         public void SetTriggerState(bool entered)
@@ -89,6 +94,11 @@ namespace XRMultiplayer
         public bool IsPlayerInTrigger()
         {
             return playerInTrigger;
+        }
+
+        public void OnDestroy()
+        {
+            toggleTriggerState -= SetTriggerState;
         }
     }
 }
