@@ -108,10 +108,6 @@ namespace XRMultiplayer.MiniGames
             StopAllCoroutines();
             RemoveGeneratedCardsServer();
 
-            yield return new WaitForSeconds(0.5f); // Give time to remove all cards
-
-            activeHands.Clear();
-
             yield return new WaitForSeconds(0.5f); // Give time for clients to catch u
 
             if (IsServer)
@@ -530,6 +526,7 @@ namespace XRMultiplayer.MiniGames
 
                 foreach (NetworkedHand hand in activeHands)
                 {
+                    hand.ownerManager.seatHandler.playerInTrigger.Value = false;
                     hand.Clear();  // Clear the server-side hands
                 }
 

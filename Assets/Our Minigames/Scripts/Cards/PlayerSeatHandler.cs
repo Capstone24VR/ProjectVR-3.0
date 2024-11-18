@@ -6,12 +6,12 @@ using XRMultiplayer.MiniGames; // Import the MiniGameManager namespace
 namespace XRMultiplayer
 {
     [RequireComponent(typeof(Collider))]
-    public class SeatHandler : MonoBehaviour
+    public class SeatHandler : NetworkBehaviour
     {
         public Collider subTriggerCollider;
 
         private MiniGameManager miniGameManager;
-        private bool playerInTrigger = false; // Tracks if player is in the trigger
+        public NetworkVariable<bool> playerInTrigger = new NetworkVariable<bool>(false); // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
         private ulong localClientID = 9999;
 
@@ -35,7 +35,7 @@ namespace XRMultiplayer
             {
                 localPlayerID = miniGameManager.GetLocalPlayerID();
                 localClientID = NetworkManager.Singleton.LocalClientId;
-                playerInTrigger = true;
+                playerInTrigger.Value = true;
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
         }
@@ -46,7 +46,7 @@ namespace XRMultiplayer
             if (miniGameManager != null)
             {
                 Debug.Log($"Player with ID {localPlayerID} exited the trigger.");
-                playerInTrigger = false;
+                playerInTrigger.Value = false;
                 localPlayerID = -1;
                 localClientID = 9999;
             }
@@ -66,7 +66,7 @@ namespace XRMultiplayer
         // Method to check if a player is currently in the trigger
         public bool IsPlayerInTrigger()
         {
-            return playerInTrigger;
+            return playerInTrigger.Value;
         }
     }
 }
