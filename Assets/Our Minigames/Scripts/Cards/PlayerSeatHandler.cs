@@ -9,21 +9,11 @@ namespace XRMultiplayer
     public class SeatHandler : MonoBehaviour
     {
         public Collider subTriggerCollider;
-        public Action<bool> toggleTriggerState;
 
         private MiniGameManager miniGameManager;
-        public NetworkVariable<bool> playerInTrigger = new NetworkVariable<bool>(false); // Tracks if player is in the trigger
+        public bool playerInTrigger = false; // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
         private ulong localClientID = 9999;
-
-        public void Start()
-        {
-            toggleTriggerState += SetTriggerState;
-            playerInTrigger.OnValueChanged += (oldValue, newValue) =>
-            {
-                Debug.Log($"Trigger State changed: {newValue}");
-            };
-        }
 
         private void Awake()
         {
@@ -43,12 +33,11 @@ namespace XRMultiplayer
             // Get the player ID from the MiniGameManager and set the playerInTrigger flag to true
             if (miniGameManager != null)
             {
+                playerInTrigger = true;
                 localPlayerID = miniGameManager.GetLocalPlayerID();
                 localClientID = NetworkManager.Singleton.LocalClientId;
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
             }
-
-            SetTriggerState(true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -56,35 +45,12 @@ namespace XRMultiplayer
             // When the player exits, reset the flag and player ID
             if (miniGameManager != null)
             {
+                playerInTrigger = false;
                 Debug.Log($"Player with ID {localPlayerID} exited the trigger.");
                 localPlayerID = -1;
                 localClientID = 9999;
             }
-
-            SetTriggerState(false);
         }
-
-        public void SetTriggerState(bool entered)
-        {
-            SetTriggerStateServerRpc(entered);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        void SetTriggerStateServerRpc(bool isReady)
-        {
-            Debug.Log("Server has recieved message");
-            playerInTrigger.Value = isReady;
-            //SetTriggerStateClientRpc(isReady);
-        }
-
-        //[ClientRpc]
-        //void SetTriggerStateClientRpc(bool isReady)
-        //{
-        //    Debug.Log($"Synching Trigger state to {isReady} for {transform.parent.name}");
-        //    playerInTrigger = isReady;
-        //}
-
-        // Method to retrieve the current player ID
         public long GetLocalPlayerId()
         {
             return localPlayerID;
@@ -98,12 +64,7 @@ namespace XRMultiplayer
         // Method to check if a player is currently in the trigger
         public bool IsPlayerInTrigger()
         {
-            return playerInTrigger.Value;
-        }
-
-        public void OnDestroy()
-        {
-            toggleTriggerState -= SetTriggerState;
+            return playerInTrigger;
         }
     }
 }
