@@ -98,7 +98,7 @@ namespace XRMultiplayer
         // Method to check if a player is currently in the trigger
         public bool IsPlayerInTrigger()
         {
-            return playerInTrigger;
+            return playerInTrigger.Value;
         }
 
         public void OnDestroy()
