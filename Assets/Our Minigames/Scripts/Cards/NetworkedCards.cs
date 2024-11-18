@@ -153,7 +153,7 @@ namespace XRMultiplayer.MiniGames
             List<NetworkedHand> duplicate = new List<NetworkedHand>(index.Length);
             for (int i = 0; i < index.Length; i++)
             {
-                duplicate.Add(activeHands[index[i]]);
+                duplicate.Add(m_hands[index[i]]);
             }
 
             activeHands = duplicate;
