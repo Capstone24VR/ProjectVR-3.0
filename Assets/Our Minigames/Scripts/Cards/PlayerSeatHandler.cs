@@ -63,12 +63,14 @@ namespace XRMultiplayer
         [ServerRpc(RequireOwnership = false)]
         void SetTriggerStateServerRpc(bool isReady)
         {
+            Debug.Log("Server has recieved message");
             SetTriggerStateClientRpc(isReady);
         }
 
         [ClientRpc]
         void SetTriggerStateClientRpc(bool isReady)
         {
+            Debug.Log($"Synching Trigger state to {isReady} for {transform.parent.name}");
             playerInTrigger = isReady;
         }
 
