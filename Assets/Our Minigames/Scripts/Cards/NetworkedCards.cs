@@ -550,7 +550,7 @@ namespace XRMultiplayer.MiniGames
                 return;
             }
 
-            NetworkObjectReference cardReference = _drawPile[_playPile.Count - 1];
+            NetworkObjectReference cardReference = _drawPile[_drawPile.Count - 1];
             if (!cardReference.TryGet(out NetworkObject res))
             {
                 Debug.Log("FATAL ERROR: Card not found at playPile(STARTCRZY8s)");
