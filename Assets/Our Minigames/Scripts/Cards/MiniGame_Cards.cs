@@ -40,6 +40,7 @@ namespace XRMultiplayer.MiniGames
             base.UpdateGame(deltaTime);
             if (m_NetworkedGameplay.IsServer)
             {
+                m_NetworkedGameplay.CheckForPlayerLeave();
                 m_NetworkedGameplay.CheckForPlayerWin();
             }
         }
@@ -77,19 +78,37 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        public IEnumerator PlayerWonRoutine(GameObject winner)
+        public IEnumerator PlayerWonRoutine(NetworkedHand winner)
         {
             if (m_MiniGameManager.LocalPlayerInGame)
             {
                 PlayerHudNotification.Instance.ShowText($"Game Complete! " + winner.name + " has won.");
             }
 
-            //if(winner.GetComponent<HandOwnerManager>()) { }
-            //if (XRINetworkGameManager.Instance.GetPlayerByID(XRINetworkPlayer.LocalPlayer.OwnerClientId, out XRINetworkPlayer player))
-            //{
-            //    m_MiniGameManager.SubmitScoreServerRpc(m_MiniGameManager.currentPlayerDictionary[player].currentScore + 1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
-            //}
+            if (XRINetworkGameManager.Instance.GetPlayerByID(XRINetworkPlayer.LocalPlayer.OwnerClientId, out XRINetworkPlayer player))
+            {
+                if(XRINetworkPlayer.LocalPlayer.OwnerClientId == winner.ownerManager.seatHandler.GetClientID()) 
+                    m_MiniGameManager.SubmitScoreServerRpc(m_MiniGameManager.currentPlayerDictionary[player].currentScore + 1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
+                else
+                    m_MiniGameManager.SubmitScoreServerRpc(m_MiniGameManager.currentPlayerDictionary[player].currentScore, XRINetworkPlayer.LocalPlayer.OwnerClientId);
+            }
 
+
+
+            if (m_MiniGameManager.IsServer && m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)
+                m_MiniGameManager.StopGameServerRpc();
+
+            FinishGame();
+
+            yield return null;
+        }
+
+        public IEnumerator PlayerLeftRoutine()
+        {
+            if (m_MiniGameManager.LocalPlayerInGame)
+            {
+                PlayerHudNotification.Instance.ShowText($"A player has left, ending game . . .");
+            }
 
 
             if (m_MiniGameManager.IsServer && m_MiniGameManager.currentNetworkedGameState == MiniGameManager.GameState.InGame)

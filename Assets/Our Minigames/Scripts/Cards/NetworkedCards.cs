@@ -191,7 +191,7 @@ namespace XRMultiplayer.MiniGames
         private void SyncActiveHandsClientRpc(int[] indexes)
         {
             List<NetworkedHand> duplicate = new List<NetworkedHand>(indexes.Length);
-            foreach(var index in indexes)
+            foreach (var index in indexes)
             {
                 duplicate.Add(m_hands[index]);
             }
@@ -641,9 +641,10 @@ namespace XRMultiplayer.MiniGames
 
         public void RequestDrawCard(GameObject card)
         {
-            if (!_drawPile.Contains(card.GetComponent<NetworkObject>())) {
+            if (!_drawPile.Contains(card.GetComponent<NetworkObject>()))
+            {
                 Debug.Log($"Requesting to draw {card.name} not in pile");
-                return; 
+                return;
             }
 
             NetworkObject networkObject = card.GetComponent<NetworkObject>();
@@ -898,6 +899,22 @@ namespace XRMultiplayer.MiniGames
             Debug.Log("Server has set current hand to " + activeHands[currentHandIndex].name);
         }
 
+
+        public void CheckForPlayerLeave()
+        {
+            if (gameStarted)
+            {
+                if (miniManager.currentPlayerDictionary.Count < activeHands.Count)
+                {
+                    if (m_CurrentMessageRoutine != null)
+                    {
+                        StopCoroutine(m_CurrentMessageRoutine);
+                    }
+                    StartCoroutine(m_MiniGame.PlayerLeftRoutine());
+                }
+            }
+        }
+
         public void CheckForPlayerWin()
         {
             if (gameStarted)
@@ -907,9 +924,9 @@ namespace XRMultiplayer.MiniGames
                     if (hand.isEmpty())
                     {
                         Debug.Log(hand.name + "is empty, calling courotine");
-                        if(m_CurrentMessageRoutine != null)
+                        if (m_CurrentMessageRoutine != null)
                         {
-                            StopCoroutine (m_CurrentMessageRoutine);
+                            StopCoroutine(m_CurrentMessageRoutine);
                         }
 
                         StartCoroutine(m_MiniGame.PlayerWonRoutine(hand.gameObject));
@@ -982,7 +999,7 @@ namespace XRMultiplayer.MiniGames
 
         public override void OnDestroy()
         {
-            foreach(var hand in m_hands)
+            foreach (var hand in m_hands)
             {
                 hand.ownerManager.seatHandler.OnTriggerAction -= TriggerReadyState;
             }
