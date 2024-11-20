@@ -81,6 +81,7 @@ public class NetworkedHand : NetworkBehaviour
             // The server adds the card to the heldCards list
             heldCards.Add(cardReference);
             ConfigureChildPositions();  // Re-arrange cards in hand
+            card.GetComponent<Card>().canBePlayed = true;
         }
     }
 
@@ -179,6 +180,7 @@ public class NetworkedHand : NetworkBehaviour
                 Vector3 newPosition = new Vector3(startingPos * bunching, 0, 0);
                 card.transform.localPosition = newPosition;
                 card.GetComponent<Card>().SetPosition(newPosition);
+                card.GetComponent<Card>().canBePlayed = true;
 
                 startingPos++;
             }

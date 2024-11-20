@@ -476,7 +476,7 @@ namespace XRMultiplayer.MiniGames
             if (IsServer)
             {
                 NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
-                card.GetComponent<Card>().played = true;
+                card.GetComponent<Card>().canBePlayed = false;
                 card.GetComponent<Card>().inHand = false;
 
                 _playPile.Add(cardReference);
@@ -540,7 +540,7 @@ namespace XRMultiplayer.MiniGames
             {
                 if (isPlay) // Set played to true to stop Play function from playing and disable XR grab interactable
                 {
-                    cardNetworkObject.gameObject.GetComponent<Card>().played = true;
+                    cardNetworkObject.gameObject.GetComponent<Card>().canBePlayed = false;
                 }
 
                 cardNetworkObject.gameObject.transform.parent = pileObj.transform;
@@ -788,7 +788,7 @@ namespace XRMultiplayer.MiniGames
                     }
 
 
-                    cardNetworkObject.gameObject.GetComponent<Card>().played = true;
+                    cardNetworkObject.gameObject.GetComponent<Card>().canBePlayed = false;
                     NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
 
                     activeHands[currentHandIndex].RemoveCardServerRpc(cardReference.NetworkObjectId);
@@ -799,7 +799,7 @@ namespace XRMultiplayer.MiniGames
                         AddToPlayPileServer(cardReference);
                         PlayCardClientRpc(cardReference.NetworkObjectId);
 
-                        Debug.Log($"Checking {cardNetworkObject.gameObject.name} status. . . played: {cardNetworkObject.gameObject.GetComponent<Card>().played}\t parent: {cardNetworkObject.gameObject.transform.parent}\t position:{cardNetworkObject.gameObject.transform.localRotation}\t position:{cardNetworkObject.gameObject.transform.localRotation}");
+                        Debug.Log($"Checking {cardNetworkObject.gameObject.name} status. . . played: {cardNetworkObject.gameObject.GetComponent<Card>().canBePlayed}\t parent: {cardNetworkObject.gameObject.transform.parent}\t position:{cardNetworkObject.gameObject.transform.localRotation}\t position:{cardNetworkObject.gameObject.transform.localRotation}");
 
                         SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
                         SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);

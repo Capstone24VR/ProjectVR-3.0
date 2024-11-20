@@ -9,7 +9,7 @@ public class PlayPile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.GetComponent<Card>().played)
+        if (!other.GetComponent<Card>().canBePlayed)
         {
             m_NetworkedGameplay.RequestPlayCard(other.GetComponent<NetworkObject>().NetworkObjectId);
         }

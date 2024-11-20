@@ -35,7 +35,7 @@ public class Card : NetworkBehaviour
     public Value value;
 
     public bool inHand = false;
-    public bool played = false;
+    public bool canBePlayed = false;
 
     [SerializeField] protected Vector3 _position = Vector3.zero;
     [SerializeField] protected Vector3 _localScale = Vector3.one;
