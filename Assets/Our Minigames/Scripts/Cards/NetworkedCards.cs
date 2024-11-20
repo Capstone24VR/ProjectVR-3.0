@@ -929,7 +929,7 @@ namespace XRMultiplayer.MiniGames
                             StopCoroutine(m_CurrentMessageRoutine);
                         }
 
-                        StartCoroutine(m_MiniGame.PlayerWonRoutine(hand.gameObject));
+                        StartCoroutine(m_MiniGame.PlayerWonRoutine(hand));
                     }
                 }
             }
