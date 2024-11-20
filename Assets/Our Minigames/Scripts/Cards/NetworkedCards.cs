@@ -581,6 +581,7 @@ namespace XRMultiplayer.MiniGames
                     if (cardRef.TryGet(out NetworkObject networkCard) && networkCard.IsSpawned)
                     {
                         networkCard.gameObject.SetActive(true);
+                        SetCardActiveClientRpc(networkCard.NetworkObjectId, true);
                         networkCard.Despawn(true); // Despawn the card across the network
                     }
                 }
@@ -596,7 +597,6 @@ namespace XRMultiplayer.MiniGames
             playObject.Clear();
             foreach (NetworkedHand hand in activeHands)
             {
-                hand.Clear();  // Clients also clear their hands
                 hand.active = false;
             }
         }
