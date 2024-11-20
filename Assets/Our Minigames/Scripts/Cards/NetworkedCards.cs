@@ -141,6 +141,7 @@ namespace XRMultiplayer.MiniGames
         {
             StopAllCoroutines();
             RemoveGeneratedCardsServer();
+            gameStarted = false;
 
             yield return new WaitForSeconds(0.5f); // Give time for clients to catch u
 
@@ -152,9 +153,7 @@ namespace XRMultiplayer.MiniGames
 
         public void StartGame()
         {
-            //GetActiveHandsServer();
-            activeHands.Add(m_hands[0]);
-            activeHands.Add(m_hands[1]);
+            GetActiveHandsServer();
             CreateDeckServer();
             ShuffleDeckServer();
             InstantiateDrawPileServer();
@@ -166,31 +165,35 @@ namespace XRMultiplayer.MiniGames
         {
             StopAllCoroutines();
             RemoveGeneratedCardsServer();
+            gameStarted = false;
         }
 
 
         private void GetActiveHandsServer()
         {
-            List<int> activeIndex = new List<int>();
-            for (int i = 0; i < m_hands.Length; i++)
+            if (IsServer)
             {
-                if (m_hands[i].active)
+                List<int> activeIndex = new List<int>();
+                for (int i = 0; i < m_hands.Length; i++)
                 {
-                    activeHands.Add(m_hands[i]);
-                    activeIndex.Add(i);
+                    if (m_hands[i].active)
+                    {
+                        activeHands.Add(m_hands[i]);
+                        activeIndex.Add(i);
+                    }
                 }
-            }
 
-            SyncActiveHandsClientRpc(activeIndex.ToArray());
+                SyncActiveHandsClientRpc(activeIndex.ToArray());
+            }
         }
 
         [ClientRpc]
-        private void SyncActiveHandsClientRpc(int[] index)
+        private void SyncActiveHandsClientRpc(int[] indexes)
         {
-            List<NetworkedHand> duplicate = new List<NetworkedHand>(index.Length);
-            for (int i = 0; i < index.Length; i++)
+            List<NetworkedHand> duplicate = new List<NetworkedHand>(indexes.Length);
+            foreach(var index in indexes)
             {
-                duplicate.Add(m_hands[index[i]]);
+                duplicate.Add(m_hands[index]);
             }
 
             activeHands = duplicate;
@@ -564,6 +567,7 @@ namespace XRMultiplayer.MiniGames
                 foreach (NetworkedHand hand in activeHands)
                 {
                     hand.Clear();  // Clear the server-side hands
+                    hand.active = false;
                 }
 
                 activeHands.Clear();
@@ -593,6 +597,7 @@ namespace XRMultiplayer.MiniGames
             foreach (NetworkedHand hand in activeHands)
             {
                 hand.Clear();  // Clients also clear their hands
+                hand.active = false;
             }
         }
 
