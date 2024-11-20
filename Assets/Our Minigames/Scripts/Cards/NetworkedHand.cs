@@ -131,6 +131,15 @@ public class NetworkedHand : NetworkBehaviour
     public void Clear()
     {
         heldCards.Clear();
+        heldCardsObj.Clear();
+
+        ClearCardsClientRpc();
+    }
+
+    [ClientRpc]
+    private void ClearCardsClientRpc()
+    {
+        heldCardsObj.Clear();
     }
 
 

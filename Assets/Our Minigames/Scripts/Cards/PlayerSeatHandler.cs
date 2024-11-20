@@ -9,14 +9,20 @@ namespace XRMultiplayer
     public class SeatHandler : MonoBehaviour
     {
         public Collider subTriggerCollider;
+        public Action<Collider, bool, int> OnTriggerAction;
 
         private MiniGameManager miniGameManager;
         public bool playerInTrigger = false; // Tracks if player is in the trigger
         private long localPlayerID = -1; // Stores the current player's ID
         private ulong localClientID = 9999;
 
+        private NetworkedCards m_NetworkedGameplay;
+        public int handIndex = -1;
+
         private void Awake()
         {
+            m_NetworkedGameplay = FindAnyObjectByType<NetworkedCards>();
+
             if (subTriggerCollider == null)
                 TryGetComponent(out subTriggerCollider);
 
@@ -37,6 +43,8 @@ namespace XRMultiplayer
                 localPlayerID = miniGameManager.GetLocalPlayerID();
                 localClientID = NetworkManager.Singleton.LocalClientId;
                 Debug.Log($"Player with ID {localPlayerID} entered the trigger.");
+
+                OnTriggerAction?.Invoke(other, true, handIndex);
             }
         }
 
@@ -49,6 +57,8 @@ namespace XRMultiplayer
                 Debug.Log($"Player with ID {localPlayerID} exited the trigger.");
                 localPlayerID = -1;
                 localClientID = 9999;
+
+                OnTriggerAction?.Invoke(other, false, handIndex);
             }
         }
         public long GetLocalPlayerId()

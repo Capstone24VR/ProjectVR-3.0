@@ -6,6 +6,7 @@ using static Card;
 using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEditor.PackageManager;
+using static XRMultiplayer.MiniGames.MiniGameManager;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -69,6 +70,7 @@ namespace XRMultiplayer.MiniGames
 
         [SerializeField] protected int currentHandIndex;
 
+        [SerializeField] protected List<int> activeIndex = new List<int>();
         [SerializeField] protected List<NetworkedHand> activeHands = new List<NetworkedHand>();
 
         [SerializeField] private MiniGameManager miniManager;
@@ -79,6 +81,38 @@ namespace XRMultiplayer.MiniGames
             deck.OnListChanged += OnDeckChanged;
             _drawPile.OnListChanged += OnDrawPileChanged;
             _playPile.OnListChanged += OnPlayPileChanged;
+
+            for (int i = 0; i < m_hands.Length; i++)
+            {
+                m_hands[i].ownerManager.seatHandler.handIndex = i;
+                m_hands[i].ownerManager.seatHandler.OnTriggerAction += TriggerReadyState;
+            }
+        }
+
+        void TriggerReadyState(Collider other, bool entered, int handIndex)
+        {
+            if (other.TryGetComponent(out CharacterController controller))
+            {
+                ToggleHandReadyServerRpc(entered, handIndex);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        void ToggleHandReadyServerRpc(bool isReady, int index)
+        {
+            Debug.Log($"Server recieved request: Toggling Hand {index} to {isReady}");
+            if (!gameStarted)
+            {
+                m_hands[index].active = isReady;
+                ToggleHandReadyClientRpc(isReady, index);
+            }
+        }
+
+        [ClientRpc]
+        void ToggleHandReadyClientRpc(bool isReady, int index)
+        {
+            Debug.Log($"Synching Clients: toggling Hand {index} to {isReady}");
+            m_hands[index].active = isReady;
         }
 
 
@@ -118,7 +152,9 @@ namespace XRMultiplayer.MiniGames
 
         public void StartGame()
         {
-            GetActiveHandsServer();
+            //GetActiveHandsServer();
+            activeHands.Add(m_hands[0]);
+            activeHands.Add(m_hands[1]);
             CreateDeckServer();
             ShuffleDeckServer();
             InstantiateDrawPileServer();
@@ -132,12 +168,13 @@ namespace XRMultiplayer.MiniGames
             RemoveGeneratedCardsServer();
         }
 
+
         private void GetActiveHandsServer()
         {
             List<int> activeIndex = new List<int>();
             for (int i = 0; i < m_hands.Length; i++)
             {
-                if (m_hands[i].GetComponent<HandOwnerManager>().seatHandler.IsPlayerInTrigger())
+                if (m_hands[i].active)
                 {
                     activeHands.Add(m_hands[i]);
                     activeIndex.Add(i);
@@ -526,7 +563,6 @@ namespace XRMultiplayer.MiniGames
 
                 foreach (NetworkedHand hand in activeHands)
                 {
-                    hand.ownerManager.seatHandler.SetTriggerState(false);
                     hand.Clear();  // Clear the server-side hands
                 }
 
@@ -936,6 +972,14 @@ namespace XRMultiplayer.MiniGames
                         playObject.Remove(noR.gameObject);
                     }
                     break;
+            }
+        }
+
+        public override void OnDestroy()
+        {
+            foreach(var hand in m_hands)
+            {
+                hand.ownerManager.seatHandler.OnTriggerAction -= TriggerReadyState;
             }
         }
     }
