@@ -5,6 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using XRMultiplayer.MiniGames;
+using Unity.Netcode;
 
 public class NewFishingRod : MonoBehaviour
 {
@@ -86,7 +87,7 @@ public class NewFishingRod : MonoBehaviour
 
             basePositions.Clear();
             tipPositions.Clear();
-            ResetCast();
+            ResetCastServerRpc();
         }
     }
 
@@ -100,7 +101,7 @@ public class NewFishingRod : MonoBehaviour
         }
         else if (isCasting)
         {
-            ResetCast();
+            ResetCastServerRpc();
         }
     }
 
@@ -166,7 +167,8 @@ public class NewFishingRod : MonoBehaviour
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
-    void ResetCast()
+    [ServerRpc(RequireOwnership =false)]
+    void ResetCastServerRpc()
     {
         floater.mass = 1;
         isCasting = false;
@@ -178,7 +180,22 @@ public class NewFishingRod : MonoBehaviour
 
         hook.caughtSomething.Value = false;
         hook.rodDropped.Value = true;
+
+        ResetCastClientRpc();
     }
+
+    [ClientRpc]
+    void ResetCastClientRpc()
+    {
+        floater.mass = 1;
+        isCasting = false;
+        fishingLine.StopCasting();
+
+        floater.position = rodTipTransform.position;
+        floater.useGravity = false;
+        floater.isKinematic = true;
+    }
+
     public void Reel(float change)
     {
         var reelChange = change - prevReelChange;
