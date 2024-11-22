@@ -87,7 +87,7 @@ public class NewFishingRod : NetworkBehaviour
 
             basePositions.Clear();
             tipPositions.Clear();
-            ResetCastServerRpc();
+            ResetCast();
         }
     }
 
@@ -101,7 +101,7 @@ public class NewFishingRod : NetworkBehaviour
         }
         else if (isCasting)
         {
-            ResetCastServerRpc();
+            ResetCast();
         }
     }
 
@@ -167,8 +167,7 @@ public class NewFishingRod : NetworkBehaviour
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
-    [ServerRpc(RequireOwnership =false)]
-    void ResetCastServerRpc()
+    void ResetCast()
     {
         if (IsServer)
         {
@@ -182,21 +181,7 @@ public class NewFishingRod : NetworkBehaviour
 
             hook.caughtSomething.Value = false;
             hook.rodDropped.Value = true;
-
-            ResetCastClientRpc();
         }
-    }
-
-    [ClientRpc]
-    void ResetCastClientRpc()
-    {
-        floater.mass = 1;
-        isCasting = false;
-        fishingLine.StopCasting();
-
-        floater.position = rodTipTransform.position;
-        floater.useGravity = false;
-        floater.isKinematic = true;
     }
 
     public void Reel(float change)
