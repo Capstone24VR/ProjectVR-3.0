@@ -7,7 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using XRMultiplayer.MiniGames;
 using Unity.Netcode;
 
-public class NewFishingRod : MonoBehaviour
+public class NewFishingRod : NetworkBehaviour
 {
     public NewFishingLine fishingLine;
     public FishingHook hook;
@@ -170,18 +170,21 @@ public class NewFishingRod : MonoBehaviour
     [ServerRpc(RequireOwnership =false)]
     void ResetCastServerRpc()
     {
-        floater.mass = 1;
-        isCasting = false;
-        fishingLine.StopCasting();
+        if (IsServer)
+        {
+            floater.mass = 1;
+            isCasting = false;
+            fishingLine.StopCasting();
 
-        floater.position = rodTipTransform.position;
-        floater.useGravity = false;
-        floater.isKinematic = true;
+            floater.position = rodTipTransform.position;
+            floater.useGravity = false;
+            floater.isKinematic = true;
 
-        hook.caughtSomething.Value = false;
-        hook.rodDropped.Value = true;
+            hook.caughtSomething.Value = false;
+            hook.rodDropped.Value = true;
 
-        ResetCastClientRpc();
+            ResetCastClientRpc();
+        }
     }
 
     [ClientRpc]
