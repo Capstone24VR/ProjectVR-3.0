@@ -809,34 +809,34 @@ namespace XRMultiplayer.MiniGames
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
             Debug.Log($"{newIndex} {oldIndex}");
-            if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
-            {
-                Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.ClientID}");
+            //if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            //{
+            //    Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.ClientID}");
 
-                if (m_CurrentMessageRoutine != null)
-                {
-                    StopCoroutine(m_CurrentMessageRoutine);
-                }
-                m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("Your turn has ended!", NetworkManager.Singleton.LocalClientId, 3);
-                StartCoroutine(m_CurrentMessageRoutine);
-            }
+            //    if (m_CurrentMessageRoutine != null)
+            //    {
+            //        StopCoroutine(m_CurrentMessageRoutine);
+            //    }
+            //    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("Your turn has ended!", NetworkManager.Singleton.LocalClientId, 3);
+            //    StartCoroutine(m_CurrentMessageRoutine);
+            //}
 
             // Update the current hand index only if it's within bounds
             Debug.Log($"{newIndex} {oldIndex} {activeHands.Count}");
             if (newIndex >= 0 && newIndex < activeHands.Count)
             {
                 currentHandIndex = newIndex;
-                Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerManager.ClientID}");
+                //Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerManager.ClientID}");
 
-                if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
-                {
-                    if (m_CurrentMessageRoutine != null)
-                    {
-                        StopCoroutine(m_CurrentMessageRoutine);
-                    }
-                    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("It's your turn!", NetworkManager.Singleton.LocalClientId, 3);
-                    StartCoroutine(m_CurrentMessageRoutine);
-                }
+                //if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
+                //{
+                //    if (m_CurrentMessageRoutine != null)
+                //    {
+                //        StopCoroutine(m_CurrentMessageRoutine);
+                //    }
+                //    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage("It's your turn!", NetworkManager.Singleton.LocalClientId, 3);
+                //    StartCoroutine(m_CurrentMessageRoutine);
+                //}
             }
             else
             {

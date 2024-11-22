@@ -3836,7 +3836,7 @@ MonoBehaviour:
   maxCards: 9999
   active: 1
   ownerManager: {fileID: 0}
-  bunching: 0.12
+  bunching: 0.4
   heldCardsObj: []
 --- !u!1001 &1386312551
 PrefabInstance:
