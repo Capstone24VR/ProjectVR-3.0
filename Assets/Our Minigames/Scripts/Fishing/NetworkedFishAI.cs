@@ -23,7 +23,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
     public Animator animator;
     private XRGrabInteractable _xrInteract;
-    private Rigidbody rb;
+    public Rigidbody rb;
 
     public bool baited;
     public float baitChance;
@@ -195,7 +195,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
         for(int i = res.Count-1; i >= 0; i--)
         {
-            if (res[i].transform.position.y > waterHeight)
+            if (res[i].transform.position.y > waterHeight && !res[i].GetComponent<FishingHook>().caughtSomething.Value)
             {
                 res.Remove(res[i]);
             }
@@ -237,10 +237,15 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
+            _xrInteract.enabled = true;
+            rb.useGravity = true;
+            rb.isKinematic = false;
+
             currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
             currentHook.GetComponent<FishingHook>().caughtObject = null;
             currentHook = null;
-            SetFishStateServerRpc(FishState.Wander);
+
+            SetFishStateServerRpc(FishState.Caught);
         }
         else
         {
@@ -357,6 +362,11 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
+        {
+            SetFishStateServerRpc(FishState.Wander);
+        }
+
         if (other.gameObject.tag == "Cooler")
         {
             //other.gameObject.GetComponent<Cooler>().newFish = this;

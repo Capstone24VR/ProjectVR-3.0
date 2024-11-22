@@ -22,7 +22,7 @@ public class FishingHook : NetworkBehaviour
             if (!caughtSomething.Value)
             {
                 caughtObject = other.transform.parent.gameObject;
-                caughtObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
+                caughtObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle); 
                 caughtSomething.Value = true;
                 Debug.Log("I baited: " + other.gameObject.transform.parent.name);
             }

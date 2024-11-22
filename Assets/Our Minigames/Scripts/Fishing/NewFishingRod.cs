@@ -176,6 +176,7 @@ public class NewFishingRod : MonoBehaviour
         floater.useGravity = false;
         floater.isKinematic = true;
 
+        hook.caughtSomething.Value = false;
         hook.rodDropped.Value = true;
     }
     public void Reel(float change)
