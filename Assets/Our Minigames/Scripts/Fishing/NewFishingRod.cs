@@ -18,21 +18,21 @@ public class NewFishingRod : NetworkBehaviour
     public Transform rodTipTransform;
     public Transform rodBaseTransform;
 
-    private List<Vector3> basePositions = new List<Vector3>();
-    private List<Vector3> tipPositions = new List<Vector3>();
+    private NetworkList<Vector3> basePositions = new NetworkList<Vector3>();
+    private NetworkList<Vector3> tipPositions = new NetworkList<Vector3>();
     private float sampleInterval = 0.05f;
     private float nextSampleTime;
 
     private int grabCount = 0;
 
     [Header("Casting")]
-    private bool castTrigger = false;
-    public bool isCasting = false;
+    private NetworkVariable<bool> castTrigger = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> isCasting = new NetworkVariable<bool>(false);
     public float castingMultiplier = 10f;
 
     [Header("Reeling")]
     public float prevReelChange = 0f;  // The previous value from reel (used to find the difference of reel change)
-    
+
     public XRBaseInteractor currentInteractor;
     public HapticImpulsePlayer hapticFeedback;
 
@@ -71,7 +71,24 @@ public class NewFishingRod : NetworkBehaviour
             hapticFeedback = currentInteractor.GetComponentInParent<HapticImpulsePlayer>();
         }
         grabCount++;
+
+        SyncGrabCountServerRpc(grabCount);
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SyncGrabCountServerRpc(int newCount)
+    {
+        grabCount = newCount;
+
+        SyncGrabCountClientRpc(grabCount);
+    }
+
+    [ClientRpc]
+    private void SyncGrabCountClientRpc(int newCount)
+    {
+        grabCount = newCount;
+    }
+
 
     private void OnRelease(SelectExitEventArgs args)
     {
@@ -80,28 +97,69 @@ public class NewFishingRod : NetworkBehaviour
 
         if (currentInteractor == args.interactorObject as XRBaseInteractor)
         {
-            currentInteractor = null;
-            hapticFeedback = null;
-            isCasting = false;
-            castTrigger = false;
+            //currentInteractor = null;
+            //hapticFeedback = null;
+            //isCasting = false;
+            //castTrigger = false;
 
-            basePositions.Clear();
-            tipPositions.Clear();
-            ResetCast();
+            //basePositions.Clear();
+            //tipPositions.Clear();
+            //ResetCast();
+            HandleReleaseServerRpc();
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void HandleReleaseServerRpc()
+    {
+        currentInteractor = null;
+        hapticFeedback = null;
+
+        SyncReleaseClientRpc();
+
+        isCasting.Value = false;
+        castTrigger.Value = false;
+
+        basePositions.Clear();
+        tipPositions.Clear();
+
+        ResetCastServerRpc();
+    }
+
+    [ClientRpc]
+    private void SyncReleaseClientRpc()
+    {
+        currentInteractor = null;
+        hapticFeedback = null;
     }
 
     private void OnActivate(ActivateEventArgs args)
     {
-        if (grabCount > 0 && !isCasting)
+        //if (grabCount > 0 && !isCasting)
+        //{
+        //    castTrigger = true;
+        //    isCasting = true;
+        //    fishingLine.StartCasting();
+        //}
+        //else if (isCasting)
+        //{
+        //    ResetCast();
+        //}
+        HandleActivateServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void HandleActivateServerRpc()
+    {
+        if (grabCount > 0 && !isCasting.Value)
         {
-            castTrigger = true;
-            isCasting = true;
+            castTrigger.Value = true;
+            isCasting.Value = true;
             fishingLine.StartCasting();
         }
-        else if (isCasting)
+        else if (isCasting.Value)
         {
-            ResetCast();
+            ResetCastServerRpc();
         }
     }
 
@@ -113,42 +171,45 @@ public class NewFishingRod : NetworkBehaviour
 
     void Update()
     {
-        if (!isCasting)
+        if (IsServer)
         {
-            floater.transform.position = rodTipTransform.position;
-            floater.transform.rotation = rodTipTransform.rotation;
-        }
-
-        if (currentInteractor == null || hapticFeedback == null) return;
-
-        if (Time.time >= nextSampleTime)
-        {
-            SampleRodPositions();
-            nextSampleTime = Time.time + sampleInterval;
-        }
-
-        if (castTrigger)
-        {
-            castTrigger = false;
-            var castingQuality = CalculateCastingQuality();
-            Debug.Log($"Casting Quality: {castingQuality}");
-            if (castingQuality == 0) return;
-            else if (castingQuality < 2.5f)
+            if (!isCasting.Value)
             {
-                Debug.Log("Weak Cast");
-                LaunchCast(castingQuality);
+                floater.transform.position = rodTipTransform.position;
+                floater.transform.rotation = rodTipTransform.rotation;
             }
-            else if (castingQuality >= 2.5f && castingQuality < 5.0f)
+
+            if (currentInteractor == null || hapticFeedback == null) return;
+
+            if (Time.time >= nextSampleTime)
             {
-                Debug.Log("Medium Cast");
-                hapticFeedback.SendHapticImpulse(0.3f, 0.2f, 0.5f);
-                LaunchCast(castingQuality*2);
+                SampleRodPositions();
+                nextSampleTime = Time.time + sampleInterval;
             }
-            else if (castingQuality >= 5.0f)
+
+            if (castTrigger.Value)
             {
-                Debug.Log("Strong Cast");
-                hapticFeedback.SendHapticImpulse(0.6f, 0.4f, 1f);
-                LaunchCast(castingQuality*5);
+                castTrigger.Value = false;
+                var castingQuality = CalculateCastingQuality();
+                Debug.Log($"Casting Quality: {castingQuality}");
+                if (castingQuality == 0) return;
+                else if (castingQuality < 2.5f)
+                {
+                    Debug.Log("Weak Cast");
+                    LaunchCast(castingQuality);
+                }
+                else if (castingQuality >= 2.5f && castingQuality < 5.0f)
+                {
+                    Debug.Log("Medium Cast");
+                    hapticFeedback.SendHapticImpulse(0.3f, 0.2f, 0.5f);
+                    LaunchCast(castingQuality * 2);
+                }
+                else if (castingQuality >= 5.0f)
+                {
+                    Debug.Log("Strong Cast");
+                    hapticFeedback.SendHapticImpulse(0.6f, 0.4f, 1f);
+                    LaunchCast(castingQuality * 5);
+                }
             }
         }
     }
@@ -167,21 +228,29 @@ public class NewFishingRod : NetworkBehaviour
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
-    void ResetCast()
+    [ServerRpc(RequireOwnership = false)]
+    void ResetCastServerRpc()
     {
-        if (IsServer)
-        {
-            floater.mass = 1;
-            isCasting = false;
-            fishingLine.StopCasting();
+        floater.mass = 1;
+        isCasting.Value = false;
+        fishingLine.StopCasting();
 
-            floater.position = rodTipTransform.position;
-            floater.useGravity = false;
-            floater.isKinematic = true;
+        floater.position = rodTipTransform.position;
+        floater.useGravity = false;
+        floater.isKinematic = true;
 
-            hook.caughtSomething.Value = false;
-            hook.rodDropped.Value = true;
-        }
+        SyncResetClientRpc();
+
+        hook.caughtSomething.Value = false;
+        hook.rodDropped.Value = true;
+    }
+
+    [ClientRpc]
+    private void SyncResetClientRpc()
+    {
+        floater.position = rodTipTransform.position;
+        floater.useGravity = false;
+        floater.isKinematic = true;
     }
 
     public void Reel(float change)
