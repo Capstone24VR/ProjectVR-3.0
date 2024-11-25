@@ -6,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using XRMultiplayer.MiniGames;
 using Unity.Netcode;
+using UnityEngine.UIElements;
 
 public class NewFishingRod : NetworkBehaviour
 {
@@ -179,6 +180,8 @@ public class NewFishingRod : NetworkBehaviour
                 floater.transform.rotation = rodTipTransform.rotation;
             }
 
+            SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
+
             if (currentInteractor == null || hapticFeedback == null) return;
 
             if (Time.time >= nextSampleTime)
@@ -196,37 +199,51 @@ public class NewFishingRod : NetworkBehaviour
                 else if (castingQuality < 2.5f)
                 {
                     Debug.Log("Weak Cast");
-                    LaunchCast(castingQuality);
+                    LaunchCastServer(castingQuality);
                 }
                 else if (castingQuality >= 2.5f && castingQuality < 5.0f)
                 {
                     Debug.Log("Medium Cast");
                     hapticFeedback.SendHapticImpulse(0.3f, 0.2f, 0.5f);
-                    LaunchCast(castingQuality * 2);
+                    LaunchCastServer(castingQuality * 2);
                 }
                 else if (castingQuality >= 5.0f)
                 {
                     Debug.Log("Strong Cast");
                     hapticFeedback.SendHapticImpulse(0.6f, 0.4f, 1f);
-                    LaunchCast(castingQuality * 5);
+                    LaunchCastServer(castingQuality * 5);
                 }
             }
+
+            SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
         }
     }
 
-    void LaunchCast(float castingQuality)
+    [ClientRpc]
+
+    private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
     {
-        floater.mass = 15;
-        floater.isKinematic = false;
-        floater.useGravity = true;
-
-        hook.rodDropped.Value = false;
-
-        Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
-
-        float launchForce = castingQuality * castingMultiplier;
-        floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
+        floater.transform.position = position;
+        floater.transform.rotation = rotation;
     }
+
+    void LaunchCastServer(float castingQuality)
+    {
+        if (IsServer)
+        {
+            floater.mass = 15;
+            floater.isKinematic = false;
+            floater.useGravity = true;
+
+            hook.rodDropped.Value = false;
+
+            Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
+
+            float launchForce = castingQuality * castingMultiplier;
+            floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
+        }
+    }
+
 
     [ServerRpc(RequireOwnership = false)]
     void ResetCastServerRpc()
