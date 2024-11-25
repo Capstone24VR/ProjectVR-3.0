@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class NewFishingLine : MonoBehaviour
+public class NewFishingLine : NetworkBehaviour
 {
     public Transform rodTip;
     public Rigidbody floater;
@@ -13,92 +14,119 @@ public class NewFishingLine : MonoBehaviour
     public float floaterMass = 0.2f;
     public float verletDamping = 0.98f;
 
-    private List<Vector3> linePoints;
-    private List<Vector3> prevPoints;
-    private bool isCasting = false;
-    private bool lineLocked = false;
+    private NetworkList<Vector3> linePoints = new NetworkList<Vector3>();
+    private NetworkList<Vector3> prevPoints = new NetworkList<Vector3>();
+    private NetworkVariable<bool> isCasting = new NetworkVariable<bool>(false);
+    private NetworkVariable<bool> lineLocked = new NetworkVariable<bool>(false);
 
     public float maxRopeLength = 2f;
     public float currentRopeLength;
 
-    public bool ropeLengthLocked = false;
+    public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
-    private void Start()
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if(IsServer) { 
+            linePoints.Clear();
+            prevPoints.Clear();
+
+            // Initialize line with segments
+            for (int i = 0; i < lineSegmentCount; i++)
+            {
+                linePoints.Add(rodTip.position);
+                prevPoints.Add(rodTip.position);
+            }
+        }
+
+        lineRenderer.positionCount = lineSegmentCount;
+    }
+
+    public void Start()
     {
         currentRopeLength = 0;
 
-        // Initialize line with segments
-        linePoints = new List<Vector3>();
-        prevPoints = new List<Vector3>();
-        for (int i = 0; i < lineSegmentCount; i++)
-        {
-            linePoints.Add(rodTip.position);
-            prevPoints.Add(rodTip.position);
-        }
 
         lineRenderer.positionCount = lineSegmentCount;
     }
 
     private void Update()
     {
-        if (!isCasting)
+        if (IsServer)
         {
-            // When not casting, set all points close to the rod tip
-            for (int i = 0; i < lineSegmentCount; i++)
-                linePoints[i] = rodTip.position;
-                
-        }
-        else
-        {
-            if (!ropeLengthLocked)
+            if (!isCasting.Value)
             {
-                var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
-                if (!floater.GetComponent<BuoyancyObject>().underwater)
-                {
-                    currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
-                }
-                else
-                {
-                    ropeLengthLocked = true;
-                }
+                // When not casting, set all points close to the rod tip
+                for (int i = 0; i < lineSegmentCount; i++)
+                    linePoints[i] = rodTip.position;
+
             }
             else
             {
-                if (!floater.GetComponent<BuoyancyObject>().underwater)
-                    floater.drag = 10f;
-            }
-            
+                if (!ropeLengthLocked.Value)
+                {
+                    var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
+                    if (!floater.GetComponent<BuoyancyObject>().underwater)
+                    {
+                        currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
+                    }
+                    else
+                    {
+                        ropeLengthLocked.Value = true;
+                    }
+                }
+                else
+                {
+                    if (!floater.GetComponent<BuoyancyObject>().underwater)
+                        floater.drag = 10f;
+                }
 
-            if (!lineLocked)
-            {
-                SimulateVerlet();
-                ApplyConstraints();
+
+                if (!lineLocked.Value)
+                {
+                    SimulateVerlet();
+                    ApplyConstraints();
+                }
             }
+
+            DrawLineClientRpc();
         }
-
-        DrawLine();
     }
 
-    public void StartCasting()
+    [ServerRpc(RequireOwnership = false)]
+    public void StartCastingServerRpc()
     {
         floater.drag = 0;
-        isCasting = true;
-        lineLocked = false;
-        ropeLengthLocked = false;
+        isCasting.Value = true;
+        lineLocked.Value = false;
+        ropeLengthLocked.Value = false;
+
+        SyncCastingClientRpc();
     }
 
-    public void StopCasting()
+    [ServerRpc(RequireOwnership = false)]
+    public void StopCastingServerRpc()
     {
         floater.drag = 0;
-        isCasting = false;
-        lineLocked = true;
-        ropeLengthLocked = false;
+        isCasting.Value = false;
+        lineLocked.Value = true;
+        ropeLengthLocked.Value = false;
+
+        SyncCastingClientRpc();
+    }
+
+    [ClientRpc]
+    private void SyncCastingClientRpc()
+    {
+        floater.drag = 0;
     }
 
     public void Reel(float reelChange)
     {
         currentRopeLength = Mathf.Max(0, currentRopeLength + reelChange);
     }
+
 
     private void SimulateVerlet()
     {
@@ -153,7 +181,8 @@ public class NewFishingLine : MonoBehaviour
         }
     }
 
-    private void DrawLine()
+    [ClientRpc]
+    private void DrawLineClientRpc()
     {
         // Render line based on the position of each segment
         for (int i = 0; i < lineSegmentCount; i++)

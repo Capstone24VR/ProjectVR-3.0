@@ -156,7 +156,7 @@ public class NewFishingRod : NetworkBehaviour
         {
             castTrigger.Value = true;
             isCasting.Value = true;
-            fishingLine.StartCasting();
+            fishingLine.StartCastingServerRpc();
         }
         else if (isCasting.Value)
         {
@@ -250,7 +250,7 @@ public class NewFishingRod : NetworkBehaviour
     {
         floater.mass = 1;
         isCasting.Value = false;
-        fishingLine.StopCasting();
+        fishingLine.StopCastingServerRpc();
 
         floater.position = rodTipTransform.position;
         floater.useGravity = false;
