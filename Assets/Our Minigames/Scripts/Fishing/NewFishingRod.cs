@@ -235,6 +235,8 @@ public class NewFishingRod : NetworkBehaviour
             floater.isKinematic = false;
             floater.useGravity = true;
 
+            LaunchCastClientRpc();
+
             hook.rodDropped.Value = false;
 
             Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
@@ -242,6 +244,14 @@ public class NewFishingRod : NetworkBehaviour
             float launchForce = castingQuality * castingMultiplier;
             floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
         }
+    }
+
+    [ClientRpc]
+    private void LaunchCastClientRpc()
+    {
+        floater.mass = 15;
+        floater.isKinematic = false;
+        floater.useGravity = true;
     }
 
 
@@ -265,6 +275,7 @@ public class NewFishingRod : NetworkBehaviour
     [ClientRpc]
     private void SyncResetClientRpc()
     {
+        floater.mass = 1;
         floater.position = rodTipTransform.position;
         floater.useGravity = false;
         floater.isKinematic = true;
