@@ -299,17 +299,17 @@ public class NewFishingRod : NetworkBehaviour
         floater.useGravity = false;
         floater.isKinematic = true;
 
-        SyncResetClientRpc();
+        SyncResetClientRpc(floater.position);
 
         hook.caughtSomething.Value = false;
         hook.rodDropped.Value = true;
     }
 
     [ClientRpc]
-    private void SyncResetClientRpc()
+    private void SyncResetClientRpc(Vector3 floaterPosition)
     {
         floater.mass = 1;
-        floater.position = rodTipTransform.position;
+        floater.position = floaterPosition;
         floater.useGravity = false;
         floater.isKinematic = true;
     }

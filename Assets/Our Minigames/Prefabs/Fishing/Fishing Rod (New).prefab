@@ -119,6 +119,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   caughtObject: {fileID: 0}
+  rodDropped:
+    m_InternalValue: 0
   caughtSomething:
     m_InternalValue: 0
 --- !u!1 &413425506858776196
@@ -1752,9 +1754,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6603052287853147593}
   - component: {fileID: 6182265908053768628}
+  - component: {fileID: 7595150710947733812}
   - component: {fileID: 1878764260375105505}
   - component: {fileID: 6660875956966467766}
-  - component: {fileID: 7595150710947733812}
   m_Layer: 0
   m_Name: Fishing Rod (New)
   m_TagString: Untagged
@@ -1883,6 +1885,27 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &7595150710947733812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6628261836878854170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1198963429
+  InScenePlacedSourceGlobalObjectIdHash: 1806902339
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &1878764260375105505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1896,15 +1919,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishingLine: {fileID: 0}
+  hook: {fileID: 0}
   floater: {fileID: 840637298867877347}
   castThreshold: 2
   rodTipTransform: {fileID: 4308361475706200526}
   rodBaseTransform: {fileID: 3615715821812839051}
-  isCasting: 0
+  isCasting:
+    m_InternalValue: 0
   castingMultiplier: 20
   prevReelChange: 0
   currentInteractor: {fileID: 0}
   hapticFeedback: {fileID: 0}
+  clientId: 9999
 --- !u!114 &6660875956966467766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1927,28 +1953,8 @@ MonoBehaviour:
   verletDamping: 0.98
   maxRopeLength: 10
   currentRopeLength: 0
-  ropeLengthLocked: 0
---- !u!114 &7595150710947733812
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6628261836878854170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1198963429
-  InScenePlacedSourceGlobalObjectIdHash: 1806902339
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  ropeLengthLocked:
+    m_InternalValue: 0
 --- !u!1 &7222867781674643276
 GameObject:
   m_ObjectHideFlags: 0
@@ -2076,8 +2082,7 @@ GameObject:
   - component: {fileID: 985139847974072137}
   - component: {fileID: 840637298867877347}
   - component: {fileID: 5837867483857533252}
-  - component: {fileID: 153185392741603967}
-  - component: {fileID: 7701063755828338779}
+  - component: {fileID: 1319770733525837685}
   m_Layer: 0
   m_Name: Floater
   m_TagString: Untagged
@@ -2198,7 +2203,7 @@ MonoBehaviour:
   waterHeight: 0.88
   underwater: 1
   uprightTorqueStrength: 10
---- !u!114 &153185392741603967
+--- !u!114 &1319770733525837685
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2207,28 +2212,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7478386638205023423}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1198963429
-  InScenePlacedSourceGlobalObjectIdHash: 1806902339
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &7701063755828338779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7478386638205023423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25f7d6f3d19b0524d9be4bc50efbc19a, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   UseUnreliableDeltas: 0
@@ -2250,7 +2234,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
-  isServerAuthoritative: 0
 --- !u!1 &7607991166782376254
 GameObject:
   m_ObjectHideFlags: 0
