@@ -121,16 +121,16 @@ namespace Domino
 
                         Debug.Log($"Other domino({other.transform.parent.name}) attempting to play with me {transform.parent.name} with Id of: {GetComponentInParent<NetworkObject>().NetworkObjectId} and conneting to hitbox: {hitboxindex}");
 
-                        // Attempt to snap the domino if the grab interactable is not selected
-                        var otherGrabInteractable = other.GetComponentInParent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-                        if (otherGrabInteractable != null && !otherGrabInteractable.isSelected)
-                        {
-                            Debug.Log($"Requesting to snap domino with side value {otherHitbox.sideValue}.");
-                            m_MiniGame.RequestPlayCard(
-                                other.GetComponentInParent<NetworkObject>().NetworkObjectId, // Domino with DominoHitboxComponent
-                                GetComponentInParent<NetworkObject>().NetworkObjectId,       // Parent domino with HitboxComponent
-                                hitboxindex);                                                // Index of the current hitbox
-                        }
+                        //// Attempt to snap the domino if the grab interactable is not selected
+                        //var otherGrabInteractable = other.GetComponentInParent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+                        //if (otherGrabInteractable != null && !otherGrabInteractable.isSelected)
+                        //{
+                        //    Debug.Log($"Requesting to snap domino with side value {otherHitbox.sideValue}.");
+                        //    m_MiniGame.RequestPlayCard(
+                        //        other.GetComponentInParent<NetworkObject>().NetworkObjectId, // Domino with DominoHitboxComponent
+                        //        GetComponentInParent<NetworkObject>().NetworkObjectId,       // Parent domino with HitboxComponent
+                        //        hitboxindex);                                                // Index of the current hitbox
+                        //}
                     }
                     else
                     {
