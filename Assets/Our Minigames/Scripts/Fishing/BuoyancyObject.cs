@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class BuoyancyObject : MonoBehaviour
+public class BuoyancyObject : NetworkBehaviour
 {
 
     public float underWaterDrag = 3f;
@@ -22,8 +24,12 @@ public class BuoyancyObject : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
     }
+
+    // Only the server should manage physics and state updates
     private void FixedUpdate()
     {
+        if (!IsServer) return;
+
         float difference = transform.position.y - waterHeight;
         if(difference < 0)
         {
