@@ -56,6 +56,14 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
+        void OnDestroy()
+        {
+            foreach (var kvp in m_InteractablePoses)
+            {
+                kvp.Key.selectExited.RemoveListener(RodDropped);
+            }
+        }
+
         public override void SetupGame()
         {
             base.SetupGame();
