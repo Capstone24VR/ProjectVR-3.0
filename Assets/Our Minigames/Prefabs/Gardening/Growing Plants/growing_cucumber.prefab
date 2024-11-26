@@ -466,7 +466,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
 --- !u!114 &1644615691878604013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -487,14 +487,14 @@ MonoBehaviour:
   - {fileID: 2874627412040789023}
   wateringSlider: {fileID: 1857407905726823620}
   timerSlider: {fileID: 23758509099440047}
-  wateringTimeRequired: 3
+  wateringTimeRequired: 1
   stageDurations:
-  - 35
-  - 35
-  - 90
-  - 90
-  - 90
-  - 90
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
   dropItems:
   - {fileID: 3589396965769481973, guid: 1c14aae0e8f4e5247ba8b86e48263631, type: 3}
   - {fileID: 3589396965769481973, guid: 1c14aae0e8f4e5247ba8b86e48263631, type: 3}

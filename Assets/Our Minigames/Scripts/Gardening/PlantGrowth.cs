@@ -1,7 +1,8 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlantGrowth : MonoBehaviour
+public class PlantGrowth : NetworkBehaviour
 {
     [Header("Plant Stages")]
     public GameObject[] growthStages; // Array of plant stage prefabs to visualize growth stages
@@ -168,18 +169,58 @@ public class PlantGrowth : MonoBehaviour
     // Handles the harvesting process, creating drop items and cleaning up
     void Harvest()
     {
+        //foreach (GameObject item in dropItems)
+        //{
+        //    Vector3 spawnPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
+        //    Instantiate(item, spawnPosition, Quaternion.identity);
+        //    Debug.Log($"Harvest: Dropping item {item.name} at {spawnPosition}.");
+        //}
+
+        //if (plantBed != null)
+        //{
+        //    plantBed.tag = "Unplanted"; // Reset the plant bed's tag
+        //}
+        //Destroy(gameObject); // Destroy the plant after harvesting
+        //Debug.Log("Harvest: Plant harvested and object destroyed.");
+        HarvestServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void HarvestServerRpc()
+    {
         foreach (GameObject item in dropItems)
         {
             Vector3 spawnPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
             Instantiate(item, spawnPosition, Quaternion.identity);
             Debug.Log($"Harvest: Dropping item {item.name} at {spawnPosition}.");
+
+            var networkObject = item.GetComponent<NetworkObject>(); // Get NetworkObject for server spawning
+
+            if (networkObject != null)
+            {
+                if (!networkObject.IsSpawned)
+                {
+                    networkObject.Spawn();
+                }
+                Debug.Log($"{item.name} has been spawned with id of: {networkObject.NetworkObjectId}");
+                if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(networkObject.NetworkObjectId))
+                {
+                    Debug.LogError($"Failed to register with NetworkObjectId {networkObject.NetworkObjectId}");
+                }
+            }
+            else
+            {
+                Debug.LogError("NetworkObject component is missing on the card prefab.");
+                continue; // Skip to the next iteration if no NetworkObject is found
+            }
         }
 
         if (plantBed != null)
         {
             plantBed.tag = "Unplanted"; // Reset the plant bed's tag
         }
-        Destroy(gameObject); // Destroy the plant after harvesting
+
+        gameObject.GetComponent<NetworkObject>().Despawn();
         Debug.Log("Harvest: Plant harvested and object destroyed.");
     }
 }
