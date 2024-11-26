@@ -125,6 +125,8 @@ public class NewFishingRod : NetworkBehaviour
         XRBaseInteractor newInteractable = null;
         HapticImpulsePlayer newHapticPlayer = null;
 
+        Debug.Log(client.PlayerObject.name);
+
         switch (controller)
         {
             case 0:
