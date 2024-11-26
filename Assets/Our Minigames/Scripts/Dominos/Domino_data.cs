@@ -48,10 +48,14 @@ public class Domino_data : NetworkBehaviour
             var hitbox = child.GetComponent<HitboxComponent>();
             if (hitbox != null)
             {
-                hitboxComponents.Add(hitbox);
+                hitboxComponents.Add(hitbox); // Add valid hitbox components to the list
             }
         }
 
+        if (hitboxComponents.Count == 0)
+        {
+            Debug.LogError("No HitboxComponent instances found in child objects.");
+        }
     }
 
     public void SetPosition(Vector3 position)
@@ -123,7 +127,23 @@ public class Domino_data : NetworkBehaviour
         _xrInteract.trackPosition = value;
         _xrInteract.trackRotation = value;
     }
+    public void SetPlayed()
+    {
+        // Mark the domino as played
+        played = true;
 
+        // Disable the XRGrabInteractable component to prevent further interaction
+        var grabInteractable = GetComponent<XRGrabInteractable>();
+        if (grabInteractable != null)
+        {
+            grabInteractable.enabled = false;
+            Debug.Log($"{gameObject.name}: XRGrabInteractable has been disabled as the domino is played.");
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name}: XRGrabInteractable component is missing. Cannot disable interaction.");
+        }
+    }
     public void SetInHand(bool isInHand)
     {
         inHand = isInHand;
@@ -179,11 +199,12 @@ public class Domino_data : NetworkBehaviour
         Top_side = newSide1;
         But_side = newSide2;
 
+        // Update all associated hitbox components with the side values
         foreach (var hitbox in hitboxComponents)
         {
             if (hitbox != null)
             {
-                hitbox.SetSideValue(Top_side, But_side);
+                hitbox.SetSideValue(Top_side, But_side); // Ensure this is called after assigning Top_side and But_side
             }
             else
             {

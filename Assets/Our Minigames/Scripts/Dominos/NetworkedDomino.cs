@@ -389,14 +389,23 @@ namespace XRMultiplayer.MiniGames
             if (IsServer)
             {
                 NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
-                card.GetComponent<Domino_data>().played = true;
-                card.GetComponent<Domino_data>().inHand = false;
+
+                // Use the SetPlayed method to properly mark the domino as played and disable interaction
+                var dominoData = card.GetComponent<Domino_data>();
+                if (dominoData != null)
+                {
+                    dominoData.SetPlayed();
+                    dominoData.inHand = false;
+                }
+                else
+                {
+                    Debug.LogError($"{card.name}: Domino_data component is missing. Cannot set as played.");
+                }
 
                 _playPile.Add(cardReference);
                 AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, true);
             }
         }
-
         private void AddToPlayPileServer(NetworkObjectReference cardReference)
         {
             if (IsServer)
@@ -441,7 +450,6 @@ namespace XRMultiplayer.MiniGames
         private void AddToPileClientRpc(ulong networkObjectId, bool isPlay)
         {
             StartCoroutine(AddToPileOnClient(networkObjectId, isPlay));
-            SetCardActiveClientRpc(networkObjectId, false);
         }
 
         IEnumerator AddToPileOnClient(ulong networkObjectId, bool isPlay)
@@ -744,16 +752,7 @@ namespace XRMultiplayer.MiniGames
                 // Mark this hitbox as used
                 cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().isUsed = true;
 
-                // Disable grab functionality on the domino
-                var grabInteractable = cardNetworkObjectsnap.GetComponent<XRGrabInteractable>();
-                if (grabInteractable != null)
-                {
-                    grabInteractable.enabled = false; // Disable the grab interactable to prevent further grabbing
-                }
-                else
-                {
-                    Debug.LogWarning("XRGrabInteractable component is missing on the snapped domino.");
-                }
+
 
                 // Reset the color to transparent after snapping
                 cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().SetColor(new Color(1, 1, 1, 0));
