@@ -39,6 +39,8 @@ public class NewFishingRod : NetworkBehaviour
     public XRBaseInteractor currentInteractor;
     public HapticImpulsePlayer hapticFeedback;
 
+    public ulong clientId = 9999;
+
 
     private void Awake()
     {
@@ -67,87 +69,33 @@ public class NewFishingRod : NetworkBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
-        int controller = -1;
 
         // Store the interactor (could be either hand)
         if (grabCount == 0)
         {
             currentInteractor = args.interactorObject as XRBaseInteractor;
             hapticFeedback = currentInteractor.GetComponentInParent<HapticImpulsePlayer>();
-
-            controller = hapticFeedback.name == "Right Controller" ? 0 : 1;
+            clientId = NetworkManager.Singleton.LocalClientId;
         }
         grabCount++;
 
-        SyncGrabServerRpc(grabCount, NetworkManager.Singleton.LocalClientId, controller);
+        SyncGrabServerRpc(grabCount, clientId);
+
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SyncGrabServerRpc(int newCount, ulong clientId, int controller)
+    private void SyncGrabServerRpc(int newCount, ulong newId)
     {
+        clientId = newId;
         grabCount = newCount;
-
-        NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client);
-
-        XRBaseInteractor newInteractable = null;
-        HapticImpulsePlayer newHapticPlayer = null;
-
-        Debug.Log(client.PlayerObject.name);
-
-        switch (controller)
-        {
-            case 0:
-                newInteractable = client.PlayerObject.transform.Find("Right Controller").GetComponentInChildren<NearFarInteractor>();
-                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
-                break;
-            case 1:
-                newInteractable = client.PlayerObject.transform.Find("Left Controller").GetComponentInChildren<NearFarInteractor>();
-                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
-                break;
-            default:
-                break;
-        }
-
-        if(newInteractable != null)
-        {
-            currentInteractor = newInteractable;
-            hapticFeedback = newHapticPlayer;
-        }
-
-        SyncGrabClientRpc(grabCount, clientId, controller);
+        SyncGrabClientRpc(grabCount, clientId);
     }
 
     [ClientRpc]
-    private void SyncGrabClientRpc(int newCount, ulong clientId, int controller)
+    private void SyncGrabClientRpc(int newCount, ulong newId)
     {
+        clientId = newId;
         grabCount = newCount;
-
-        NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client);
-            
-        XRBaseInteractor newInteractable = null;
-        HapticImpulsePlayer newHapticPlayer = null;
-
-        Debug.Log(client.PlayerObject.name);
-
-        switch (controller)
-        {
-            case 0:
-                newInteractable = client.PlayerObject.transform.Find("Right Controller").GetComponentInChildren<NearFarInteractor>();
-                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
-                break;
-            case 1:
-                newInteractable = client.PlayerObject.transform.Find("Left Controller").GetComponentInChildren<NearFarInteractor>();
-                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
-                break;
-            default:
-                break;
-        }
-
-        if (newInteractable != null)
-        {
-            currentInteractor = newInteractable;
-            hapticFeedback = newHapticPlayer;
-        }
     }
 
 
@@ -173,9 +121,7 @@ public class NewFishingRod : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void HandleReleaseServerRpc()
     {
-        currentInteractor = null;
-        hapticFeedback = null;
-
+        clientId = 9999;
         SyncReleaseClientRpc();
 
         isCasting.Value = false;
@@ -190,6 +136,7 @@ public class NewFishingRod : NetworkBehaviour
     [ClientRpc]
     private void SyncReleaseClientRpc()
     {
+        clientId = 9999;
         currentInteractor = null;
         hapticFeedback = null;
     }
@@ -242,7 +189,7 @@ public class NewFishingRod : NetworkBehaviour
 
             SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
 
-            if (currentInteractor == null || hapticFeedback == null) return;
+            if (grabCount == 0) return;
 
             if (Time.time >= nextSampleTime)
             {
@@ -264,13 +211,13 @@ public class NewFishingRod : NetworkBehaviour
                 else if (castingQuality >= 2.5f && castingQuality < 5.0f)
                 {
                     Debug.Log("Medium Cast");
-                    hapticFeedback.SendHapticImpulse(0.3f, 0.2f, 0.5f);
+                    TriggerHapticImpulse(0.3f, 0.2f, 0.5f, clientId);
                     LaunchCastServer(castingQuality * 2);
                 }
                 else if (castingQuality >= 5.0f)
                 {
                     Debug.Log("Strong Cast");
-                    hapticFeedback.SendHapticImpulse(0.6f, 0.4f, 1f);
+                    TriggerHapticImpulse(0.6f, 0.4f, 1f, clientId);
                     LaunchCastServer(castingQuality * 5);
                 }
             }
@@ -280,7 +227,6 @@ public class NewFishingRod : NetworkBehaviour
     }
 
     [ClientRpc]
-
     private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
     {
         floater.transform.position = position;
@@ -315,6 +261,31 @@ public class NewFishingRod : NetworkBehaviour
 
         Debug.Log($"Syncing floater: \tgravity: {floater.useGravity}\tkinematic: {floater.isKinematic}\tmass: {floater.mass}");
     }
+
+    private void TriggerHapticImpulse(float amplitude, float duration, float frequency, ulong targetClientId)
+    {
+        ClientRpcParams rpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new[] { targetClientId }
+            }
+        };
+
+        TriggerHapticImpulseClientRpc(amplitude, duration, frequency, targetClientId, rpcParams);
+    }
+
+
+    [ClientRpc]
+    private void TriggerHapticImpulseClientRpc(float amplitude, float duration, float frequency, ulong targetClientId, ClientRpcParams clientRpcParams = default)
+    {
+        // Target only the specified client
+        if (NetworkManager.Singleton.LocalClientId == targetClientId)
+        {
+            hapticFeedback?.SendHapticImpulse(amplitude, duration, frequency);
+        }
+    }
+
 
 
     [ServerRpc(RequireOwnership = false)]
