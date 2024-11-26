@@ -1050,7 +1050,7 @@ MonoBehaviour:
   drawPileObj: {fileID: 215406242}
   playPileObj: {fileID: 1612757931}
   gameStarted: 0
-  startingHand: 5
+  startingHand: 3
   drawObject: []
   playObject: []
   currentHandIndex: 0
