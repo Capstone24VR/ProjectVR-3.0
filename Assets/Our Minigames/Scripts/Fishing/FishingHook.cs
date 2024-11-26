@@ -21,11 +21,51 @@ public class FishingHook : NetworkBehaviour
         {
             if (!caughtSomething.Value)
             {
-                caughtObject = other.transform.parent.gameObject;
-                caughtObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle); 
-                caughtSomething.Value = true;
+                //caughtObject = other.transform.parent.gameObject;
+                //caughtObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle); 
+                //caughtSomething.Value = true;
+
+                ulong fishNetworkId = other.transform.parent.GetComponent<NetworkObject>().NetworkObjectId;
+                CatchFishServerRpc(fishNetworkId);
+
                 Debug.Log("I baited: " + other.gameObject.transform.parent.name);
             }
         }
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void CatchFishServerRpc(ulong fishNetworkId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
+        {
+            caughtObject = fishNetworkObject.gameObject;
+            caughtSomething.Value = true;
+
+            // Update fish state
+            fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
+
+            // Notify clients about the catch
+            NotifyCatchClientRpc(fishNetworkId);
+        }
+        else
+        {
+            Debug.LogError($"Fish with NetworkObjectId {fishNetworkId} not found!");
+        }
+    }
+
+    [ClientRpc]
+    private void NotifyCatchClientRpc(ulong fishNetworkId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
+        {
+            caughtObject = fishNetworkObject.gameObject;
+            caughtSomething.Value = true;
+            Debug.Log($"Caught fish: {caughtObject.name} on client.");
+        }
+        else
+        {
+            Debug.LogError($"Fish with NetworkObjectId {fishNetworkId} not found on client!");
+        }
+    }
 }
+
