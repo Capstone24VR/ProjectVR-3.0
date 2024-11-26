@@ -92,6 +92,8 @@ public class NewFishingRod : NetworkBehaviour
         XRBaseInteractor newInteractable = null;
         HapticImpulsePlayer newHapticPlayer = null;
 
+        Debug.Log(client.PlayerObject.name);
+
         switch (controller)
         {
             case 0:
@@ -121,7 +123,7 @@ public class NewFishingRod : NetworkBehaviour
         grabCount = newCount;
 
         NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client);
-
+            
         XRBaseInteractor newInteractable = null;
         HapticImpulsePlayer newHapticPlayer = null;
 
