@@ -7,6 +7,8 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using XRMultiplayer.MiniGames;
 using Unity.Netcode;
 using UnityEngine.UIElements;
+using Unity.Services.Lobbies.Models;
+using XRMultiplayer;
 
 public class NewFishingRod : NetworkBehaviour
 {
@@ -65,29 +67,83 @@ public class NewFishingRod : NetworkBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
+        int controller = -1;
+
         // Store the interactor (could be either hand)
         if (grabCount == 0)
         {
             currentInteractor = args.interactorObject as XRBaseInteractor;
             hapticFeedback = currentInteractor.GetComponentInParent<HapticImpulsePlayer>();
+
+            controller = hapticFeedback.name == "Right Controller" ? 0 : 1;
         }
         grabCount++;
 
-        SyncGrabCountServerRpc(grabCount);
+        SyncGrabServerRpc(grabCount, NetworkManager.Singleton.LocalClientId, controller);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SyncGrabCountServerRpc(int newCount)
+    private void SyncGrabServerRpc(int newCount, ulong clientId, int controller)
     {
         grabCount = newCount;
 
-        SyncGrabCountClientRpc(grabCount);
+        NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client);
+
+        XRBaseInteractor newInteractable = null;
+        HapticImpulsePlayer newHapticPlayer = null;
+
+        switch (controller)
+        {
+            case 0:
+                newInteractable = client.PlayerObject.transform.Find("Right Controller").GetComponentInChildren<NearFarInteractor>();
+                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
+                break;
+            case 1:
+                newInteractable = client.PlayerObject.transform.Find("Left Controller").GetComponentInChildren<NearFarInteractor>();
+                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
+                break;
+            default:
+                break;
+        }
+
+        if(newInteractable != null)
+        {
+            currentInteractor = newInteractable;
+            hapticFeedback = newHapticPlayer;
+        }
+
+        SyncGrabClientRpc(grabCount, clientId, controller);
     }
 
     [ClientRpc]
-    private void SyncGrabCountClientRpc(int newCount)
+    private void SyncGrabClientRpc(int newCount, ulong clientId, int controller)
     {
         grabCount = newCount;
+
+        NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client);
+
+        XRBaseInteractor newInteractable = null;
+        HapticImpulsePlayer newHapticPlayer = null;
+
+        switch (controller)
+        {
+            case 0:
+                newInteractable = client.PlayerObject.transform.Find("Right Controller").GetComponentInChildren<NearFarInteractor>();
+                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
+                break;
+            case 1:
+                newInteractable = client.PlayerObject.transform.Find("Left Controller").GetComponentInChildren<NearFarInteractor>();
+                newHapticPlayer = newInteractable.GetComponentInParent<HapticImpulsePlayer>();
+                break;
+            default:
+                break;
+        }
+
+        if (newInteractable != null)
+        {
+            currentInteractor = newInteractable;
+            hapticFeedback = newHapticPlayer;
+        }
     }
 
 
@@ -252,6 +308,8 @@ public class NewFishingRod : NetworkBehaviour
         floater.mass = 15;
         floater.isKinematic = false;
         floater.useGravity = true;
+
+        Debug.Log($"Syncing floater: \tgravity: {floater.useGravity}\tkinematic: {floater.isKinematic}\tmass: {floater.mass}");
     }
 
 

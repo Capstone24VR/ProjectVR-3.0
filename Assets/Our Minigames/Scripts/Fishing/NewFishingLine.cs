@@ -47,7 +47,6 @@ public class NewFishingLine : NetworkBehaviour
     {
         currentRopeLength = 0;
 
-
         lineRenderer.positionCount = lineSegmentCount;
     }
 
