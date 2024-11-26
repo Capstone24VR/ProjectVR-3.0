@@ -84,27 +84,30 @@ namespace Domino
             }
         }
 
-        private void OnTriggerStay(Collider other)
+        private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Domino"))
             {
+                if (GetComponentInParent<Domino_data>().inHand || !other.GetComponentInParent<Domino_data>().inHand) return;
+
                 var otherHitbox = other.GetComponent<HitboxComponent>();
                 if (otherHitbox == null) return;
 
                 // Check if the other hitbox is a Domino hitbox
                 if (otherHitbox.hitboxType == HitboxType.Domino && hitboxType == HitboxType.Snap)
                 {
+
                     var dominoinPlay = GetComponentInParent<Domino_data>();
                     if (dominoinPlay == null || !dominoinPlay.played)
                     {
-                        Debug.LogWarning($"{gameObject.name}: Domino in play is either null or not marked as played.");
+                        Debug.LogWarning($"{name}: Domino in play is either null or not marked as played.");
                         return;
                     }
 
                     // Ensure this hitbox is not already used
                     if (isUsed)
                     {
-                        Debug.Log($"{gameObject.name}: This hitbox is already used.");
+                        Debug.Log($"{name}: This hitbox is already used.");
                         return;
                     }
 
@@ -112,6 +115,11 @@ namespace Domino
                     if (sideValue == otherHitbox.sideValue)
                     {
                         SetColor(matchColor);
+                        other.GetComponentInParent<Domino_data>().canBePlayed = true;
+                        other.GetComponentInParent<Domino_data>().playHitboxIndex = hitboxindex;
+                        other.GetComponentInParent<Domino_data>().stillDominoId = GetComponentInParent<NetworkObject>().NetworkObjectId;
+
+                        Debug.Log($"Other domino({other.transform.parent.name}) attempting to play with me {transform.parent.name} with Id of: {GetComponentInParent<NetworkObject>().NetworkObjectId} and conneting to hitbox: {hitboxindex}");
 
                         // Attempt to snap the domino if the grab interactable is not selected
                         var otherGrabInteractable = other.GetComponentInParent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
@@ -127,8 +135,9 @@ namespace Domino
                     else
                     {
                         SetColor(mismatchColor);
+                        other.GetComponentInParent<Domino_data>().canBePlayed = false;
                     }
-                }
+                }   
             }
         }
 

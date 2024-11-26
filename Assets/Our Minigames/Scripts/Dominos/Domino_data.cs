@@ -30,16 +30,24 @@ public class Domino_data : NetworkBehaviour
     [SerializeField] protected Vector3 _localScale = Vector3.one;
 
     private XRGrabInteractable _xrInteract;
-    private NetworkedDomino _DominoManager;
+    private NetworkedDomino _dominoManager;
+    private Rigidbody _rb;
+
+    // Stuff needed to snap domino!
+    public bool canBePlayed = false;
+    public ulong stillDominoId = 9999;
+    public int playHitboxIndex = -1;
 
     private void Awake()
     {
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.useGravity = false;  // Ensure gravity is disabled
-            rb.isKinematic = true;  // Make the Rigidbody kinematic to ignore all physical forces
-        }
+        _xrInteract = GetComponent<XRGrabInteractable>();
+        _dominoManager = FindAnyObjectByType<NetworkedDomino>();
+        _rb = GetComponent<Rigidbody>();
+
+
+        _rb.useGravity = false;  // Ensure gravity is disabled
+        _rb.isKinematic = true;  // Make the Rigidbody kinematic to ignore all physical forces
+        
         _localScale = transform.localScale;
 
         // Save references to the hitboxes so they’re not destroyed
@@ -65,7 +73,7 @@ public class Domino_data : NetworkBehaviour
 
     public void ResetPosition()
     {
-        GetComponent<Rigidbody>().isKinematic = true;
+        _rb.isKinematic = true;
         transform.localPosition = _position;
         transform.localRotation = Quaternion.identity;
     }
@@ -167,7 +175,17 @@ public class Domino_data : NetworkBehaviour
     {
         ResetPosition();
         HoverDeSelect();
-        _DominoManager.RequestDrawCard(gameObject);
+        if (canBePlayed && stillDominoId != 9999 && playHitboxIndex != -1)
+        {
+            NetworkObject stillDomino = NetworkManager.Singleton.SpawnManager.SpawnedObjects[stillDominoId];
+            Debug.Log($"Attempting to play {name} with {stillDomino.name} with Id of: {stillDominoId} and conneting to hitbox: {playHitboxIndex}");
+            _dominoManager.RequestPlayCard(GetComponent<NetworkObject>().NetworkObjectId, stillDominoId, playHitboxIndex);
+            playHitboxIndex = -1;
+            canBePlayed = false;
+            stillDominoId = 9999;
+            Debug.Log($"Resetting all values: canBePlayed: {canBePlayed}, playHitBoxIndex: {playHitboxIndex}, stillDominoId: {stillDominoId}");
+        }
+        _dominoManager.RequestDrawCard(gameObject);
     }
 
     private void OnEnable()
