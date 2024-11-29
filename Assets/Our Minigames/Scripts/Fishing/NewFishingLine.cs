@@ -121,10 +121,12 @@ public class NewFishingLine : NetworkBehaviour
         floater.drag = 0;
     }
 
-    public void Reel(float reelChange)
+    [ServerRpc(RequireOwnership =false)]
+    public void ReelServerRpc(float reelChange)
     {
         currentRopeLength.Value = Mathf.Max(0, currentRopeLength.Value + reelChange);
     }
+
 
 
     private void SimulateVerlet()

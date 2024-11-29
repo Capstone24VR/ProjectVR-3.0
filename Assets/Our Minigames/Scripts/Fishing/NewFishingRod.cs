@@ -149,6 +149,8 @@ public class NewFishingRod : NetworkBehaviour
         {
             floater.transform.position = rodTipTransform.position;
             floater.transform.rotation = rodTipTransform.rotation;
+
+            UpdateFloaterPositionServerRpc(floater.transform.position, floater.transform.rotation);
         }
 
         if (grabCount == 0) return;
@@ -223,7 +225,7 @@ public class NewFishingRod : NetworkBehaviour
     {
         var reelChange = change - prevReelChange;
         prevReelChange = change;
-        fishingLine.Reel(reelChange);
+        fishingLine.ReelServerRpc(reelChange);
         Debug.Log(reelChange);
     }
 
@@ -244,6 +246,13 @@ public class NewFishingRod : NetworkBehaviour
     {
         basePositions.Clear();
         tipPositions.Clear();
+    }
+
+    [ServerRpc]
+    private void UpdateFloaterPositionServerRpc(Vector3 position, Quaternion rotation)
+    {
+        floater.transform.position = position;
+        floater.transform.rotation = rotation;
     }
 
     float CalculateCastingQuality()

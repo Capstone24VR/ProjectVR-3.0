@@ -2080,7 +2080,7 @@ GameObject:
   - component: {fileID: 985139847974072137}
   - component: {fileID: 840637298867877347}
   - component: {fileID: 5837867483857533252}
-  - component: {fileID: 1319770733525837685}
+  - component: {fileID: 2477764216636177665}
   m_Layer: 0
   m_Name: Floater
   m_TagString: Untagged
@@ -2201,7 +2201,7 @@ MonoBehaviour:
   waterHeight: 0.88
   underwater: 1
   uprightTorqueStrength: 10
---- !u!114 &1319770733525837685
+--- !u!114 &2477764216636177665
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2210,7 +2210,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7478386638205023423}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 25f7d6f3d19b0524d9be4bc50efbc19a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   UseUnreliableDeltas: 0
@@ -2223,8 +2223,8 @@ MonoBehaviour:
   SyncScaleX: 1
   SyncScaleY: 1
   SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
+  PositionThreshold: 0.0001
+  RotAngleThreshold: 0.001
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
   UseQuaternionCompression: 0
@@ -2232,6 +2232,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+  isServerAuthoritative: 0
 --- !u!1 &7607991166782376254
 GameObject:
   m_ObjectHideFlags: 0
