@@ -212,6 +212,7 @@ public class NewFishingRod : NetworkBehaviour
     [ClientRpc]
     private void ResetClientRpc(Vector3 floaterPosition)
     {
+        isCasting = false;
         floater.mass = 1;
         floater.position = floaterPosition;
         floater.useGravity = false;
