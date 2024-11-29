@@ -121,6 +121,8 @@ public class NewFishingRod : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void HandleReleaseServerRpc()
     {
+        var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
+        grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
         clientId = 9999;
         SyncReleaseClientRpc();
 
@@ -136,6 +138,8 @@ public class NewFishingRod : NetworkBehaviour
     [ClientRpc]
     private void SyncReleaseClientRpc()
     {
+        var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
+        grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
         clientId = 9999;
         currentInteractor = null;
         hapticFeedback = null;
@@ -153,6 +157,7 @@ public class NewFishingRod : NetworkBehaviour
         //{
         //    ResetCast();
         //}
+        Debug.Log("My casting quality: " + CalculateCastingQuality());
         HandleActivateServerRpc();
     }
 
