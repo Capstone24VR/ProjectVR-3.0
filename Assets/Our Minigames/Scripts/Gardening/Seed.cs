@@ -13,28 +13,43 @@ public class Seed : NetworkBehaviour
     // Layer on which the plant beds are set, used to detect collisions with the correct objects.
     private int plantLayer;
     public GameObject plantPrefabs; // Prefab to instantiate when the seed is planted.
-    private Vector3 originalPosition; // Original position of the seed to reset after invalid movement or interaction.
-    private Quaternion originalRotation; // Original rotation to maintain orientation upon reset.
+    private NetworkVariable<Vector3> originalPosition = new NetworkVariable<Vector3>(); // Original position of the seed to reset after invalid movement or interaction.
+    private NetworkVariable<Quaternion> originalRotation = new NetworkVariable<Quaternion>(); // Original rotation to maintain orientation upon reset.
     private float thresholdY = 0f; // Y position threshold to check if the seed has fallen below a certain height.
 
     private void Awake()
     {
         // Initialize the plantLayer by converting the layer name to an integer for use in collision detection.
         plantLayer = LayerMask.NameToLayer("Bed");
-        // Capture the initial position and rotation of the seed to reset later if needed.
-        originalPosition = transform.position;
-        originalRotation = transform.rotation;
+
+        if (IsServer) {
+            // Capture the initial position and rotation of the seed to reset later if needed.
+            originalPosition.Value = transform.position;
+            originalRotation.Value = transform.rotation;
+        }
     }
 
     void Update()
     {
-        // Check if the seed has fallen below the allowed height (e.g., off the side of the platform).
-        if (transform.position.y < thresholdY)
+        if(IsServer)
         {
-            // Reset the position of the seed to its original state to prevent it from getting lost.
-            transform.position = originalPosition;
+            // Check if the seed has fallen below the allowed height (e.g., off the side of the platform).
+            if (transform.position.y < thresholdY)
+            {
+                // Reset the position of the seed to its original state to prevent it from getting lost.
+                transform.position = originalPosition.Value;
+            }
+
+            SetPositionClientRpc(originalPosition.Value);
         }
     }
+
+    [ClientRpc]
+    private void SetPositionClientRpc(Vector3 position)
+    {
+        transform.position = position;
+    }
+        
 
     private void OnCollisionEnter(Collision collision)
     {
