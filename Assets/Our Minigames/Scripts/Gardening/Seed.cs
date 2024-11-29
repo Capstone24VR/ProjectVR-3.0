@@ -38,14 +38,15 @@ public class Seed : NetworkBehaviour
             {
                 // Reset the position of the seed to its original state to prevent it from getting lost.
                 transform.position = originalPosition.Value;
+                transform.rotation = originalRotation.Value;
             }
 
-            SetPositionClientRpc(originalPosition.Value);
+            SetTransformClientRpc(transform.position, transform.rotation);
         }
     }
 
     [ClientRpc]
-    private void SetPositionClientRpc(Vector3 position)
+    private void SetTransformClientRpc(Vector3 position, Quaternion rotation)
     {
         transform.position = position;
     }
@@ -108,8 +109,10 @@ public class Seed : NetworkBehaviour
         // Update the plant bed's tag to "Planted" to indicate it now contains a growing plant.
         collision.gameObject.tag = "Planted";
         // Reset the seed's position and rotation to prevent reuse after planting.
-        transform.position = originalPosition;
-        transform.rotation = originalRotation;
+        transform.position = originalPosition.Value;
+        transform.rotation = originalRotation.Value;
+
+        SetTransformClientRpc(transform.position, transform.rotation);
         // Also reset any movement dynamics to prevent the seed from drifting away after planting.
         gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
