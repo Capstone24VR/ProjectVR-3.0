@@ -248,7 +248,7 @@ public class NewFishingRod : NetworkBehaviour
         tipPositions.Clear();
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void UpdateFloaterPositionServerRpc(Vector3 position, Quaternion rotation)
     {
         floater.transform.position = position;
