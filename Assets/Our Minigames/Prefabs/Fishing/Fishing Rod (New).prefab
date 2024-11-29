@@ -384,7 +384,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
@@ -1922,8 +1922,7 @@ MonoBehaviour:
   castThreshold: 2
   rodTipTransform: {fileID: 4308361475706200526}
   rodBaseTransform: {fileID: 3615715821812839051}
-  isCasting:
-    m_InternalValue: 0
+  isCasting: 0
   castingMultiplier: 20
   prevReelChange: 0
   currentInteractor: {fileID: 0}

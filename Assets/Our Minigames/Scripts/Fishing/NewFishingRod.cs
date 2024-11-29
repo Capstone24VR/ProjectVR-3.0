@@ -21,16 +21,16 @@ public class NewFishingRod : NetworkBehaviour
     public Transform rodTipTransform;
     public Transform rodBaseTransform;
 
-    private NetworkList<Vector3> basePositions = new NetworkList<Vector3>();
-    private NetworkList<Vector3> tipPositions = new NetworkList<Vector3>();
+    private List<Vector3> basePositions = new List<Vector3>();
+    private List<Vector3> tipPositions = new List<Vector3>();
     private float sampleInterval = 0.05f;
     private float nextSampleTime;
 
     private int grabCount = 0;
 
     [Header("Casting")]
-    private NetworkVariable<bool> castTrigger = new NetworkVariable<bool>(false);
-    public NetworkVariable<bool> isCasting = new NetworkVariable<bool>(false);
+    private bool castTrigger = false;
+    public bool isCasting = false;
     public float castingMultiplier = 10f;
 
     [Header("Reeling")]
@@ -78,25 +78,8 @@ public class NewFishingRod : NetworkBehaviour
             clientId = NetworkManager.Singleton.LocalClientId;
         }
         grabCount++;
-
-        SyncGrabServerRpc(grabCount, clientId);
-
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void SyncGrabServerRpc(int newCount, ulong newId)
-    {
-        clientId = newId;
-        grabCount = newCount;
-        SyncGrabClientRpc(grabCount, clientId);
-    }
-
-    [ClientRpc]
-    private void SyncGrabClientRpc(int newCount, ulong newId)
-    {
-        clientId = newId;
-        grabCount = newCount;
-    }
 
 
     private void OnRelease(SelectExitEventArgs args)
@@ -106,71 +89,49 @@ public class NewFishingRod : NetworkBehaviour
 
         if (currentInteractor == args.interactorObject as XRBaseInteractor)
         {
-            //currentInteractor = null;
-            //hapticFeedback = null;
-            //isCasting = false;
-            //castTrigger = false;
+            var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
+            grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
+            clientId = 9999;
 
-            //basePositions.Clear();
-            //tipPositions.Clear();
-            //ResetCast();
-            HandleReleaseServerRpc();
+            isCasting = false;
+
+            basePositions.Clear();
+            tipPositions.Clear();
+
+            ResetCastServerRpc();
         }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void HandleReleaseServerRpc()
-    {
-        var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
-        grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
-        clientId = 9999;
-        SyncReleaseClientRpc();
-
-        isCasting.Value = false;
-        castTrigger.Value = false;
-
-        basePositions.Clear();
-        tipPositions.Clear();
-
-        ResetCastServerRpc();
-    }
-
-    [ClientRpc]
-    private void SyncReleaseClientRpc()
-    {
-        var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
-        grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
-        clientId = 9999;
-        currentInteractor = null;
-        hapticFeedback = null;
     }
 
     private void OnActivate(ActivateEventArgs args)
     {
-        //if (grabCount > 0 && !isCasting)
-        //{
-        //    castTrigger = true;
-        //    isCasting = true;
-        //    fishingLine.StartCasting();
-        //}
-        //else if (isCasting)
-        //{
-        //    ResetCast();
-        //}
-        Debug.Log("My casting quality: " + CalculateCastingQuality());
-        HandleActivateServerRpc();
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void HandleActivateServerRpc()
-    {
-        if (grabCount > 0 && !isCasting.Value)
+        if (grabCount > 0 && !isCasting)
         {
-            castTrigger.Value = true;
-            isCasting.Value = true;
+            isCasting = true;
             fishingLine.StartCastingServerRpc();
+
+            var castingQuality = CalculateCastingQuality();
+            Debug.Log($"Casting Quality: {castingQuality}");
+
+            if (castingQuality == 0) return;
+            else if (castingQuality < 2.5f)
+            {
+                Debug.Log("Weak Cast");
+                LaunchCastServerRpc(castingQuality);
+            }
+            else if (castingQuality >= 2.5f && castingQuality < 5.0f)
+            {
+                Debug.Log("Medium Cast");
+                hapticFeedback?.SendHapticImpulse(0.3f, 0.2f, 0.5f);
+                LaunchCastServerRpc(castingQuality * 2);
+            }
+            else if (castingQuality >= 5.0f)
+            {
+                Debug.Log("Strong Cast");
+                hapticFeedback?.SendHapticImpulse(0.6f, 0.4f, 1f);
+                LaunchCastServerRpc(castingQuality * 5);
+            }
         }
-        else if (isCasting.Value)
+        else if (isCasting)
         {
             ResetCastServerRpc();
         }
@@ -184,61 +145,24 @@ public class NewFishingRod : NetworkBehaviour
 
     void Update()
     {
-        if (IsServer)
+        if (!isCasting)
         {
-            if (!isCasting.Value)
-            {
-                floater.transform.position = rodTipTransform.position;
-                floater.transform.rotation = rodTipTransform.rotation;
-            }
+            floater.transform.position = rodTipTransform.position;
+            floater.transform.rotation = rodTipTransform.rotation;
+        }
 
-            SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
+        if (grabCount == 0) return;
 
-            if (grabCount == 0) return;
-
-            if (Time.time >= nextSampleTime)
-            {
-                SampleRodPositions();
-                nextSampleTime = Time.time + sampleInterval;
-            }
-
-            if (castTrigger.Value)
-            {
-                castTrigger.Value = false;
-                var castingQuality = CalculateCastingQuality();
-                Debug.Log($"Casting Quality: {castingQuality}");
-                if (castingQuality == 0) return;
-                else if (castingQuality < 2.5f)
-                {
-                    Debug.Log("Weak Cast");
-                    LaunchCastServer(castingQuality);
-                }
-                else if (castingQuality >= 2.5f && castingQuality < 5.0f)
-                {
-                    Debug.Log("Medium Cast");
-                    TriggerHapticImpulse(0.3f, 0.2f, 0.5f, clientId);
-                    LaunchCastServer(castingQuality * 2);
-                }
-                else if (castingQuality >= 5.0f)
-                {
-                    Debug.Log("Strong Cast");
-                    TriggerHapticImpulse(0.6f, 0.4f, 1f, clientId);
-                    LaunchCastServer(castingQuality * 5);
-                }
-            }
-
-            SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
+        if (Time.time >= nextSampleTime)
+        {
+            SampleRodPositions();
+            nextSampleTime = Time.time + sampleInterval;
         }
     }
 
-    [ClientRpc]
-    private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
-    {
-        floater.transform.position = position;
-        floater.transform.rotation = rotation;
-    }
 
-    void LaunchCastServer(float castingQuality)
+    [ServerRpc(RequireOwnership = false)]
+    void LaunchCastServerRpc(float castingQuality)
     {
         if (IsServer)
         {
@@ -267,51 +191,26 @@ public class NewFishingRod : NetworkBehaviour
         Debug.Log($"Syncing floater: \tgravity: {floater.useGravity}\tkinematic: {floater.isKinematic}\tmass: {floater.mass}");
     }
 
-    private void TriggerHapticImpulse(float amplitude, float duration, float frequency, ulong targetClientId)
-    {
-        ClientRpcParams rpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new[] { targetClientId }
-            }
-        };
-
-        TriggerHapticImpulseClientRpc(amplitude, duration, frequency, targetClientId, rpcParams);
-    }
-
-
-    [ClientRpc]
-    private void TriggerHapticImpulseClientRpc(float amplitude, float duration, float frequency, ulong targetClientId, ClientRpcParams clientRpcParams = default)
-    {
-        // Target only the specified client
-        if (NetworkManager.Singleton.LocalClientId == targetClientId)
-        {
-            hapticFeedback?.SendHapticImpulse(amplitude, duration, frequency);
-        }
-    }
-
-
 
     [ServerRpc(RequireOwnership = false)]
     void ResetCastServerRpc()
     {
         floater.mass = 1;
-        isCasting.Value = false;
+        isCasting = false;
         fishingLine.StopCastingServerRpc();
 
         floater.position = rodTipTransform.position;
         floater.useGravity = false;
         floater.isKinematic = true;
 
-        SyncResetClientRpc(floater.position);
+        ResetClientRpc(floater.position);
 
         hook.caughtSomething.Value = false;
         hook.rodDropped.Value = true;
     }
 
     [ClientRpc]
-    private void SyncResetClientRpc(Vector3 floaterPosition)
+    private void ResetClientRpc(Vector3 floaterPosition)
     {
         floater.mass = 1;
         floater.position = floaterPosition;
@@ -338,6 +237,12 @@ public class NewFishingRod : NetworkBehaviour
 
         basePositions.Add(basePosition);
         tipPositions.Add(tipPosition);
+    }
+
+    void ResetSamples()
+    {
+        basePositions.Clear();
+        tipPositions.Clear();
     }
 
     float CalculateCastingQuality()
