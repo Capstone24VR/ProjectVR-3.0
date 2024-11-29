@@ -7,6 +7,7 @@ public class NewFishingLine : NetworkBehaviour
     public Transform rodTip;
     public Rigidbody floater;
     public LineRenderer lineRenderer;
+    public NewFishingRod rod;
 
     public int lineSegmentCount = 20;  // Number of points in the line
     public float segmentLength = 0.1f; // Distance between each segment point
@@ -14,47 +15,60 @@ public class NewFishingLine : NetworkBehaviour
     public float floaterMass = 0.2f;
     public float verletDamping = 0.98f;
 
-    private NetworkList<Vector3> linePoints = new NetworkList<Vector3>();
-    private NetworkList<Vector3> prevPoints = new NetworkList<Vector3>();
-    private NetworkVariable<bool> isCasting = new NetworkVariable<bool>(false);
-    private NetworkVariable<bool> lineLocked = new NetworkVariable<bool>(false);
+    private List<Vector3> linePoints = new List<Vector3>();
+    private List<Vector3> prevPoints = new List<Vector3>();
+    private bool lineLocked = false;
 
     public float maxRopeLength = 2f;
-    public NetworkVariable<float> currentRopeLength = new NetworkVariable<float>();
+    public float currentRopeLength = 0f;
 
     public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
+    //public override void OnNetworkSpawn()
+    //{
+    //    base.OnNetworkSpawn();
+    //    rod = GetComponent<NewFishingRod>();
 
-        if(IsServer) { 
-            linePoints.Clear();
-            prevPoints.Clear();
+    //    if (IsServer) { 
+    //        linePoints.Clear();
+    //        prevPoints.Clear();
 
-            // Initialize line with segments
-            for (int i = 0; i < lineSegmentCount; i++)
-            {
-                linePoints.Add(rodTip.position);
-                prevPoints.Add(rodTip.position);
-            }
-        }
+    //        // Initialize line with segments
+    //        for (int i = 0; i < lineSegmentCount; i++)
+    //        {
+    //            linePoints.Add(rodTip.position);
+    //            prevPoints.Add(rodTip.position);
+    //        }
+    //    }
 
-        lineRenderer.positionCount = lineSegmentCount;
-    }
+    //    lineRenderer.positionCount = lineSegmentCount;
+    //}
 
     public void Start()
     {
-        currentRopeLength.Value = 0;
+        currentRopeLength = 0;
 
         lineRenderer.positionCount = lineSegmentCount;
+        rod = GetComponent<NewFishingRod>();
+
+        linePoints.Clear();
+        prevPoints.Clear();
+
+        // Initialize line with segments
+        for (int i = 0; i < lineSegmentCount; i++)
+        {
+            linePoints.Add(rodTip.position);
+            prevPoints.Add(rodTip.position);
+        }
     }
 
     private void Update()
     {
-        if (IsServer)
+        if (NetworkManager.Singleton.LocalClientId == rod.clientId)
         {
-            if (!isCasting.Value)
+            Debug.Log($"This is my rod!");
+
+            if (!rod.isCasting)
             {
                 // When not casting, set all points close to the rod tip
                 for (int i = 0; i < lineSegmentCount; i++)
@@ -68,7 +82,7 @@ public class NewFishingLine : NetworkBehaviour
                     var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
                     if (!floater.GetComponent<BuoyancyObject>().underwater)
                     {
-                        currentRopeLength.Value = Mathf.Min(distanceTofloater, maxRopeLength);
+                        currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
                     }
                     else
                     {
@@ -82,7 +96,7 @@ public class NewFishingLine : NetworkBehaviour
                 }
 
 
-                if (!lineLocked.Value)
+                if (!lineLocked)
                 {
                     SimulateVerlet();
                     ApplyConstraints();
@@ -97,8 +111,7 @@ public class NewFishingLine : NetworkBehaviour
     public void StartCastingServerRpc()
     {
         floater.drag = 0;
-        isCasting.Value = true;
-        lineLocked.Value = false;
+        lineLocked = false;
         ropeLengthLocked.Value = false;
 
         SyncCastingClientRpc();
@@ -108,8 +121,7 @@ public class NewFishingLine : NetworkBehaviour
     public void StopCastingServerRpc()
     {
         floater.drag = 0;
-        isCasting.Value = false;
-        lineLocked.Value = true;
+        lineLocked = true;
         ropeLengthLocked.Value = false;
 
         SyncCastingClientRpc();
@@ -124,7 +136,7 @@ public class NewFishingLine : NetworkBehaviour
     [ServerRpc(RequireOwnership =false)]
     public void ReelServerRpc(float reelChange)
     {
-        currentRopeLength.Value = Mathf.Max(0, currentRopeLength.Value + reelChange);
+        currentRopeLength = Mathf.Max(0, currentRopeLength + reelChange);
     }
 
 
@@ -156,10 +168,10 @@ public class NewFishingLine : NetworkBehaviour
             // Move floater closer to rod tip when length changes
             Vector3 floaterPosition = floater.position;
             float distanceToRod = Vector3.Distance(rodTip.position, floaterPosition);
-            if (distanceToRod > currentRopeLength.Value)
+            if (distanceToRod > currentRopeLength)
             {
                 Vector3 direcitonToRod = (rodTip.position - floaterPosition).normalized;
-                floaterPosition = rodTip.position - direcitonToRod * currentRopeLength.Value;
+                floaterPosition = rodTip.position - direcitonToRod * currentRopeLength;
                 floater.MovePosition(floaterPosition);
             }
 
