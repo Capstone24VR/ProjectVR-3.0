@@ -4,10 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
-using XRMultiplayer.MiniGames;
 using Unity.Netcode;
-using UnityEngine.UIElements;
-using Unity.Services.Lobbies.Models;
 using XRMultiplayer;
 
 public class NewFishingRod : NetworkBehaviour
@@ -29,7 +26,6 @@ public class NewFishingRod : NetworkBehaviour
     private int grabCount = 0;
 
     [Header("Casting")]
-    private bool castTrigger = false;
     public bool isCasting = false;
     public float castingMultiplier = 10f;
 
@@ -94,6 +90,7 @@ public class NewFishingRod : NetworkBehaviour
             clientId = 9999;
 
             isCasting = false;
+            floater.GetComponent<ClientNetworkTransform>().enabled = false;
 
             basePositions.Clear();
             tipPositions.Clear();
@@ -107,6 +104,7 @@ public class NewFishingRod : NetworkBehaviour
         if (grabCount > 0 && !isCasting)
         {
             isCasting = true;
+            floater.GetComponent<ClientNetworkTransform>().enabled = true;
             fishingLine.StartCastingServerRpc();
 
             var castingQuality = CalculateCastingQuality();
@@ -149,8 +147,6 @@ public class NewFishingRod : NetworkBehaviour
         {
             floater.transform.position = rodTipTransform.position;
             floater.transform.rotation = rodTipTransform.rotation;
-
-            UpdateFloaterPositionServerRpc(floater.transform.position, floater.transform.rotation);
         }
 
         if (grabCount == 0) return;
@@ -199,6 +195,7 @@ public class NewFishingRod : NetworkBehaviour
     {
         floater.mass = 1;
         isCasting = false;
+        floater.GetComponent<ClientNetworkTransform>().enabled = false;
         fishingLine.StopCastingServerRpc();
 
         floater.position = rodTipTransform.position;
@@ -215,6 +212,7 @@ public class NewFishingRod : NetworkBehaviour
     private void ResetClientRpc(Vector3 floaterPosition)
     {
         isCasting = false;
+        floater.GetComponent<ClientNetworkTransform>().enabled = false;
         floater.mass = 1;
         floater.position = floaterPosition;
         floater.useGravity = false;

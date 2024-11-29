@@ -4098,11 +4098,6 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.022
       objectReference: {fileID: 0}
-    - target: {fileID: 7477101737842757236, guid: 58a3d193185889e49a6d65fbf78a0acc,
-        type: 3}
-      propertyPath: PositionThreshold
-      value: 0.0001
-      objectReference: {fileID: 0}
     - target: {fileID: 7583436213903510890, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: GlobalObjectIdHash
