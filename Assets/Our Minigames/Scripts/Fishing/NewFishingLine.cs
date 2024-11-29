@@ -20,7 +20,7 @@ public class NewFishingLine : NetworkBehaviour
     private NetworkVariable<bool> lineLocked = new NetworkVariable<bool>(false);
 
     public float maxRopeLength = 2f;
-    public float currentRopeLength;
+    public NetworkVariable<float> currentRopeLength = new NetworkVariable<float>();
 
     public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
@@ -45,7 +45,7 @@ public class NewFishingLine : NetworkBehaviour
 
     public void Start()
     {
-        currentRopeLength = 0;
+        currentRopeLength.Value = 0;
 
         lineRenderer.positionCount = lineSegmentCount;
     }
@@ -68,7 +68,7 @@ public class NewFishingLine : NetworkBehaviour
                     var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
                     if (!floater.GetComponent<BuoyancyObject>().underwater)
                     {
-                        currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
+                        currentRopeLength.Value = Mathf.Min(distanceTofloater, maxRopeLength);
                     }
                     else
                     {
@@ -123,7 +123,7 @@ public class NewFishingLine : NetworkBehaviour
 
     public void Reel(float reelChange)
     {
-        currentRopeLength = Mathf.Max(0, currentRopeLength + reelChange);
+        currentRopeLength.Value = Mathf.Max(0, currentRopeLength.Value + reelChange);
     }
 
 
@@ -154,10 +154,10 @@ public class NewFishingLine : NetworkBehaviour
             // Move floater closer to rod tip when length changes
             Vector3 floaterPosition = floater.position;
             float distanceToRod = Vector3.Distance(rodTip.position, floaterPosition);
-            if (distanceToRod > currentRopeLength)
+            if (distanceToRod > currentRopeLength.Value)
             {
                 Vector3 direcitonToRod = (rodTip.position - floaterPosition).normalized;
-                floaterPosition = rodTip.position - direcitonToRod * currentRopeLength;
+                floaterPosition = rodTip.position - direcitonToRod * currentRopeLength.Value;
                 floater.MovePosition(floaterPosition);
             }
 
