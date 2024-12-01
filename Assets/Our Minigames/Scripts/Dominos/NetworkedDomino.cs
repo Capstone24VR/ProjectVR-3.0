@@ -798,27 +798,34 @@ namespace XRMultiplayer.MiniGames
             if (dominoSnap != null && dominoStill != null)
             {
                 Debug.Log("Is this the topside?: " + isTopSide);
-                dominoSnap.transform.position = dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].transform.position;
-                Vector3 baseRotation = dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].transform.rotation.eulerAngles;
+
+                Transform hitboxTransform = dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].transform;
+                dominoSnap.transform.position = hitboxTransform.position;
+
+
+                Vector3 baseRotation = hitboxTransform.rotation.eulerAngles;
                 baseRotation.z = isTopSide ? baseRotation.z - 180 : baseRotation.z;
                 dominoSnap.transform.rotation = Quaternion.Euler(baseRotation);
 
+
                 switch (hitbox)
                 {
-                    case 0:
-                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x, dominoSnap.transform.localPosition.y + 0.0306988f, dominoSnap.transform.localPosition.z);
+                    case 0: // Top & But Domino
+                        dominoSnap.transform.position += dominoStill.transform.up * 0.0306988f;
                         break;
-                    case 1:
-                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x, dominoSnap.transform.localPosition.y - 0.0306988f, dominoSnap.transform.localPosition.z);
+                    case 1: // But Domino
+                        dominoSnap.transform.position -= dominoStill.transform.up * 0.0306988f;
                         break;
-                    case 2:
-                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x + 0.03450492f, dominoSnap.transform.localPosition.y, dominoSnap.transform.localPosition.z);
+                    case 2: // Left Domino 
+                    case 4:
+                        dominoSnap.transform.position += dominoStill.transform.right * 0.03450492f;
                         break;
-                    case 3:
-                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x - 0.03450492f, dominoSnap.transform.localPosition.y, dominoSnap.transform.localPosition.z);
+                    case 3: // Right Domino 
+                    case 5:
+                        dominoSnap.transform.position -= dominoStill.transform.right * 0.03450492f;
                         break;
                 }
-                dominoSnap.transform.rotation = Quaternion.Euler(baseRotation);
+
 
                 // Mark this hitbox as used
                 dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().isUsed = true;
