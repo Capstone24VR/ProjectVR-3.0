@@ -21,9 +21,14 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] NetworkedHandDomino[] m_hands;
 
         /// <summary>
-        /// The card prefab to spawn.
+        /// The Basic Domino (Not Doubles) prefab to spawn.
         /// </summary>
-        [SerializeField] GameObject Domino;
+        [SerializeField] GameObject dominoBasic;
+
+        /// <summary>
+        /// The Domino (Double) prefab to spawn.
+        /// </summary>
+        [SerializeField] GameObject dominoDouble;
 
         /// <summary>
         /// The card prefab to spawn.
@@ -59,6 +64,9 @@ namespace XRMultiplayer.MiniGames
         /// The number of starting cards
         /// </summary>
         [SerializeField] int startingHand = 5;
+
+
+        // To do Add Rounds
 
 
         [SerializeField] protected NetworkList<NetworkObjectReference> deck = new NetworkList<NetworkObjectReference>();
@@ -198,12 +206,13 @@ namespace XRMultiplayer.MiniGames
 
             int dominosSpawned = 0;
 
-            for (int topSide = 0; topSide <= 6; topSide++)
+            for (int topSide = 0; topSide < 7; topSide++)
             {
-                for (int butSide = topSide; butSide <= 6; butSide++)
+                for (int butSide = topSide; butSide < 7; butSide++)
                 {
                     // Instantiate the domino prefab
-                    GameObject newDomino = Instantiate(Domino, drawPileObj.transform, false);
+
+                    GameObject newDomino = (butSide == topSide) ? Instantiate(dominoDouble, drawPileObj.transform, false) : Instantiate(dominoBasic, drawPileObj.transform, false);
                     var networkObject = newDomino.GetComponent<NetworkObject>();
 
                     if (networkObject != null)
@@ -228,7 +237,6 @@ namespace XRMultiplayer.MiniGames
                     {
                         // Initialize the domino with the calculated prefab index
                         dominoComponent.InitializeDomino(topSide, butSide);
-                        dominoComponent.AssignDominoVisual();  // Ensure the correct visual is assigned based on the prefab index
                         newDomino.name = $"Domino: [{topSide}-{butSide}]";
 
                         // Add domino data to lists for client notification
@@ -523,6 +531,10 @@ namespace XRMultiplayer.MiniGames
         protected void StartDomino()
         {
             NetworkObjectReference firstReference = _drawPile[_drawPile.Count - 1];
+
+            Debug.Log($"{activeHands[FindStartingPlayer()]} has the highest hands");
+            currentHandIndex = FindStartingPlayer();
+
             if (firstReference.TryGet(out NetworkObject networkCardDraw))
             {
                 _drawPile.Remove(firstReference);
@@ -545,23 +557,66 @@ namespace XRMultiplayer.MiniGames
             }
             SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
 
-            Debug.Log("First card drawn.");
+            //Debug.Log("First card drawn.");
             UpdateCurrentIndexClientRpc(currentHandIndex, 0);
 
             gameStarted = true;
         }
 
-        public void GetNewDomino()
-        {
-            GetNewDominoServerRpc();
-        }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void GetNewDominoServerRpc()
+        private int FindStartingPlayer()
         {
-            StartDomino();
-        }
+            // Step: Find Player with Highest Domino, if that fails find player with highest single
+            int indexDouble = -1;
+            int indexSingle = -1;
+            int highestDouble = -1;
+            int highestSingle = -1;
+            for(int i  = 0; i < activeHands.Count; i++)
+            {
+                foreach(var dominoRef in activeHands[i].heldDominos)
+                {
+                    NetworkObject domino = NetworkManager.Singleton.SpawnManager.SpawnedObjects[dominoRef.NetworkObjectId];
+                    if(domino == null)
+                    {
+                        Debug.LogError("Domino didn't exist somehow?");
+                        return -1;
+                    }
 
+                    if (domino.GetComponent<Domino_data>().But_side == domino.GetComponent<Domino_data>().Top_side)
+                    {
+                        if(domino.GetComponent<Domino_data>().But_side > highestDouble)
+                        {
+                            highestDouble = domino.GetComponent<Domino_data>().But_side;
+                            indexDouble = i;
+                            Debug.Log($"{activeHands[indexDouble].name} has new highest Double: {highestDouble}-{highestDouble}");
+
+                        }
+                    }
+                    else
+                    {
+                        int singleTotal = domino.GetComponent<Domino_data>().But_side + domino.GetComponent<Domino_data>().Top_side;
+                        if (singleTotal > highestSingle)
+                        {
+                            highestSingle = singleTotal;
+                            indexSingle = i;
+                            Debug.Log($"{activeHands[indexSingle].name} has new highest Single: {domino.GetComponent<Domino_data>().Top_side}-{domino.GetComponent<Domino_data>().But_side}");
+                        }
+                    }
+                }
+            }
+
+            // Delete later but this debug stuff:
+            if(indexDouble > -1)
+            {
+                Debug.Log($"There was a highest double, the double is {highestDouble} and the hand is {activeHands[indexDouble]}");
+            }
+            else
+            {
+                Debug.Log($"There is no highest double, the highest total single is {highestSingle} and the hand is {activeHands[indexSingle]}");
+            }
+            
+            return (indexDouble > -1) ? indexDouble : indexSingle;
+        }
 
         [ClientRpc]
         public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, int index)
@@ -569,7 +624,7 @@ namespace XRMultiplayer.MiniGames
             activeHands[index].DrawCardClientRpc(cardReference);  // Add card to the correct hand on the client side
         }
 
-        public void RequestDrawCard(GameObject card)
+        public void RequestDrawDomino(GameObject card)
         {
             if (!_drawPile.Contains(card.GetComponent<NetworkObject>()))
             {
@@ -610,6 +665,8 @@ namespace XRMultiplayer.MiniGames
         [ServerRpc(RequireOwnership = false)]
         private void DrawTopCardServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
         {
+            // To do Draw Dominoes from boneyard until you can play
+            // To Do  Scoring: 
             ulong clientId = rpcParams.Receive.SenderClientId;
             Debug.Log($"Server processing card draw request from client {clientId}.");
 
@@ -659,7 +716,7 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        public void RequestPlayCard(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox)
+        public void RequestPlayDomino(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox, bool isTopSide)
         {
             NetworkObject networkObjectsnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
             NetworkObject networkObjectstill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
@@ -675,7 +732,7 @@ namespace XRMultiplayer.MiniGames
             }
 
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {networkObjectsnap.gameObject.name}");
-            if (!activeHands[currentHandIndex].heldCards.Contains(networkObjectsnap)) // Card from wrong hand do not accept
+            if (!activeHands[currentHandIndex].heldDominos.Contains(networkObjectsnap)) // Card from wrong hand do not accept
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId}'s turn!");
                 return;
@@ -683,7 +740,7 @@ namespace XRMultiplayer.MiniGames
 
             if (networkObjectsnap != null && networkObjectstill != null)
             {
-                PlayCardServerRpc(networkObjectIdsnap, networkObjectIdstill, hitbox);
+                PlayCardServerRpc(networkObjectIdsnap, networkObjectIdstill, hitbox, isTopSide);
             }
             else
             {
@@ -692,7 +749,7 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void PlayCardServerRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox, ServerRpcParams rpcParams = default)
+        public void PlayCardServerRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox, bool isTopSide, ServerRpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
             Debug.Log($"Server processing card play request from client {clientId}.");
@@ -724,7 +781,7 @@ namespace XRMultiplayer.MiniGames
 
 
                     AddToPlayPileServer(cardReference);
-                    PlayCardClientRpc(cardReference.NetworkObjectId, networkObjectIdstill, hitbox);
+                    PlayCardClientRpc(cardReference.NetworkObjectId, networkObjectIdstill, hitbox, isTopSide);
 
                     UpdateCurrentIndexServerRpc();
                 }
@@ -732,25 +789,45 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ClientRpc]
-        public void PlayCardClientRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox)
+        public void PlayCardClientRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox, bool isTopSide)
         {
-            NetworkObject cardNetworkObjectsnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
-            NetworkObject cardNetworkObjectstill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
+            NetworkObject dominoSnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
+            NetworkObject dominoStill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
 
 
-            if (cardNetworkObjectsnap != null && cardNetworkObjectstill != null)
+            if (dominoSnap != null && dominoStill != null)
             {
-                cardNetworkObjectsnap.transform.position = cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].transform.position;
-                cardNetworkObjectsnap.transform.rotation = cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].transform.rotation;
+                Debug.Log("Is this the topside?: " + isTopSide);
+                dominoSnap.transform.position = dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].transform.position;
+                Vector3 baseRotation = dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].transform.rotation.eulerAngles;
+                baseRotation.z = isTopSide ? baseRotation.z - 180 : baseRotation.z;
+                dominoSnap.transform.rotation = Quaternion.Euler(baseRotation);
+
+                switch (hitbox)
+                {
+                    case 0:
+                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x, dominoSnap.transform.localPosition.y + 0.0306988f, dominoSnap.transform.localPosition.z);
+                        break;
+                    case 1:
+                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x, dominoSnap.transform.localPosition.y - 0.0306988f, dominoSnap.transform.localPosition.z);
+                        break;
+                    case 2:
+                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x + 0.03450492f, dominoSnap.transform.localPosition.y, dominoSnap.transform.localPosition.z);
+                        break;
+                    case 3:
+                        dominoSnap.transform.localPosition = new Vector3(dominoSnap.transform.localPosition.x - 0.03450492f, dominoSnap.transform.localPosition.y, dominoSnap.transform.localPosition.z);
+                        break;
+                }
+                dominoSnap.transform.rotation = Quaternion.Euler(baseRotation);
 
                 // Mark this hitbox as used
-                cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().isUsed = true;
-                cardNetworkObjectsnap.GetComponent<XRGrabInteractable>().enabled = false;
+                dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().isUsed = true;
+                dominoSnap.GetComponent<XRGrabInteractable>().enabled = false;
 
 
 
                 // Reset the color to transparent after snapping
-                cardNetworkObjectstill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().SetColor(new Color(1, 1, 1, 0));
+                dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].GetComponent<HitboxComponent>().SetColor(new Color(1, 1, 1, 0));
             }
         }
 
@@ -802,7 +879,6 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
-            Debug.Log($"{newIndex} {oldIndex}");
             //if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
             //{
             //    Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.ClientID}");

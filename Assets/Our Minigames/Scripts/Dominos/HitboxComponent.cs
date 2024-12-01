@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRMultiplayer.MiniGames;
 
 namespace Domino
@@ -65,7 +66,6 @@ namespace Domino
                 if (dominoData != null)
                 {
                     sideValue = (hitboxSide == Side.Top) ? dominoData.Top_side : dominoData.But_side;
-                    Debug.Log($"{gameObject.name}: Initialized with side value {sideValue} ({hitboxSide})");
                 }
                 else
                 {
@@ -84,60 +84,72 @@ namespace Domino
             }
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerStay(Collider other)
         {
             if (other.CompareTag("Domino"))
             {
+
                 if (GetComponentInParent<Domino_data>().inHand || !other.GetComponentInParent<Domino_data>().inHand) return;
+                Debug.Log("I am: " + GetComponentInParent<Domino_data>().name);
+                Debug.Log("Other hitbox is: " + other.GetComponentInParent<Domino_data>().name);
 
-                var otherHitbox = other.GetComponent<HitboxComponent>();
-                if (otherHitbox == null) return;
 
-                // Check if the other hitbox is a Domino hitbox
-                if (otherHitbox.hitboxType == HitboxType.Domino && hitboxType == HitboxType.Snap)
+                int value = other.name == "TopDomino" ? other.GetComponentInParent<Domino_data>().Top_side : other.GetComponentInParent<Domino_data>().But_side;
+                bool isTopSide = other.name == "TopDomino";
+                Debug.Log($"{other.name} has a value of {value}");
+
+                var dominoinPlay = GetComponentInParent<Domino_data>();
+                if (dominoinPlay == null || !dominoinPlay.played)
                 {
+                    Debug.LogWarning($"{name}: Domino in play is either null or not marked as played.");
+                    return;
+                }
 
-                    var dominoinPlay = GetComponentInParent<Domino_data>();
-                    if (dominoinPlay == null || !dominoinPlay.played)
-                    {
-                        Debug.LogWarning($"{name}: Domino in play is either null or not marked as played.");
-                        return;
-                    }
+                // Ensure this hitbox is not already used
+                if (isUsed)
+                {
+                    Debug.Log($"{name}: This hitbox is already used.");
+                    return;
+                }
 
-                    // Ensure this hitbox is not already used
-                    if (isUsed)
-                    {
-                        Debug.Log($"{name}: This hitbox is already used.");
-                        return;
-                    }
+                // Check if the side values match
+                if (sideValue == value)
+                {
+                    SetColor(matchColor);
+                    other.GetComponentInParent<Domino_data>().canBePlayed = true;
+                    other.GetComponentInParent<Domino_data>().playHitboxIndex = hitboxindex;
+                    other.GetComponentInParent<Domino_data>().stillDominoId = GetComponentInParent<NetworkObject>().NetworkObjectId;
+                    other.GetComponentInParent<Domino_data>().isTopSide = isTopSide;
 
-                    // Check if the side values match
-                    if (sideValue == otherHitbox.sideValue)
-                    {
-                        SetColor(matchColor);
-                        other.GetComponentInParent<Domino_data>().canBePlayed = true;
-                        other.GetComponentInParent<Domino_data>().playHitboxIndex = hitboxindex;
-                        other.GetComponentInParent<Domino_data>().stillDominoId = GetComponentInParent<NetworkObject>().NetworkObjectId;
+                    Debug.Log($"Other domino({other.transform.parent.name}) attempting to play with me {transform.parent.name} with Id of: {GetComponentInParent<NetworkObject>().NetworkObjectId} and conneting to hitbox: {hitboxindex}, and are we playing the topSide: {isTopSide}");
 
-                        Debug.Log($"Other domino({other.transform.parent.name}) attempting to play with me {transform.parent.name} with Id of: {GetComponentInParent<NetworkObject>().NetworkObjectId} and conneting to hitbox: {hitboxindex}");
+                    // Attempt to snap the domino if the grab interactable is not selected
+                    //var otherGrabInteractable = other.GetComponentInParent<XRGrabInteractable>();
+                    //Debug.Log(otherGrabInteractable.name);
+                    //Debug.Log(otherGrabInteractable.isSelected);
+                    //if (otherGrabInteractable != null && !otherGrabInteractable.isSelected)
+                    //{
+                    //    Debug.Log($"Requesting to snap domino with side value {value}.");
 
-                        //// Attempt to snap the domino if the grab interactable is not selected
-                        //var otherGrabInteractable = other.GetComponentInParent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-                        //if (otherGrabInteractable != null && !otherGrabInteractable.isSelected)
-                        //{
-                        //    Debug.Log($"Requesting to snap domino with side value {otherHitbox.sideValue}.");
-                        //    m_MiniGame.RequestPlayCard(
-                        //        other.GetComponentInParent<NetworkObject>().NetworkObjectId, // Domino with DominoHitboxComponent
-                        //        GetComponentInParent<NetworkObject>().NetworkObjectId,       // Parent domino with HitboxComponent
-                        //        hitboxindex);                                                // Index of the current hitbox
-                        //}
-                    }
-                    else
-                    {
-                        SetColor(mismatchColor);
-                        other.GetComponentInParent<Domino_data>().canBePlayed = false;
-                    }
-                }   
+                    //    m_MiniGame.RequestPlayDomino(other.GetComponentInParent<NetworkObject>().NetworkObjectId, GetComponentInParent<NetworkObject>().NetworkObjectId, hitboxindex, isTopSide);
+                    //    other.GetComponentInParent<Domino_data>().canBePlayed = false;
+                    //    other.GetComponentInParent<Domino_data>().playHitboxIndex = -1;
+                    //    other.GetComponentInParent<Domino_data>().stillDominoId = 9999;
+
+                    //    Debug.Log($"Resetting all values: canBePlayed: {other.GetComponentInParent<Domino_data>().canBePlayed}, playHitBoxIndex: {other.GetComponentInParent<Domino_data>().playHitboxIndex}, stillDominoId: {other.GetComponentInParent<Domino_data>().stillDominoId}");
+
+                    //    //Debug.Log($"Requesting to snap domino with side value {otherHitbox.sideValue}.");
+                    //    //m_MiniGame.RequestPlayCard(
+                    //    //    other.GetComponentInParent<NetworkObject>().NetworkObjectId, // Domino with DominoHitboxComponent
+                    //    //    GetComponentInParent<NetworkObject>().NetworkObjectId,       // Parent domino with HitboxComponent
+                    //    //    hitboxindex);                                                // Index of the current hitbox
+                    //}
+                }
+                else
+                {
+                    SetColor(mismatchColor);
+                    other.GetComponentInParent<Domino_data>().canBePlayed = false;
+                }
             }
         }
 
@@ -162,7 +174,6 @@ namespace Domino
         public void SetSideValue(int topSide, int bottomSide)
         {
             sideValue = (hitboxSide == Side.Top) ? topSide : bottomSide;
-            Debug.Log($"{gameObject.name}: Set side value to {sideValue} (Top: {topSide}, Bottom: {bottomSide})");
         }
     }
 }

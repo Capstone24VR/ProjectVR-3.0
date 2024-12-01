@@ -37,6 +37,7 @@ public class Domino_data : NetworkBehaviour
     public bool canBePlayed = false;
     public ulong stillDominoId = 9999;
     public int playHitboxIndex = -1;
+    public bool isTopSide = false;
 
     private void Awake()
     {
@@ -179,13 +180,13 @@ public class Domino_data : NetworkBehaviour
         {
             NetworkObject stillDomino = NetworkManager.Singleton.SpawnManager.SpawnedObjects[stillDominoId];
             Debug.Log($"Attempting to play {name} with {stillDomino.name} with Id of: {stillDominoId} and conneting to hitbox: {playHitboxIndex}");
-            _dominoManager.RequestPlayCard(GetComponent<NetworkObject>().NetworkObjectId, stillDominoId, playHitboxIndex);
+            _dominoManager.RequestPlayDomino(GetComponent<NetworkObject>().NetworkObjectId, stillDominoId, playHitboxIndex, isTopSide);
             playHitboxIndex = -1;
             canBePlayed = false;
             stillDominoId = 9999;
             Debug.Log($"Resetting all values: canBePlayed: {canBePlayed}, playHitBoxIndex: {playHitboxIndex}, stillDominoId: {stillDominoId}");
         }
-        _dominoManager.RequestDrawCard(gameObject);
+        _dominoManager.RequestDrawDomino(gameObject);
     }
 
     private void OnEnable()
@@ -242,9 +243,12 @@ public class Domino_data : NetworkBehaviour
             // Destroy any existing LOD models in the transform, except for hitboxes
             foreach (Transform child in transform)
             {
+                Debug.Log($"object: {name}, child: {child}, child tag: {child.tag}");
                 // Only destroy the child if it's part of the LOD model, not the hitboxes
-                if (!hitboxComponents.Exists(hitbox => hitbox.transform == child))
+                
+                if(child.tag != "SnapBox" && child.tag != "Domino")
                 {
+                    Debug.Log(child.tag);
                     Destroy(child.gameObject);
                 }
             }
@@ -301,9 +305,7 @@ public class Domino_data : NetworkBehaviour
                 lodGroup.RecalculateBounds(); // Recalculate bounds for accurate LOD switching
 
                 // Destroy the temporary prefabInstance after copying its LOD data
-                Destroy(prefabInstance);
-
-                Debug.Log($"Assigned visual for domino [{But_side}-{Top_side}] with LODs.");
+                Destroy(prefabInstance);    
             }
             else
             {
@@ -342,31 +344,5 @@ public class Domino_data : NetworkBehaviour
 
         return index;
     }
-
-    // Optional: A method to be called externally to spawn and initialize the domino
-    public static Domino_data CreateDomino(GameObject dominoSamplePrefab, int side1, int side2, Vector3 position, Quaternion rotation, Transform parent, GameObject[] dominoPrefabsArray)
-    {
-        // Instantiate the Domino Sample Prefab
-        GameObject dominoObject = Instantiate(dominoSamplePrefab, position, rotation, parent);
-
-        // Get the Domino_data component
-        Domino_data dominoData = dominoObject.GetComponent<Domino_data>();
-
-        if (dominoData != null)
-        {
-            // Assign the dominoPrefabs array
-            dominoData.dominoPrefabs = dominoPrefabsArray;
-
-            // Initialize the domino with the given sides
-            dominoData.InitializeDomino(side1, side2);
-        }
-        else
-        {
-            Debug.LogError("Domino_data component not found on the instantiated prefab.");
-        }
-
-        return dominoData;
-    }
-
 
 }

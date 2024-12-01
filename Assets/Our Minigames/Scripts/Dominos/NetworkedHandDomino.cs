@@ -28,32 +28,32 @@ public class NetworkedHandDomino : NetworkBehaviour
     /// <summary>
     /// The Reference to cards the hand holds
     /// </summary>
-    [SerializeField] public NetworkList<NetworkObjectReference> heldCards = new NetworkList<NetworkObjectReference>();
+    [SerializeField] public NetworkList<NetworkObjectReference> heldDominos = new NetworkList<NetworkObjectReference>();
 
     /// <summary>
     /// FOR RESTING PURPOSES: the gameobject of the cards
     /// </summary>
-    [SerializeField] public List<GameObject> heldCardsObj = new List<GameObject>();
+    [SerializeField] public List<GameObject> heldDominosObj = new List<GameObject>();
 
 
     private void Awake()
     {
-        heldCards = new NetworkList<NetworkObjectReference>();
+        heldDominos = new NetworkList<NetworkObjectReference>();
     }
     
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        heldCards.OnListChanged += OnHeldCardsChange;
+        heldDominos.OnListChanged += OnheldDominosChange;
     }
 
-    public bool isFull() { return heldCards.Count == maxCards; }
-    public bool isEmpty() { return heldCards.Count == 0; }
-    public bool canDraw() { return heldCards.Count < maxCards; }
+    public bool isFull() { return heldDominos.Count == maxCards; }
+    public bool isEmpty() { return heldDominos.Count == 0; }
+    public bool canDraw() { return heldDominos.Count < maxCards; }
     public void ConfigureChildPositions()
     {
         List<ulong> cardObjectsIds = new List<ulong>();
-        foreach (var cardReference in heldCards)  // Transform references into actual game Objects to use
+        foreach (var cardReference in heldDominos)  // Transform references into actual game Objects to use
         {
             if (cardReference.TryGet(out NetworkObject card))
             {
@@ -78,8 +78,8 @@ public class NetworkedHandDomino : NetworkBehaviour
     {
         if (cardReference.TryGet(out NetworkObject card))
         {
-            // The server adds the card to the heldCards list
-            heldCards.Add(cardReference);
+            // The server adds the card to the heldDominos list
+            heldDominos.Add(cardReference);
             ConfigureChildPositions();  // Re-arrange cards in hand
         }
     }
@@ -113,7 +113,7 @@ public class NetworkedHandDomino : NetworkBehaviour
             NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
 
             // Remove the card from the hand on the server
-            heldCards.Remove(cardReference);
+            heldDominos.Remove(cardReference);
 
             // Call the ClientRpc to update the hand positions on all clients
             RemoveCardClientRpc(networkObjectId);
@@ -130,7 +130,7 @@ public class NetworkedHandDomino : NetworkBehaviour
 
     public void Clear()
     {
-        heldCards.Clear();
+        heldDominos.Clear();
     }
 
 
@@ -175,23 +175,23 @@ public class NetworkedHandDomino : NetworkBehaviour
             }
         }
     }
-    private void OnHeldCardsChange(NetworkListEvent<NetworkObjectReference> changeEvent)
+    private void OnheldDominosChange(NetworkListEvent<NetworkObjectReference> changeEvent)
     {
-        // Handle changes to the heldCards list
+        // Handle changes to the heldDominos list
         switch (changeEvent.Type)
         {
             case NetworkListEvent<NetworkObjectReference>.EventType.Add:
                 //Debug.Log($"Card added: {changeEvent.Value}");
                 if (changeEvent.Value.TryGet(out NetworkObject noA))
                 {
-                    heldCardsObj.Add(noA.gameObject);
+                    heldDominosObj.Add(noA.gameObject);
                 }
                 break;
             case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
                 //Debug.Log($"Card removed: {changeEvent.Value}");
                 if (changeEvent.Value.TryGet(out NetworkObject noR))
                 {
-                    heldCardsObj.Remove(noR.gameObject);
+                    heldDominosObj.Remove(noR.gameObject);
                 }
                 break;
         }
