@@ -99,7 +99,6 @@ public class NewFishingRod : NetworkBehaviour
 
         if (currentInteractor == args.interactorObject as XRBaseInteractor)
         {
-            ResetOwnerShipServerRpc();
             var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
             grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
             clientId = 9999;
@@ -164,7 +163,6 @@ public class NewFishingRod : NetworkBehaviour
             return;
         }
 
-        Debug.Log("I am the owner");
         // The chad who is using the rodd
         if (!isCasting)
         {
