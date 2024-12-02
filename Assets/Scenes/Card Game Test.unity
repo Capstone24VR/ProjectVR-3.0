@@ -126,6 +126,12 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &29034522 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279626534}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &95679560
 GameObject:
   m_ObjectHideFlags: 0
@@ -2514,7 +2520,7 @@ PrefabInstance:
     - target: {fileID: 8822072584581691642, guid: 208c2548f5e1da646af2d1b9e3cf4cf9,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.9141746
+      value: -7.55
       objectReference: {fileID: 0}
     - target: {fileID: 8822072584581691642, guid: 208c2548f5e1da646af2d1b9e3cf4cf9,
         type: 3}
@@ -3183,6 +3189,7 @@ Transform:
   m_Children:
   - {fileID: 937396946}
   - {fileID: 2562911674159306897}
+  - {fileID: 29034522}
   - {fileID: 1895681632}
   - {fileID: 1568443581}
   m_Father: {fileID: 0}
@@ -3255,6 +3262,106 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da77994876d07ef4c867d97686cd9603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &1279626534
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1118337850}
+    m_Modifications:
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -21.61
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 12.09257
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 210802937868666806, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759488708728784206, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_GameType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3531178947710221530, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 60182095
+      objectReference: {fileID: 0}
+    - target: {fileID: 5178899802028235783, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_text
+      value: "<b><u>Game Rules</u></b>\n\nMove to the start position to begin the
+        countdown. \n\nYou start with 3 Dominoes. The player with the highest double
+        starts, if there are no doubles, the player with the piece with the highest
+        combined total starts\n\nGoing clockwise, each player take turns playing
+        a domino on the *ENDS*. You can play off the sides of the ends but it has
+        to be on the ends. \n\nIf you cannot play a domino, draw dominoes until you
+        have one that you can play.\n\nThe first player to play all their dominoes
+        win"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276148540437052329, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 330
+      objectReference: {fileID: 0}
+    - target: {fileID: 5282048978985738646, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5938793530201439269, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: m_Name
+      value: Mini Game - Domino
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
 --- !u!1001 &1312241075
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4047,6 +4154,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_GameType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -5331,6 +5443,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7260889602183112792, guid: 3c7ef34d5d6343c478262d7d98f44ee5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -53.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 7260889602183112792, guid: 3c7ef34d5d6343c478262d7d98f44ee5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -1.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 7360546119777934516, guid: 3c7ef34d5d6343c478262d7d98f44ee5,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.6599998
+      objectReference: {fileID: 0}
+    - target: {fileID: 7360546119777934516, guid: 3c7ef34d5d6343c478262d7d98f44ee5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -54.32
       objectReference: {fileID: 0}
     - target: {fileID: 7522177418160668254, guid: 3c7ef34d5d6343c478262d7d98f44ee5,
         type: 3}

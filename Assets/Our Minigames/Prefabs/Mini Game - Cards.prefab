@@ -3648,8 +3648,8 @@ Transform:
   - {fileID: 3575821856739022798}
   - {fileID: 1551888379988635802}
   - {fileID: 8436230592130660163}
-  - {fileID: 3854021360322964420}
   - {fileID: 966040176394412678}
+  - {fileID: 3854021360322964420}
   - {fileID: 3226262059493662357}
   - {fileID: 7980476400003235226}
   m_Father: {fileID: 2088735113269151378}
@@ -5010,7 +5010,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1288242953
+  GlobalObjectIdHash: 4049892351
   InScenePlacedSourceGlobalObjectIdHash: 2761222166
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -5083,8 +5083,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_hands:
   - {fileID: 2372202408546462665}
-  - {fileID: 6208097378541615985}
   - {fileID: 6923918858353125044}
+  - {fileID: 6208097378541615985}
   - {fileID: 6886190108110295524}
   card: {fileID: 3529856017834294217, guid: 5aaebc66c9d92b64f8888218db5db503, type: 3}
   drawPileObj: {fileID: 2977533686019291105}
@@ -7809,7 +7809,7 @@ GameObject:
   - component: {fileID: 7824189554804118511}
   - component: {fileID: 6208097378541615985}
   m_Layer: 0
-  m_Name: Hand2
+  m_Name: Hand3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10691,7 +10691,7 @@ GameObject:
   - component: {fileID: 5550182844825408592}
   - component: {fileID: 6923918858353125044}
   m_Layer: 0
-  m_Name: Hand3
+  m_Name: Hand2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
