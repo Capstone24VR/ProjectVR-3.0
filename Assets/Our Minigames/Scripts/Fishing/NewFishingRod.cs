@@ -148,7 +148,8 @@ public class NewFishingRod : NetworkBehaviour
             floater.transform.rotation = rodTipTransform.rotation;
             return;
         }
-        
+
+        Debug.Log("I am the owner");
         // The chad who is using the rodd
         if (!isCasting)
         {
