@@ -164,9 +164,7 @@ public class NewFishingRod : NetworkBehaviour
         floater.isKinematic = false;
         floater.useGravity = true;
 
-        LaunchCastClientRpc();
-
-        hook.rodDropped.Value = false;
+        ToggleRodDroppedServerRpc(false);
 
         Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
 
@@ -185,8 +183,20 @@ public class NewFishingRod : NetworkBehaviour
         floater.useGravity = false;
         floater.isKinematic = true;
 
+        ToggleCaughtSomethingServerRpc(false);
+        ToggleRodDroppedServerRpc(true);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void ToggleRodDroppedServerRpc(bool toggle)
+    {
+        hook.rodDropped.Value = false;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void ToggleCaughtSomethingServerRpc(bool toggle)
+    {
         hook.caughtSomething.Value = false;
-        hook.rodDropped.Value = true;
     }
 
 
