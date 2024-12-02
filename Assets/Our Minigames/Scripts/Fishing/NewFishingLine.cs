@@ -24,26 +24,6 @@ public class NewFishingLine : NetworkBehaviour
 
     public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
-    //public override void OnNetworkSpawn()
-    //{
-    //    base.OnNetworkSpawn();
-    //    rod = GetComponent<NewFishingRod>();
-
-    //    if (IsServer) { 
-    //        linePoints.Clear();
-    //        prevPoints.Clear();
-
-    //        // Initialize line with segments
-    //        for (int i = 0; i < lineSegmentCount; i++)
-    //        {
-    //            linePoints.Add(rodTip.position);
-    //            prevPoints.Add(rodTip.position);
-    //        }
-    //    }
-
-    //    lineRenderer.positionCount = lineSegmentCount;
-    //}
-
     public void Start()
     {
         currentRopeLength = 0;
@@ -103,7 +83,7 @@ public class NewFishingLine : NetworkBehaviour
                 }
             }
 
-            DrawLineClientRpc();
+            DrawLine();
         }
     }
 
@@ -133,7 +113,7 @@ public class NewFishingLine : NetworkBehaviour
         floater.drag = 0;
     }
 
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     public void ReelServerRpc(float reelChange)
     {
         currentRopeLength = Mathf.Max(0, currentRopeLength + reelChange);
@@ -163,7 +143,7 @@ public class NewFishingLine : NetworkBehaviour
         linePoints[0] = rodTip.position;
 
         int constraintIterations = 5;
-        for(int z  = 0; z < constraintIterations; z++)
+        for (int z = 0; z < constraintIterations; z++)
         {
             // Move floater closer to rod tip when length changes
             Vector3 floaterPosition = floater.position;
@@ -192,6 +172,13 @@ public class NewFishingLine : NetworkBehaviour
                 }
             }
         }
+    }
+
+    private void DrawLine()
+    {
+        // Render line based on the position of each segment
+        for (int i = 0; i < lineSegmentCount; i++)
+            lineRenderer.SetPosition(i, linePoints[i]);
     }
 
     [ClientRpc]

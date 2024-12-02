@@ -95,7 +95,7 @@ public class NewFishingRod : NetworkBehaviour
             basePositions.Clear();
             tipPositions.Clear();
 
-            ResetCastServerRpc();
+            ResetCast();
         }
     }
 
@@ -114,24 +114,24 @@ public class NewFishingRod : NetworkBehaviour
             else if (castingQuality < 2.5f)
             {
                 Debug.Log("Weak Cast");
-                LaunchCastServerRpc(castingQuality);
+                LaunchCast(castingQuality);
             }
             else if (castingQuality >= 2.5f && castingQuality < 5.0f)
             {
                 Debug.Log("Medium Cast");
                 hapticFeedback?.SendHapticImpulse(0.3f, 0.2f, 0.5f);
-                LaunchCastServerRpc(castingQuality * 2);
+                LaunchCast(castingQuality * 2);
             }
             else if (castingQuality >= 5.0f)
             {
                 Debug.Log("Strong Cast");
                 hapticFeedback?.SendHapticImpulse(0.6f, 0.4f, 1f);
-                LaunchCastServerRpc(castingQuality * 5);
+                LaunchCast(castingQuality * 5);
             }
         }
         else if (isCasting)
         {
-            ResetCastServerRpc();
+            ResetCast();
         }
     }
 
@@ -157,6 +157,38 @@ public class NewFishingRod : NetworkBehaviour
             nextSampleTime = Time.time + sampleInterval;
         }
     }
+
+    void LaunchCast(float castingQuality)
+    {
+        floater.mass = 15;
+        floater.isKinematic = false;
+        floater.useGravity = true;
+
+        LaunchCastClientRpc();
+
+        hook.rodDropped.Value = false;
+
+        Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
+
+        float launchForce = castingQuality * castingMultiplier;
+        floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
+    }
+
+    void ResetCast()
+    {
+        floater.mass = 1;
+        isCasting = false;
+        floater.GetComponent<ClientNetworkTransform>().enabled = false;
+        fishingLine.StopCastingServerRpc();
+
+        floater.position = rodTipTransform.position;
+        floater.useGravity = false;
+        floater.isKinematic = true;
+
+        hook.caughtSomething.Value = false;
+        hook.rodDropped.Value = true;
+    }
+
 
 
     [ServerRpc(RequireOwnership = false)]
