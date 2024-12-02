@@ -141,6 +141,15 @@ public class NewFishingRod : NetworkBehaviour
 
     void Update()
     {
+        // Non -owners (the unwashed masses)
+        if(!IsOwner)
+        {
+            floater.transform.position = rodTipTransform.position;
+            floater.transform.rotation = rodTipTransform.rotation;
+            return;
+        }
+        
+        // The chad who is using the rodd
         if (!isCasting)
         {
             floater.transform.position = rodTipTransform.position;
