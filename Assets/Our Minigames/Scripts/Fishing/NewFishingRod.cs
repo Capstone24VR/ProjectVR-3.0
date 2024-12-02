@@ -72,8 +72,22 @@ public class NewFishingRod : NetworkBehaviour
             currentInteractor = args.interactorObject as XRBaseInteractor;
             hapticFeedback = currentInteractor.GetComponentInParent<HapticImpulsePlayer>();
             clientId = NetworkManager.Singleton.LocalClientId;
+
+            SetOwnerShipServerRpc(clientId);
         }
         grabCount++;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetOwnerShipServerRpc(ulong clientId)
+    {
+        GetComponent<NetworkObject>().ChangeOwnership(clientId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ResetOwnerShipServerRpc()
+    {
+        GetComponent<NetworkObject>().RemoveOwnership();
     }
 
 
@@ -85,6 +99,7 @@ public class NewFishingRod : NetworkBehaviour
 
         if (currentInteractor == args.interactorObject as XRBaseInteractor)
         {
+            ResetOwnerShipServerRpc();
             var grabInteractable = GetComponentInChildren<XRGrabInteractable>();
             grabInteractable.GetComponent<Rigidbody>().isKinematic = false;
             clientId = 9999;
