@@ -18,6 +18,7 @@ public class Domino_data : NetworkBehaviour
     public int But_side;
     public bool played = false;
     public bool inHand = false;
+    public bool isFirstDomino = false;
 
     // Array to store all the domino models/prefabs (with specific meshes)
     public GameObject[] dominoPrefabs;
@@ -81,6 +82,14 @@ public class Domino_data : NetworkBehaviour
             hitboxComponents[3].gameObject.SetActive(false);
             hitboxComponents[4].gameObject.SetActive(false);
             hitboxComponents[5].gameObject.SetActive(false);
+        }
+    }
+
+    public void SetAllHitboxesOff()
+    {
+        foreach (var hitbox in hitboxComponents)
+        {
+            hitbox.gameObject.SetActive(false);
         }
     }
 
@@ -203,6 +212,9 @@ public class Domino_data : NetworkBehaviour
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)
     {
+        if(isFirstDomino)
+            return;
+        
         ResetPosition();
         HoverDeSelect();
         if (canBePlayed && stillDominoId != 9999 && playHitboxIndex != -1)
@@ -272,12 +284,10 @@ public class Domino_data : NetworkBehaviour
             // Destroy any existing LOD models in the transform, except for hitboxes
             foreach (Transform child in transform)
             {
-                Debug.Log($"object: {name}, child: {child}, child tag: {child.tag}");
                 // Only destroy the child if it's part of the LOD model, not the hitboxes
                 
                 if(child.tag != "SnapBox" && child.tag != "Domino")
                 {
-                    Debug.Log(child.tag);
                     Destroy(child.gameObject);
                 }
             }

@@ -975,6 +975,7 @@ MonoBehaviour:
   canBePlayed: 0
   stillDominoId: 9999
   playHitboxIndex: -1
+  isTopSide: 0
 --- !u!114 &3520430618443808131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1436,7 +1437,7 @@ MonoBehaviour:
   hitboxType: 0
   isUsed: 0
   m_MiniGame: {fileID: 0}
-  hitboxSide: 0
+  hitboxSide: 1
   sideValue: 0
   hitboxindex: 0
 --- !u!54 &6032342816378425580
