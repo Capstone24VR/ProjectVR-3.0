@@ -22,7 +22,7 @@ public class NewFishingLine : NetworkBehaviour
     public float maxRopeLength = 2f;
     public float currentRopeLength = 0f;
 
-    public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
+    public bool ropeLengthLocked = false;
 
     public void Start()
     {
@@ -57,7 +57,7 @@ public class NewFishingLine : NetworkBehaviour
             }
             else
             {
-                if (!ropeLengthLocked.Value)
+                if (!ropeLengthLocked)
                 {
                     var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
                     if (!floater.GetComponent<BuoyancyObject>().underwater)
@@ -66,7 +66,7 @@ public class NewFishingLine : NetworkBehaviour
                     }
                     else
                     {
-                        ropeLengthLocked.Value = true;
+                        ropeLengthLocked = true;
                     }
                 }
                 else
@@ -92,7 +92,7 @@ public class NewFishingLine : NetworkBehaviour
     {
         floater.drag = 0;
         lineLocked = false;
-        ropeLengthLocked.Value = false;
+        ropeLengthLocked = false;
 
         SyncCastingClientRpc();
     }
@@ -102,7 +102,7 @@ public class NewFishingLine : NetworkBehaviour
     {
         floater.drag = 0;
         lineLocked = true;
-        ropeLengthLocked.Value = false;
+        ropeLengthLocked = false;
 
         SyncCastingClientRpc();
     }
