@@ -67,6 +67,35 @@ public class Domino_data : NetworkBehaviour
         }
     }
 
+    // Use this for the first Domino only!!!
+    public void SetOpenHitboxes()
+    {
+        if (Top_side == But_side)
+        {
+            hitboxComponents[0].gameObject.SetActive(false);
+            hitboxComponents[1].gameObject.SetActive(false);
+        }
+        else
+        {
+            hitboxComponents[2].gameObject.SetActive(false);
+            hitboxComponents[3].gameObject.SetActive(false);
+            hitboxComponents[4].gameObject.SetActive(false);
+            hitboxComponents[5].gameObject.SetActive(false);
+        }
+    }
+
+    // For your snapped domino
+    public void SetSnapHitboxes(bool isTopSide)
+    {
+        foreach(var hitbox in hitboxComponents)
+        {
+            if(isTopSide == (hitbox.hitboxSide == HitboxComponent.Side.Top))
+            {
+                hitbox.gameObject.SetActive(false);
+            }       
+        }
+    }
+
     public void SetPosition(Vector3 position)
     {
         _position = position;

@@ -304,6 +304,11 @@ namespace XRMultiplayer.MiniGames
                     cardNetworkObject.transform.localPosition = Vector3.zero;
                     cardNetworkObject.transform.localRotation = Quaternion.identity;
 
+
+                    if(topSide == bottomSide)
+                    {
+                        dominoComponent.SetOpenHitboxes();
+                    }
                 }
             }
 
@@ -386,6 +391,39 @@ namespace XRMultiplayer.MiniGames
                 Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} active to {value} on clients");
                 cardNetworkObject.gameObject.SetActive(value);
                 Debug.Log($"Checking if domino is active: {cardNetworkObject.isActiveAndEnabled}");
+            }
+            else
+            {
+                Debug.LogError("FATAL ERROR: domino not found on client.");
+            }
+        }
+
+        [ClientRpc]
+        void SetOpenHitboxesClientRpc(ulong networkObjectId)
+        {
+
+            NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (dominoNetworkObject != null && dominoNetworkObject.IsSpawned)
+            {
+                Debug.Log($"Server attempting to set {dominoNetworkObject.gameObject.name} open hitboxes on clients");
+                dominoNetworkObject.GetComponent<Domino_data>().SetOpenHitboxes();
+            }
+            else
+            {
+                Debug.LogError("FATAL ERROR: domino not found on client.");
+            }
+        }
+
+
+        [ClientRpc]
+        void SetSnapHitboxesClientRpc(ulong networkObjectId, bool isTopSide)
+        {
+
+            NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (dominoNetworkObject != null && dominoNetworkObject.IsSpawned)
+            {
+                Debug.Log($"Server attempting to set {dominoNetworkObject.gameObject.name} open hitboxes on clients");
+                dominoNetworkObject.GetComponent<Domino_data>().SetSnapHitboxes(isTopSide);
             }
             else
             {
@@ -542,6 +580,7 @@ namespace XRMultiplayer.MiniGames
                 Debug.Log("Drawing First card(" + firstCard.name + ") for Domino . . . ");
                 AddToPlayPileServer(firstCard);
                 SetCardActiveClientRpc(firstReference.NetworkObjectId, true);
+                SetOpenHitboxesClientRpc(firstReference.NetworkObjectId);
             }
             else
             {
@@ -774,10 +813,15 @@ namespace XRMultiplayer.MiniGames
                     //    return;
                     //}
 
-                    cardNetworkObjectsnap.gameObject.GetComponent<Domino_data>().played = true;
+                    cardNetworkObjectsnap.GetComponent<Domino_data>().played = true;
+
+                    //cardNetworkObjectstill.GetComponent<Domino_data>().ConfigureStillHitBoxes();
+                    //cardNetworkObjectsnap.GetComponent<Domino_data>().ConfigureSnapHitBoxes(hitbox);
+
                     NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObjectsnap);
 
                     activeHands[currentHandIndex].RemoveCardServerRpc(cardReference.NetworkObjectId);
+
 
 
                     AddToPlayPileServer(cardReference);
@@ -807,24 +851,34 @@ namespace XRMultiplayer.MiniGames
                 baseRotation.z = isTopSide ? baseRotation.z - 180 : baseRotation.z;
                 dominoSnap.transform.rotation = Quaternion.Euler(baseRotation);
 
-
-                switch (hitbox)
+                if (dominoSnap.GetComponent<Domino_data>().But_side == dominoSnap.GetComponent<Domino_data>().Top_side)
                 {
-                    case 0: // Top & But Domino
-                        dominoSnap.transform.position += dominoStill.transform.up * 0.0306988f;
-                        break;
-                    case 1: // But Domino
-                        dominoSnap.transform.position -= dominoStill.transform.up * 0.0306988f;
-                        break;
-                    case 2: // Left Domino 
-                    case 4:
-                        dominoSnap.transform.position += dominoStill.transform.right * 0.03450492f;
-                        break;
-                    case 3: // Right Domino 
-                    case 5:
-                        dominoSnap.transform.position -= dominoStill.transform.right * 0.03450492f;
-                        break;
+                    baseRotation.z = baseRotation.z - 90;
+                    dominoSnap.transform.rotation = Quaternion.Euler(baseRotation);
                 }
+                else
+                {
+                    switch (hitbox)
+                    {
+                        case 0: // Top & But Domino
+                            dominoSnap.transform.position += dominoStill.transform.up * 0.0306988f;
+                            break;
+                        case 1: // But Domino
+                            dominoSnap.transform.position -= dominoStill.transform.up * 0.0306988f;
+                            break;
+                        case 2: // Left Domino 
+                        case 4:
+                            dominoSnap.transform.position += dominoStill.transform.right * 0.03450492f;
+                            break;
+                        case 3: // Right Domino 
+                        case 5:
+                            dominoSnap.transform.position -= dominoStill.transform.right * 0.03450492f;
+                            break;
+                    }
+                }
+
+                SetOpenHitboxesClientRpc(dominoStill.NetworkObjectId);
+                SetSnapHitboxesClientRpc(dominoSnap.NetworkObjectId, isTopSide);
 
 
                 // Mark this hitbox as used
