@@ -46,8 +46,6 @@ public class NewFishingLine : NetworkBehaviour
     {
         if (NetworkManager.Singleton.LocalClientId == rod.clientId)
         {
-            Debug.Log($"This is my rod!");
-
             if (!rod.isCasting)
             {
                 // When not casting, set all points close to the rod tip
