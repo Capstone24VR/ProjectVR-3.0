@@ -15,8 +15,8 @@ public class NewFishingLine : NetworkBehaviour
     public float floaterMass = 0.2f;
     public float verletDamping = 0.98f;
 
-    private List<Vector3> linePoints = new List<Vector3>();
-    private List<Vector3> prevPoints = new List<Vector3>();
+    private NetworkList<Vector3> linePoints = new NetworkList<Vector3>();
+    private NetworkList<Vector3> prevPoints = new NetworkList<Vector3>();
     private bool lineLocked = false;
 
     public float maxRopeLength = 2f;
@@ -77,12 +77,12 @@ public class NewFishingLine : NetworkBehaviour
 
             if (!lineLocked)
             {
-                SimulateVerlet();
-                ApplyConstraints();
+                SimulateVerletServerRpc();
+                ApplyConstraintsServerRpc();
             }
         }
 
-        DrawLineClientRpc(linePoints.ToArray());
+        DrawLineClientRpc();
     }
 
     [ServerRpc(RequireOwnership = true)]
@@ -124,8 +124,8 @@ public class NewFishingLine : NetworkBehaviour
     }
 
 
-
-    private void SimulateVerlet()
+    [ServerRpc(RequireOwnership = true)]
+    private void SimulateVerletServerRpc()
     {
         // Apply Verlet integration to simulate line segments
         for (int i = 1; i < lineSegmentCount; i++)
@@ -141,7 +141,8 @@ public class NewFishingLine : NetworkBehaviour
         }
     }
 
-    private void ApplyConstraints()
+    [ServerRpc(RequireOwnership = true)]
+    private void ApplyConstraintsServerRpc()
     {
         // Keep the first segment at the rod tip position
         linePoints[0] = rodTip.position;
@@ -186,10 +187,10 @@ public class NewFishingLine : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void DrawLineClientRpc(Vector3[] myLine)
+    private void DrawLineClientRpc()
     {
         // Render line based on the position of each segment
         for (int i = 0; i < lineSegmentCount; i++)
-            lineRenderer.SetPosition(i, myLine[i]);
+            lineRenderer.SetPosition(i, linePoints[i]);
     }
 }
