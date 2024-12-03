@@ -57,7 +57,6 @@ public class NewFishingLine : NetworkBehaviour
         {
             if (!ropeLengthLocked.Value)
             {
-                Debug.Log("Rope is not locked");
 
                 var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
                 if (!floater.GetComponent<BuoyancyObject>().underwater.Value)
@@ -66,7 +65,6 @@ public class NewFishingLine : NetworkBehaviour
                 }
                 else
                 {
-                    Debug.Log("Rope Length locked");
                     SetRopeLengthLockedServerRpc(true);
                 }
             }
@@ -84,7 +82,7 @@ public class NewFishingLine : NetworkBehaviour
             }
         }
 
-        DrawLineClientRpc();
+        DrawLineClientRpc(linePoints.ToArray());
     }
 
     [ServerRpc(RequireOwnership = true)]
@@ -188,11 +186,10 @@ public class NewFishingLine : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void DrawLineClientRpc()
+    private void DrawLineClientRpc(Vector3[] myLine)
     {
-        Debug.Log("Drawing the line for all clients");
         // Render line based on the position of each segment
         for (int i = 0; i < lineSegmentCount; i++)
-            lineRenderer.SetPosition(i, linePoints[i]);
+            lineRenderer.SetPosition(i, myLine[i]);
     }
 }
