@@ -22,7 +22,7 @@ public class NewFishingLine : NetworkBehaviour
     public float maxRopeLength = 2f;
     public float currentRopeLength = 0f;
 
-    public bool ropeLengthLocked = false;
+    public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
     public void Start()
     {
@@ -55,7 +55,7 @@ public class NewFishingLine : NetworkBehaviour
         }
         else
         {
-            if (!ropeLengthLocked)
+            if (!ropeLengthLocked.Value)
             {
                 Debug.Log("Rope is not locked");
 
@@ -67,7 +67,7 @@ public class NewFishingLine : NetworkBehaviour
                 else
                 {
                     Debug.Log("Rope Length locked");
-                    ropeLengthLocked = true;
+                    ropeLengthLocked.Value = true;
                 }
             }
             else
@@ -92,7 +92,7 @@ public class NewFishingLine : NetworkBehaviour
     {
         floater.drag = 0;
         lineLocked = false;
-        ropeLengthLocked = false;
+        ropeLengthLocked.Value = false;
 
         SyncCastingClientRpc();
     }
@@ -102,7 +102,7 @@ public class NewFishingLine : NetworkBehaviour
     {
         floater.drag = 0;
         lineLocked = true;
-        ropeLengthLocked = false;
+        ropeLengthLocked.Value = false;
 
         SyncCastingClientRpc();
     }

@@ -164,6 +164,13 @@ public class NewFishingRod : NetworkBehaviour
 
     void Update()
     {
+        if(IsOwnedByServer && grabCount == 0)
+        {
+            floater.transform.position = rodTipTransform.position;
+            floater.transform.rotation = rodTipTransform.rotation;
+            return;
+        }
+
         if (!IsOwner) return;
        
         if (!isCasting)
