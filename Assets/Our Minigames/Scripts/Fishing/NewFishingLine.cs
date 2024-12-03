@@ -24,14 +24,7 @@ public class NewFishingLine : NetworkBehaviour
 
     public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-        InitializeLineServerRpc();
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void InitializeLineServerRpc()
+    public void Start()
     {
         currentRopeLength = 0;
 
@@ -47,25 +40,6 @@ public class NewFishingLine : NetworkBehaviour
             linePoints.Add(rodTip.position);
             prevPoints.Add(rodTip.position);
         }
-    }
-
-
-    public void Start()
-    {
-        //currentRopeLength = 0;
-
-        //lineRenderer.positionCount = lineSegmentCount;
-        //rod = GetComponent<NewFishingRod>();
-
-        //linePoints.Clear();
-        //prevPoints.Clear();
-
-        //// Initialize line with segments
-        //for (int i = 0; i < lineSegmentCount; i++)
-        //{
-        //    linePoints.Add(rodTip.position);
-        //    prevPoints.Add(rodTip.position);
-        //}
     }
 
     private void Update()
@@ -103,12 +77,12 @@ public class NewFishingLine : NetworkBehaviour
 
             if (!lineLocked)
             {
-                SimulateVerletServerRpc();
-                ApplyConstraintsServerRpc();
+                SimulateVerlet();
+                ApplyConstraints();
             }
         }
 
-        DrawLineClientRpc();
+        DrawLine();
     }
 
     [ServerRpc(RequireOwnership = true)]
@@ -150,8 +124,8 @@ public class NewFishingLine : NetworkBehaviour
     }
 
 
-    [ServerRpc(RequireOwnership = true)]
-    private void SimulateVerletServerRpc()
+
+    private void SimulateVerlet()
     {
         // Apply Verlet integration to simulate line segments
         for (int i = 1; i < lineSegmentCount; i++)
@@ -167,8 +141,7 @@ public class NewFishingLine : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = true)]
-    private void ApplyConstraintsServerRpc()
+    private void ApplyConstraints()
     {
         // Keep the first segment at the rod tip position
         linePoints[0] = rodTip.position;
