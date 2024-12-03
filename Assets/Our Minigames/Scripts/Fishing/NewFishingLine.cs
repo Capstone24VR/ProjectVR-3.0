@@ -24,8 +24,10 @@ public class NewFishingLine : NetworkBehaviour
 
     public NetworkVariable<bool> ropeLengthLocked = new NetworkVariable<bool>(false);
 
-    public void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         currentRopeLength = 0;
 
         lineRenderer.positionCount = lineSegmentCount;
@@ -40,6 +42,25 @@ public class NewFishingLine : NetworkBehaviour
             linePoints.Add(rodTip.position);
             prevPoints.Add(rodTip.position);
         }
+
+    }
+
+    public void Start()
+    {
+        //currentRopeLength = 0;
+
+        //lineRenderer.positionCount = lineSegmentCount;
+        //rod = GetComponent<NewFishingRod>();
+
+        //linePoints.Clear();
+        //prevPoints.Clear();
+
+        //// Initialize line with segments
+        //for (int i = 0; i < lineSegmentCount; i++)
+        //{
+        //    linePoints.Add(rodTip.position);
+        //    prevPoints.Add(rodTip.position);
+        //}
     }
 
     private void Update()
