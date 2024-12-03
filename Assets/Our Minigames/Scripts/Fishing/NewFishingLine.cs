@@ -190,6 +190,7 @@ public class NewFishingLine : NetworkBehaviour
     [ClientRpc]
     private void DrawLineClientRpc()
     {
+        Debug.Log("Drawing the line for all clients");
         // Render line based on the position of each segment
         for (int i = 0; i < lineSegmentCount; i++)
             lineRenderer.SetPosition(i, linePoints[i]);

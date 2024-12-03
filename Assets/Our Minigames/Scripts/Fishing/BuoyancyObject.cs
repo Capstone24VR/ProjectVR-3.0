@@ -28,7 +28,7 @@ public class BuoyancyObject : NetworkBehaviour
     // Only the server should manage physics and state updates
     private void FixedUpdate()
     {
-        if (!IsServer) return;
+        if (!IsOwner) return;
 
         float difference = transform.position.y - waterHeight;
         if(difference < 0)
@@ -43,20 +43,20 @@ public class BuoyancyObject : NetworkBehaviour
 
             if (!underwater.Value)
             {
-                underwater.Value = true;
-                SwitchState(underwater.Value);
+                SwitchStateServerRpc(true);
             }
         }
         else if(underwater.Value)
         {
-            underwater.Value = false;
-            SwitchState(underwater.Value);
+            SwitchStateServerRpc(false);
         }
     }
 
-    void SwitchState(bool isUnderwater)
+    [ServerRpc(RequireOwnership = true)]
+    private void SwitchStateServerRpc(bool isUnderwater)
     {
-        if(isUnderwater)
+        underwater.Value = isUnderwater;
+        if (isUnderwater)
         {
             rb.drag = underWaterDrag;
             rb.angularDrag = underWaterAngularDrag;
