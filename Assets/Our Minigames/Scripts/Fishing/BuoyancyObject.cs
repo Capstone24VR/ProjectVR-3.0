@@ -14,7 +14,7 @@ public class BuoyancyObject : NetworkBehaviour
     public float airAngularDrag = 0.05f;
     public float floatingPower = 15f;
     public float waterHeight = 0.25f;
-    public NetworkVariable<bool> underwater;
+    public NetworkVariable<bool> underwater = new NetworkVariable<bool>(true);
 
     public float uprightTorqueStrength = 10f;
 
