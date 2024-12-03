@@ -84,7 +84,7 @@ public class NewFishingLine : NetworkBehaviour
             }
         }
 
-        DrawLine();
+        DrawLineClientRpc();
     }
 
     [ServerRpc(RequireOwnership = true)]
