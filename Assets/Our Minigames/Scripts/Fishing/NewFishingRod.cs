@@ -81,13 +81,19 @@ public class NewFishingRod : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SetOwnerShipServerRpc(ulong clientId)
     {
-        GetComponent<NetworkObject>().ChangeOwnership(clientId);
+        NetworkObject networkObject = GetComponent<NetworkObject>();
+        if (networkObject.OwnerClientId != clientId)
+        {
+            networkObject.ChangeOwnership(clientId);
+        }
     }
+
 
     [ServerRpc(RequireOwnership = false)]
     private void ResetOwnerShipServerRpc()
     {
-        GetComponent<NetworkObject>().RemoveOwnership();
+        NetworkObject networkObject = GetComponent<NetworkObject>();
+        networkObject.RemoveOwnership();
     }
 
 
@@ -109,11 +115,14 @@ public class NewFishingRod : NetworkBehaviour
             tipPositions.Clear();
 
             ResetCast();
+            ResetOwnerShipServerRpc();
         }
     }
 
     private void OnActivate(ActivateEventArgs args)
     {
+        if (!IsOwner) return;
+
         if (grabCount > 0 && !isCasting)
         {
             isCasting = true;
@@ -155,15 +164,8 @@ public class NewFishingRod : NetworkBehaviour
 
     void Update()
     {
-        // Non -owners (the unwashed masses)
-        if(!IsOwner)
-        {
-            floater.transform.position = rodTipTransform.position;
-            floater.transform.rotation = rodTipTransform.rotation;
-            return;
-        }
-
-        // The chad who is using the rodd
+        if (!IsOwner) return;
+       
         if (!isCasting)
         {
             floater.transform.position = rodTipTransform.position;
@@ -219,66 +221,6 @@ public class NewFishingRod : NetworkBehaviour
         hook.caughtSomething.Value = false;
     }
 
-
-
-    [ServerRpc(RequireOwnership = false)]
-    void LaunchCastServerRpc(float castingQuality)
-    {
-        if (IsServer)
-        {
-            floater.mass = 15;
-            floater.isKinematic = false;
-            floater.useGravity = true;
-
-            LaunchCastClientRpc();
-
-            hook.rodDropped.Value = false;
-
-            Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
-
-            float launchForce = castingQuality * castingMultiplier;
-            floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
-        }
-    }
-
-    [ClientRpc]
-    private void LaunchCastClientRpc()
-    {
-        floater.mass = 15;
-        floater.isKinematic = false;
-        floater.useGravity = true;
-
-        Debug.Log($"Syncing floater: \tgravity: {floater.useGravity}\tkinematic: {floater.isKinematic}\tmass: {floater.mass}");
-    }
-
-
-    [ServerRpc(RequireOwnership = false)]
-    void ResetCastServerRpc()
-    {
-        floater.mass = 1;
-        isCasting = false;
-        fishingLine.StopCastingServerRpc();
-
-        floater.position = rodTipTransform.position;
-        floater.useGravity = false;
-        floater.isKinematic = true;
-
-        ResetClientRpc(floater.position);
-
-        hook.caughtSomething.Value = false;
-        hook.rodDropped.Value = true;
-    }
-
-    [ClientRpc]
-    private void ResetClientRpc(Vector3 floaterPosition)
-    {
-        isCasting = false;
-        floater.mass = 1;
-        floater.position = floaterPosition;
-        floater.useGravity = false;
-        floater.isKinematic = true;
-    }
-
     public void Reel(float change)
     {
         var reelChange = change - prevReelChange;
@@ -298,19 +240,6 @@ public class NewFishingRod : NetworkBehaviour
 
         basePositions.Add(basePosition);
         tipPositions.Add(tipPosition);
-    }
-
-    void ResetSamples()
-    {
-        basePositions.Clear();
-        tipPositions.Clear();
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void UpdateFloaterPositionServerRpc(Vector3 position, Quaternion rotation)
-    {
-        floater.transform.position = position;
-        floater.transform.rotation = rotation;
     }
 
     float CalculateCastingQuality()

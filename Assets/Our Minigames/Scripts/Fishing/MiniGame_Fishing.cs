@@ -112,7 +112,7 @@ namespace XRMultiplayer.MiniGames
                 body.isKinematic = true;
                 interactable.transform.SetPositionAndRotation(m_InteractablePoses[interactable].position, m_InteractablePoses[interactable].rotation);
                 yield return new WaitForFixedUpdate();
-                body.isKinematic = wasKinematic;
+                //body.isKinematic = wasKinematic;
                 foreach (var collider in interactable.colliders)
                 {
                     collider.enabled = true;

@@ -383,6 +383,7 @@ MonoBehaviour:
   hookSpot: {fileID: 0}
   waterHeight: 0.88
   animator: {fileID: 0}
+  rb: {fileID: 0}
   baited: 0
   baitChance: 0
   wanderDuration: 0
@@ -435,7 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
   m_Colliders:
-  - {fileID: 0}
+  - {fileID: 8253135797128480505}
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
