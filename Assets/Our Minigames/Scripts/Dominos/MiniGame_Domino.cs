@@ -40,6 +40,7 @@ namespace XRMultiplayer.MiniGames
             base.UpdateGame(deltaTime);
             if (m_NetworkedGameplay.IsServer)
             {
+                m_NetworkedGameplay.CheckForPlayerLeave();
                 m_NetworkedGameplay.CheckForPlayerWin();
             }
         }
