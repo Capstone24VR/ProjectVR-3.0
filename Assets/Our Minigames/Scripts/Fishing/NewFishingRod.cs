@@ -225,7 +225,7 @@ public class NewFishingRod : NetworkBehaviour
     {
         var reelChange = change - prevReelChange;
         prevReelChange = change;
-        fishingLine.ReelServerRpc(reelChange);
+        fishingLine.Reel(reelChange);
         Debug.Log(reelChange);
     }
 

@@ -117,8 +117,7 @@ public class NewFishingLine : NetworkBehaviour
         floater.drag = 0;
     }
 
-    [ServerRpc(RequireOwnership = true)]
-    public void ReelServerRpc(float reelChange)
+    public void Reel(float reelChange)
     {
         currentRopeLength = Mathf.Max(0, currentRopeLength + reelChange);
     }
