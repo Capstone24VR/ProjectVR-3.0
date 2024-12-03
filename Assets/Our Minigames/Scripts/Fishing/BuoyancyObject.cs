@@ -14,7 +14,7 @@ public class BuoyancyObject : NetworkBehaviour
     public float airAngularDrag = 0.05f;
     public float floatingPower = 15f;
     public float waterHeight = 0.25f;
-    public bool underwater;
+    public NetworkVariable<bool> underwater;
 
     public float uprightTorqueStrength = 10f;
 
@@ -41,16 +41,16 @@ public class BuoyancyObject : NetworkBehaviour
             Vector3 torque = Vector3.Cross(currentUp, upright) * uprightTorqueStrength;
             rb.AddTorque(torque, ForceMode.Force);
 
-            if (!underwater)
+            if (!underwater.Value)
             {
-                underwater = true;
-                SwitchState(underwater);
+                underwater.Value = true;
+                SwitchState(underwater.Value);
             }
         }
-        else if(underwater)
+        else if(underwater.Value)
         {
-            underwater = false;
-            SwitchState(underwater);
+            underwater.Value = false;
+            SwitchState(underwater.Value);
         }
     }
 

@@ -60,7 +60,7 @@ public class NewFishingLine : NetworkBehaviour
                 Debug.Log("Rope is not locked");
 
                 var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
-                if (!floater.GetComponent<BuoyancyObject>().underwater)
+                if (!floater.GetComponent<BuoyancyObject>().underwater.Value)
                 {
                     currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
                 }
@@ -72,7 +72,7 @@ public class NewFishingLine : NetworkBehaviour
             }
             else
             {
-                if (!floater.GetComponent<BuoyancyObject>().underwater)
+                if (!floater.GetComponent<BuoyancyObject>().underwater.Value)
                     floater.drag = 10f;
             }
 
@@ -134,7 +134,7 @@ public class NewFishingLine : NetworkBehaviour
         {
             Vector3 currentPoint = linePoints[i];
             Vector3 prevPoint = prevPoints[i];
-            float effectiveGravity = floater.GetComponent<BuoyancyObject>().underwater ? gravity : gravity * 0.5f;
+            float effectiveGravity = floater.GetComponent<BuoyancyObject>().underwater.Value ? gravity : gravity * 0.5f;
             Vector3 acceleration = new Vector3(0, effectiveGravity * floaterMass, 0);
 
             // Verlet position update
