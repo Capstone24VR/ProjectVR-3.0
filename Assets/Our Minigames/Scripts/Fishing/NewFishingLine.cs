@@ -67,7 +67,7 @@ public class NewFishingLine : NetworkBehaviour
                 else
                 {
                     Debug.Log("Rope Length locked");
-                    ropeLengthLocked.Value = true;
+                    SetRopeLengthLocked(true);
                 }
             }
             else
@@ -85,6 +85,12 @@ public class NewFishingLine : NetworkBehaviour
         }
 
         DrawLine();
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SetRopeLengthLocked(bool locked)
+    {
+        ropeLengthLocked.Value = locked;
     }
 
     [ServerRpc(RequireOwnership = true)]
