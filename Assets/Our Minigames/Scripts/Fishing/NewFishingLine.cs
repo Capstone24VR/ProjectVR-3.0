@@ -27,24 +27,28 @@ public class NewFishingLine : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        if (IsServer)
+        InitializeLineServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void InitializeLineServerRpc()
+    {
+        currentRopeLength = 0;
+
+        lineRenderer.positionCount = lineSegmentCount;
+        rod = GetComponent<NewFishingRod>();
+
+        linePoints.Clear();
+        prevPoints.Clear();
+
+        // Initialize line with segments
+        for (int i = 0; i < lineSegmentCount; i++)
         {
-            currentRopeLength = 0;
-
-            lineRenderer.positionCount = lineSegmentCount;
-            rod = GetComponent<NewFishingRod>();
-
-            linePoints.Clear();
-            prevPoints.Clear();
-
-            // Initialize line with segments
-            for (int i = 0; i < lineSegmentCount; i++)
-            {
-                linePoints.Add(rodTip.position);
-                prevPoints.Add(rodTip.position);
-            }
+            linePoints.Add(rodTip.position);
+            prevPoints.Add(rodTip.position);
         }
     }
+
 
     public void Start()
     {
