@@ -44,48 +44,47 @@ public class NewFishingLine : NetworkBehaviour
 
     private void Update()
     {
-        if (NetworkManager.Singleton.LocalClientId == rod.clientId)
-        {
-            if (!rod.isCasting)
-            {
-                // When not casting, set all points close to the rod tip
-                for (int i = 0; i < lineSegmentCount; i++)
-                    linePoints[i] = rodTip.position;
+        if(!IsOwner) { return; }
 
-            }
-            else
+        if (!rod.isCasting)
+        {
+            // When not casting, set all points close to the rod tip
+            for (int i = 0; i < lineSegmentCount; i++)
+                linePoints[i] = rodTip.position;
+
+        }
+        else
+        {
+            if (!ropeLengthLocked)
             {
-                if (!ropeLengthLocked)
+                var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
+                if (!floater.GetComponent<BuoyancyObject>().underwater)
                 {
-                    var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
-                    if (!floater.GetComponent<BuoyancyObject>().underwater)
-                    {
-                        currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
-                    }
-                    else
-                    {
-                        ropeLengthLocked = true;
-                    }
+                    currentRopeLength = Mathf.Min(distanceTofloater, maxRopeLength);
                 }
                 else
                 {
-                    if (!floater.GetComponent<BuoyancyObject>().underwater)
-                        floater.drag = 10f;
-                }
-
-
-                if (!lineLocked)
-                {
-                    SimulateVerlet();
-                    ApplyConstraints();
+                    ropeLengthLocked = true;
                 }
             }
+            else
+            {
+                if (!floater.GetComponent<BuoyancyObject>().underwater)
+                    floater.drag = 10f;
+            }
 
-            DrawLine();
+
+            if (!lineLocked)
+            {
+                SimulateVerlet();
+                ApplyConstraints();
+            }
         }
+
+        DrawLine();
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = true)]
     public void StartCastingServerRpc()
     {
         floater.drag = 0;
@@ -95,7 +94,7 @@ public class NewFishingLine : NetworkBehaviour
         SyncCastingClientRpc();
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = true)]
     public void StopCastingServerRpc()
     {
         floater.drag = 0;
@@ -111,7 +110,7 @@ public class NewFishingLine : NetworkBehaviour
         floater.drag = 0;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = true)]
     public void ReelServerRpc(float reelChange)
     {
         currentRopeLength = Mathf.Max(0, currentRopeLength + reelChange);
