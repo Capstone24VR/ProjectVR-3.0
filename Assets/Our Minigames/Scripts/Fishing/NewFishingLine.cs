@@ -57,6 +57,8 @@ public class NewFishingLine : NetworkBehaviour
         {
             if (!ropeLengthLocked)
             {
+                Debug.Log("Rope is not locked");
+
                 var distanceTofloater = Vector3.Distance(rodTip.position, floater.position);
                 if (!floater.GetComponent<BuoyancyObject>().underwater)
                 {
@@ -64,6 +66,7 @@ public class NewFishingLine : NetworkBehaviour
                 }
                 else
                 {
+                    Debug.Log("Rope Length locked");
                     ropeLengthLocked = true;
                 }
             }
