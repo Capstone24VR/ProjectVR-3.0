@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEditor.PackageManager;
 using static XRMultiplayer.MiniGames.MiniGameManager;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -139,6 +140,7 @@ namespace XRMultiplayer.MiniGames
 
         public IEnumerator ResetGame()
         {
+            ToggleTeleportbuttonsClientRpc(true);
             StopAllCoroutines();
             RemoveGeneratedCardsServer();
             gameStarted = false;
@@ -157,6 +159,7 @@ namespace XRMultiplayer.MiniGames
             CreateDeckServer();
             ShuffleDeckServer();
             InstantiateDrawPileServer();
+            ToggleTeleportbuttonsClientRpc(false);
 
             StartCoroutine(WaitForClientsToCreateDeck());
         }
@@ -167,6 +170,17 @@ namespace XRMultiplayer.MiniGames
             RemoveGeneratedCardsServer();
             gameStarted = false;
         }
+
+        [ClientRpc]
+        private void ToggleTeleportbuttonsClientRpc(bool toggle)
+        {
+            foreach (var hand in m_hands)
+            {
+                hand.ownerManager.seatHandler.GetComponentInParent<TeleportationAnchor>().GetComponentInChildren<UIComponentToggler>().gameObject.SetActive(toggle);
+            }
+
+        }
+
 
 
         private void GetActiveHandsServer()
