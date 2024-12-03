@@ -15,8 +15,8 @@ public class NewFishingLine : NetworkBehaviour
     public float floaterMass = 0.2f;
     public float verletDamping = 0.98f;
 
-    private NetworkList<Vector3> linePoints = new NetworkList<Vector3>();
-    private NetworkList<Vector3> prevPoints = new NetworkList<Vector3>();
+    private List<Vector3> linePoints = new List<Vector3>();
+    private List<Vector3> prevPoints = new List<Vector3>();
     private bool lineLocked = false;
 
     public float maxRopeLength = 2f;
