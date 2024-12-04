@@ -224,6 +224,7 @@ public class NetworkedFishAI : NetworkBehaviour
         {
             Debug.Log($"{name} is baited lol");
             target = currentHook.transform.position;
+            Debug.Log("The position: " + target);
             MoveServerRpc(target);
         }
     }
