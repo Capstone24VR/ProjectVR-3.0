@@ -43,19 +43,17 @@ public class BuoyancyObject : NetworkBehaviour
 
             if (!underwater.Value)
             {
-                SwitchStateServerRpc(true);
+                SwitchState(true);
             }
         }
         else if(underwater.Value)
         {
-            SwitchStateServerRpc(false);
+            SwitchState(false);
         }
     }
 
-    [ServerRpc(RequireOwnership = true)]
-    private void SwitchStateServerRpc(bool isUnderwater)
+    private void SwitchState(bool isUnderwater)
     {
-        underwater.Value = isUnderwater;
         if (isUnderwater)
         {
             rb.drag = underWaterDrag;
@@ -64,7 +62,30 @@ public class BuoyancyObject : NetworkBehaviour
         else
         {
             rb.drag = airDrag;
-            rb.angularDrag= airAngularDrag;
+            rb.angularDrag = airAngularDrag;
+        }
+        SwitchStateServerRpc(isUnderwater);
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SwitchStateServerRpc(bool isUnderwater)
+    {
+        underwater.Value = isUnderwater;
+        SwitchStateClientRpc(isUnderwater);
+    }
+
+    [ClientRpc]
+    private void SwitchStateClientRpc(bool isUnderwater)
+    {
+        if (isUnderwater)
+        {
+            rb.drag = underWaterDrag;
+            rb.angularDrag = underWaterAngularDrag;
+        }
+        else
+        {
+            rb.drag = airDrag;
+            rb.angularDrag = airAngularDrag;
         }
     }
 }
