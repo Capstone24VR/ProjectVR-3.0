@@ -174,7 +174,7 @@ public class NetworkedFishAI : NetworkBehaviour
         foreach (var hook in activeHooks)
         {
             index++;
-            if (hook.transform.position.y <= waterHeight && hook.GetComponent<FishingHook>().caughtSomething.Value)
+            if (hook.transform.position.y <= waterHeight && !hook.GetComponent<FishingHook>().caughtSomething.Value)
             {
                 var distanceFromHook = Vector3.Distance(gameObject.transform.position, hook.transform.position);
                 var cap = 10 / distanceFromHook + stats.weight / 2;
@@ -208,6 +208,10 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         currentHook = activeHooks[hookIndex];
         activeHooks = GetActiveHooks();
+
+        Debug.Log($"Caught Something: {currentHook.GetComponent<FishingHook>().caughtSomething.Value}");
+        Debug.Log($"Caught Object is me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
+        Debug.Log($"Is an activeHook: {!activeHooks.Contains(currentHook)}");
 
         if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
         {
