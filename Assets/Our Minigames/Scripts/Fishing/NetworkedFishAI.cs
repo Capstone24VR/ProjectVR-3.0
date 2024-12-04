@@ -210,10 +210,10 @@ public class NetworkedFishAI : NetworkBehaviour
         activeHooks = GetActiveHooks();
 
         Debug.Log($"Caught Something: {currentHook.GetComponent<FishingHook>().caughtSomething.Value}");
-        Debug.Log($"Caught Object is me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
-        Debug.Log($"Is an activeHook: {!activeHooks.Contains(currentHook)}");
+        Debug.Log($"Caught Object not me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
+        Debug.Log($"Is an activeHook: {activeHooks.Contains(currentHook)}");
 
-        if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
+        if ((currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this) || !activeHooks.Contains(currentHook))
         {
             hookIndex = -1;
             ChooseNewRandomposition();
