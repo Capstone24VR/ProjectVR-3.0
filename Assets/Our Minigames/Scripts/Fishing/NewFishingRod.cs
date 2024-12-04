@@ -63,6 +63,32 @@ public class NewFishingRod : NetworkBehaviour
         grabInteractable.deactivated.RemoveListener(OnDeactivate);
     }
 
+    void Update()
+    {
+        if (!IsOwner) return;
+
+        if (!isCasting)
+        {
+            floater.transform.position = rodTipTransform.position;
+            floater.transform.rotation = rodTipTransform.rotation;
+        }
+
+        if (grabCount > 0)
+        {
+            Debug.Log(transform.parent);
+        }
+
+        if (grabCount == 0) return;
+
+        if (Time.time >= nextSampleTime)
+        {
+            SampleRodPositions();
+            nextSampleTime = Time.time + sampleInterval;
+        }
+
+        SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
+    }
+
     private void OnGrab(SelectEnterEventArgs args)
     {
 
@@ -74,41 +100,10 @@ public class NewFishingRod : NetworkBehaviour
             clientId = NetworkManager.Singleton.LocalClientId;
 
             SetOwnerShipServerRpc(clientId);
-            Debug.Log(transform.parent);
-            if(transform.parent.TryGetComponent(out NetworkObject networkobject))
-            {
-                Debug.Log("I the transform parent have a networkobject i can use");
-            }
-            //SyncParentServerRpc(transform.parent);
+            SyncGrabServerRpc(args.interactableObject.transform.GetComponent<NetworkObject>().NetworkObjectId);
         }
         grabCount++;
     }
-
-    //[ServerRpc(RequireOwnership = true)]
-    //private void SyncParentServerRpc(Transform parent)
-    //{
-    //    Debug.Log($"{parent.name} is this");
-    //}
-
-    [ServerRpc(RequireOwnership = false)]
-    private void SetOwnerShipServerRpc(ulong clientId)
-    {
-        NetworkObject networkObject = GetComponent<NetworkObject>();
-        if (networkObject.OwnerClientId != clientId)
-        {
-            networkObject.ChangeOwnership(clientId);
-        }
-    }
-
-
-    [ServerRpc(RequireOwnership = false)]
-    private void ResetOwnerShipServerRpc()
-    {
-        NetworkObject networkObject = GetComponent<NetworkObject>();
-        networkObject.RemoveOwnership();
-    }
-
-
 
     private void OnRelease(SelectExitEventArgs args)
     {
@@ -127,6 +122,7 @@ public class NewFishingRod : NetworkBehaviour
             tipPositions.Clear();
 
             ResetCast();
+            SyncReleaseServerRpc(args.interactableObject.transform.GetComponent<NetworkObject>().NetworkObjectId);
             ResetOwnerShipServerRpc();
         }
     }
@@ -174,48 +170,6 @@ public class NewFishingRod : NetworkBehaviour
         //    isCasting = true;
     }
 
-    void Update()
-    {
-        if (!IsOwner) return;
-       
-        if (!isCasting)
-        {
-            floater.transform.position = rodTipTransform.position;
-            floater.transform.rotation = rodTipTransform.rotation;
-        }
-
-        if (grabCount > 0)
-        {
-            Debug.Log(transform.parent);
-        }
-
-        if (grabCount == 0) return;
-
-        if (Time.time >= nextSampleTime)
-        {
-            SampleRodPositions();
-            nextSampleTime = Time.time + sampleInterval;
-        }
-
-        SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
-    }
-
-    [ServerRpc(RequireOwnership = true)]
-    private void SyncFloaterTransformServerRpc(Vector3 position, Quaternion rotation)
-    {
-        SyncFloaterTransformClientRpc(position, rotation);
-    }
-
-    [ClientRpc]
-    private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
-    {
-        if (!IsOwner)
-        {
-            floater.transform.position = position;
-            floater.transform.rotation = rotation;
-        }
-    }
-
     void LaunchCast(float castingQuality)
     {
         floater.mass = 15;
@@ -229,20 +183,6 @@ public class NewFishingRod : NetworkBehaviour
 
         float launchForce = castingQuality * castingMultiplier;
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
-    }
-
-    [ServerRpc(RequireOwnership = true)]
-    void SyncLaunchFloaterServerRpc()
-    {
-        SyncLaunchFloaterClientRpc();
-    }
-
-    [ClientRpc]
-    void SyncLaunchFloaterClientRpc()
-    {
-        floater.mass = 15;
-        floater.isKinematic = false;
-        floater.useGravity = true;
     }
 
     void ResetCast()
@@ -263,6 +203,90 @@ public class NewFishingRod : NetworkBehaviour
         ToggleRodDroppedServerRpc(true);
     }
 
+    public void Reel(float change)
+    {
+        var reelChange = change - prevReelChange;
+        prevReelChange = change;
+        fishingLine.Reel(reelChange);
+    }
+
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetOwnerShipServerRpc(ulong clientId)
+    {
+        NetworkObject networkObject = GetComponent<NetworkObject>();
+        if (networkObject.OwnerClientId != clientId)  networkObject.ChangeOwnership(clientId);
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ResetOwnerShipServerRpc()
+    {
+        GetComponent<NetworkObject>().RemoveOwnership();
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SyncGrabServerRpc(ulong networkObjectId)
+    {
+        SyncGrabClientRpc(networkObjectId);
+    }
+
+    [ClientRpc]
+    private void SyncGrabClientRpc(ulong networkObjectId)
+    {
+        if (!IsOwner)
+        {
+            NetworkObject rod = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (rod != null) rod.transform.SetParent(null, true);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SyncReleaseServerRpc(ulong networkObjectId)
+    {
+        SyncReleaseClientRpc(networkObjectId);
+    }
+
+    [ClientRpc]
+    private void SyncReleaseClientRpc(ulong networkObjectId)
+    {
+        if (!IsOwner)
+        {
+            NetworkObject rod = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (rod != null) rod.transform.SetParent(transform, true);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SyncFloaterTransformServerRpc(Vector3 position, Quaternion rotation)
+    {
+        SyncFloaterTransformClientRpc(position, rotation);
+    }
+
+    [ClientRpc]
+    private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (!IsOwner)
+        {
+            floater.transform.position = position;
+            floater.transform.rotation = rotation;
+        }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    void SyncLaunchFloaterServerRpc()
+    {
+        SyncLaunchFloaterClientRpc();
+    }
+
+    [ClientRpc]
+    void SyncLaunchFloaterClientRpc()
+    {
+        floater.mass = 15;
+        floater.isKinematic = false;
+        floater.useGravity = true;
+    }
 
     [ServerRpc(RequireOwnership = true)]
     void SyncResetFloaterServerRpc()
@@ -288,14 +312,6 @@ public class NewFishingRod : NetworkBehaviour
     void ToggleCaughtSomethingServerRpc(bool toggle)
     {
         hook.caughtSomething.Value = false;
-    }
-
-    public void Reel(float change)
-    {
-        var reelChange = change - prevReelChange;
-        prevReelChange = change;
-        fishingLine.Reel(reelChange);
-        Debug.Log(reelChange);
     }
 
     void SampleRodPositions()
