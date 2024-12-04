@@ -38,20 +38,22 @@ public class FishingHook : NetworkBehaviour
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
         {
-            caughtObject = fishNetworkObject.gameObject;
             caughtSomething.Value = true;
-
-            // Update fish state
-            fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
+            caughtObject = fishNetworkObject.gameObject;
 
             // Notify clients about the catch
             NotifyCatchClientRpc(fishNetworkId);
+
+
+            // Update fish state
+            fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
         }
         else
         {
             Debug.LogError($"Fish with NetworkObjectId {fishNetworkId} not found!");
         }
     }
+
 
     [ClientRpc]
     private void NotifyCatchClientRpc(ulong fishNetworkId)
