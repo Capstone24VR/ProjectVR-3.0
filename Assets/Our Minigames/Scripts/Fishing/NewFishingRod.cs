@@ -95,7 +95,6 @@ public class NewFishingRod : NetworkBehaviour
             clientId = NetworkManager.Singleton.LocalClientId;
 
             SetOwnerShipServerRpc(clientId);
-            SyncGrabServerRpc();
         }
         grabCount++;
     }
@@ -117,7 +116,6 @@ public class NewFishingRod : NetworkBehaviour
             tipPositions.Clear();
 
             ResetCast();
-            SyncReleaseServerRpc();
             ResetOwnerShipServerRpc();
         }
     }
@@ -138,18 +136,21 @@ public class NewFishingRod : NetworkBehaviour
             else if (castingQuality < 2.5f)
             {
                 Debug.Log("Weak Cast");
+                SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
                 LaunchCast(castingQuality);
             }
             else if (castingQuality >= 2.5f && castingQuality < 5.0f)
             {
                 Debug.Log("Medium Cast");
                 hapticFeedback?.SendHapticImpulse(0.3f, 0.2f, 0.5f);
+                SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
                 LaunchCast(castingQuality * 2);
             }
             else if (castingQuality >= 5.0f)
             {
                 Debug.Log("Strong Cast");
                 hapticFeedback?.SendHapticImpulse(0.6f, 0.4f, 1f);
+                SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
                 LaunchCast(castingQuality * 5);
             }
         }
@@ -212,9 +213,6 @@ public class NewFishingRod : NetworkBehaviour
     {
         NetworkObject networkObject = GetComponent<NetworkObject>();
         if (networkObject.OwnerClientId != clientId) networkObject.ChangeOwnership(clientId);
-
-        NetworkObject rodNetworkObject = rodBaseTransform.GetComponentInParent<NetworkObject>();
-        if(rodNetworkObject.OwnerClientId != clientId) rodNetworkObject.ChangeOwnership(clientId);
     }
 
 
@@ -222,39 +220,8 @@ public class NewFishingRod : NetworkBehaviour
     private void ResetOwnerShipServerRpc()
     {
         GetComponent<NetworkObject>().RemoveOwnership();
-        Debug.Log(rodBaseTransform.GetComponentInParent<NetworkObject>().name);
-        rodBaseTransform.GetComponentInParent<NetworkObject>().RemoveOwnership();
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void SyncGrabServerRpc()
-    {
-        SyncGrabClientRpc();
-    }
-
-    [ClientRpc]
-    private void SyncGrabClientRpc()
-    {
-        if (!IsOwner)
-        {
-            rodBaseTransform.parent.SetParent(null, true);
-        }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void SyncReleaseServerRpc()
-    {
-        SyncReleaseClientRpc();
-    }
-
-    [ClientRpc]
-    private void SyncReleaseClientRpc()
-    {
-        if (!IsOwner)
-        {
-            rodBaseTransform.parent.SetParent(transform, true);
-        }
-    }
 
     [ServerRpc(RequireOwnership = true)]
     private void SyncFloaterTransformServerRpc(Vector3 position, Quaternion rotation)
