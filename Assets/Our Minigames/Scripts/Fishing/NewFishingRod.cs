@@ -179,6 +179,23 @@ public class NewFishingRod : NetworkBehaviour
             SampleRodPositions();
             nextSampleTime = Time.time + sampleInterval;
         }
+
+        SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SyncFloaterTransformServerRpc(Vector3 position, Quaternion rotation)
+    {
+        SyncFloaterTransformClientRpc(position, rotation);
+    }
+
+    private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (!IsOwner)
+        {
+            floater.transform.position = position;
+            floater.transform.rotation = rotation;
+        }
     }
 
     void LaunchCast(float castingQuality)
