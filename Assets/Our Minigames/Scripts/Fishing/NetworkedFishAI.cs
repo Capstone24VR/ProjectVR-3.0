@@ -351,14 +351,14 @@ public class NetworkedFishAI : NetworkBehaviour
         GetComponent<NetworkObject>().Despawn(true);
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if(collision.gameObject.tag == "Hook")
-        {
-            Debug.Log($"{name} has touched the {collision.transform.parent.name}");
-            SetFishStateServerRpc(FishState.Caught);
-        }
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if(collision.gameObject.tag == "Hook")
+    //    {
+    //        Debug.Log($"{name} has touched the {collision.transform.parent.name}");
+    //        SetFishStateServerRpc(FishState.Caught);
+    //    }
+    //}
 
 
     private void OnTriggerEnter(Collider other)
@@ -366,7 +366,7 @@ public class NetworkedFishAI : NetworkBehaviour
         if (other.gameObject.tag == "Hook")
         {
             Debug.Log($"{name} has touched the {other.transform.parent.name}");
-            SetFishStateServerRpc(FishState.Caught);
+            //SetFishStateServerRpc(FishState.Struggle);
         }
 
         if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
