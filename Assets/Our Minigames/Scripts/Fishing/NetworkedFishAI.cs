@@ -362,7 +362,13 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
+        if (other.gameObject.tag == "Hook")
+        {
+            Debug.Log($"{name} has touched the {other.transform.parent.name}");
+            SetFishStateServerRpc(FishState.Caught);
+        }
+
+        if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
         {
             SetFishStateServerRpc(FishState.Wander);
         }
