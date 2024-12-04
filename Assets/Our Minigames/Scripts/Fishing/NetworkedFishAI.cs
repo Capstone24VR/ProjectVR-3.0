@@ -213,14 +213,16 @@ public class NetworkedFishAI : NetworkBehaviour
         Debug.Log($"Caught Object not me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
         Debug.Log($"Is an activeHook: {activeHooks.Contains(currentHook)}");
 
-        if ((currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this) || !activeHooks.Contains(currentHook))
+        if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
         {
+            Debug.Log($"{name} is no longer baited");
             hookIndex = -1;
             ChooseNewRandomposition();
             SetFishStateServerRpc(FishState.Wander);
         }
         else
         {
+            Debug.Log($"{name} is baited lol");
             target = currentHook.transform.position;
             MoveServerRpc(target);
         }
