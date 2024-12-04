@@ -1951,7 +1951,8 @@ MonoBehaviour:
   verletDamping: 0.98
   maxRopeLength: 10
   currentRopeLength: 0
-  ropeLengthLocked: 0
+  ropeLengthLocked:
+    m_InternalValue: 0
 --- !u!1 &7222867781674643276
 GameObject:
   m_ObjectHideFlags: 0
@@ -2175,8 +2176,8 @@ Rigidbody:
     m_Bits: 256
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
@@ -2198,7 +2199,8 @@ MonoBehaviour:
   airAngularDrag: 0.05
   floatingPower: 220
   waterHeight: 0.88
-  underwater: 1
+  underwater:
+    m_InternalValue: 0
   uprightTorqueStrength: 10
 --- !u!114 &8561199845938542332
 MonoBehaviour:

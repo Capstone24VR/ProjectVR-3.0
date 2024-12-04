@@ -183,6 +183,9 @@ public class NewFishingRod : NetworkBehaviour
 
     void LaunchCast(float castingQuality)
     {
+        floater.mass = 15;
+        floater.isKinematic = false;
+        floater.useGravity = true;
         SyncLaunchFloaterServerRpc();
 
         ToggleRodDroppedServerRpc(false);
@@ -209,6 +212,10 @@ public class NewFishingRod : NetworkBehaviour
 
     void ResetCast()
     {
+        floater.mass = 1;
+        floater.useGravity = false;
+        floater.isKinematic = true;
+
         SyncResetFloaterServerRpc();
 
         isCasting = false;
