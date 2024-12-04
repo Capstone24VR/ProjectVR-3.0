@@ -226,7 +226,7 @@ public class NewFishingRod : NetworkBehaviour
         rodBaseTransform.GetComponentInParent<NetworkObject>().RemoveOwnership();
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     private void SyncGrabServerRpc()
     {
         SyncGrabClientRpc();
@@ -241,7 +241,7 @@ public class NewFishingRod : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     private void SyncReleaseServerRpc()
     {
         SyncReleaseClientRpc();
