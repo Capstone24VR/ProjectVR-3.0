@@ -84,11 +84,11 @@ public class NewFishingRod : NetworkBehaviour
         grabCount++;
     }
 
-    [ServerRpc(RequireOwnership = true)]
-    private void SyncParentServerRpc(Transform parent)
-    {
-        Debug.Log($"{parent.name} is this");
-    }
+    //[ServerRpc(RequireOwnership = true)]
+    //private void SyncParentServerRpc(Transform parent)
+    //{
+    //    Debug.Log($"{parent.name} is this");
+    //}
 
     [ServerRpc(RequireOwnership = false)]
     private void SetOwnerShipServerRpc(ulong clientId)
