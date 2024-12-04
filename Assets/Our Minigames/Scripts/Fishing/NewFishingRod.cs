@@ -183,9 +183,7 @@ public class NewFishingRod : NetworkBehaviour
 
     void LaunchCast(float castingQuality)
     {
-        floater.mass = 15;
-        floater.isKinematic = false;
-        floater.useGravity = true;
+        SyncLaunchFloaterServerRpc();
 
         ToggleRodDroppedServerRpc(false);
 
@@ -195,18 +193,47 @@ public class NewFishingRod : NetworkBehaviour
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
+    [ServerRpc(RequireOwnership = true)]
+    void SyncLaunchFloaterServerRpc()
+    {
+        SyncLaunchFloaterClientRpc();
+    }
+
+    [ClientRpc]
+    void SyncLaunchFloaterClientRpc()
+    {
+        floater.mass = 15;
+        floater.isKinematic = false;
+        floater.useGravity = true;
+    }
+
     void ResetCast()
     {
-        floater.mass = 1;
+        SyncResetFloaterServerRpc();
+
         isCasting = false;
         fishingLine.StopCastingServerRpc();
 
         floater.position = rodTipTransform.position;
-        floater.useGravity = false;
-        floater.isKinematic = true;
+
 
         ToggleCaughtSomethingServerRpc(false);
         ToggleRodDroppedServerRpc(true);
+    }
+
+
+    [ServerRpc(RequireOwnership = true)]
+    void SyncResetFloaterServerRpc()
+    {
+        SyncResetFloaterClientRpc();
+    }
+
+    [ClientRpc]
+    void SyncResetFloaterClientRpc()
+    {
+        floater.mass = 1;
+        floater.useGravity = false;
+        floater.isKinematic = true;
     }
 
     [ServerRpc(RequireOwnership = false)]

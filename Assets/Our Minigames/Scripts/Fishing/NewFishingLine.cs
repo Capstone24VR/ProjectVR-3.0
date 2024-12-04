@@ -82,7 +82,7 @@ public class NewFishingLine : NetworkBehaviour
             }
         }
 
-        DrawLine();
+        DrawLineServerRpc(linePoints.ToArray());
     }
 
     [ServerRpc(RequireOwnership = true)]
@@ -184,11 +184,17 @@ public class NewFishingLine : NetworkBehaviour
             lineRenderer.SetPosition(i, linePoints[i]);
     }
 
+    [ServerRpc(RequireOwnership = true)]
+    private void DrawLineServerRpc(Vector3[] myLine)
+    {
+        DrawLineClientRpc(myLine);
+    }
+
     [ClientRpc]
-    private void DrawLineClientRpc()
+    private void DrawLineClientRpc(Vector3[] myLine )
     {
         // Render line based on the position of each segment
         for (int i = 0; i < lineSegmentCount; i++)
-            lineRenderer.SetPosition(i, linePoints[i]);
+            lineRenderer.SetPosition(i, myLine[i]);
     }
 }
