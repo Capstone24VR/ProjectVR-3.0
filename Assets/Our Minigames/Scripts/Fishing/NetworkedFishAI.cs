@@ -237,6 +237,7 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
+            Debug.Log("IOMG");
             _xrInteract.enabled = true;
             rb.useGravity = true;
             rb.isKinematic = false;

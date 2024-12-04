@@ -270,7 +270,7 @@ public class NewFishingRod : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void ToggleRodDroppedServerRpc(bool toggle)
     {
-        hook.rodDropped.Value = false;
+        hook.rodDropped.Value = toggle;
     }
 
     [ServerRpc(RequireOwnership = false)]
