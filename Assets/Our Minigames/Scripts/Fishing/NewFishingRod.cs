@@ -95,7 +95,7 @@ public class NewFishingRod : NetworkBehaviour
             clientId = NetworkManager.Singleton.LocalClientId;
 
             SetOwnerShipServerRpc(clientId);
-            SyncGrabServerRpc(args.interactableObject.transform.GetComponent<NetworkObject>().NetworkObjectId);
+            SyncGrabServerRpc();
         }
         grabCount++;
     }
@@ -117,7 +117,7 @@ public class NewFishingRod : NetworkBehaviour
             tipPositions.Clear();
 
             ResetCast();
-            SyncReleaseServerRpc(args.interactableObject.transform.GetComponent<NetworkObject>().NetworkObjectId);
+            SyncReleaseServerRpc();
             ResetOwnerShipServerRpc();
         }
     }
@@ -211,7 +211,10 @@ public class NewFishingRod : NetworkBehaviour
     private void SetOwnerShipServerRpc(ulong clientId)
     {
         NetworkObject networkObject = GetComponent<NetworkObject>();
-        if (networkObject.OwnerClientId != clientId)  networkObject.ChangeOwnership(clientId);
+        if (networkObject.OwnerClientId != clientId) networkObject.ChangeOwnership(clientId);
+
+        NetworkObject rodNetworkObject = rodBaseTransform.GetComponentInParent<NetworkObject>();
+        if(rodNetworkObject.OwnerClientId != clientId) rodNetworkObject.ChangeOwnership(clientId);
     }
 
 
@@ -219,37 +222,37 @@ public class NewFishingRod : NetworkBehaviour
     private void ResetOwnerShipServerRpc()
     {
         GetComponent<NetworkObject>().RemoveOwnership();
+        Debug.Log(rodBaseTransform.GetComponentInParent<NetworkObject>().name);
+        rodBaseTransform.GetComponentInParent<NetworkObject>().RemoveOwnership();
     }
 
     [ServerRpc(RequireOwnership = true)]
-    private void SyncGrabServerRpc(ulong networkObjectId)
+    private void SyncGrabServerRpc()
     {
-        SyncGrabClientRpc(networkObjectId);
+        SyncGrabClientRpc();
     }
 
     [ClientRpc]
-    private void SyncGrabClientRpc(ulong networkObjectId)
+    private void SyncGrabClientRpc()
     {
         if (!IsOwner)
         {
-            NetworkObject rod = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (rod != null) rod.transform.SetParent(null, true);
+            rodBaseTransform.parent.SetParent(null, true);
         }
     }
 
     [ServerRpc(RequireOwnership = true)]
-    private void SyncReleaseServerRpc(ulong networkObjectId)
+    private void SyncReleaseServerRpc()
     {
-        SyncReleaseClientRpc(networkObjectId);
+        SyncReleaseClientRpc();
     }
 
     [ClientRpc]
-    private void SyncReleaseClientRpc(ulong networkObjectId)
+    private void SyncReleaseClientRpc()
     {
         if (!IsOwner)
         {
-            NetworkObject rod = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (rod != null) rod.transform.SetParent(transform, true);
+            rodBaseTransform.parent.SetParent(transform, true);
         }
     }
 
