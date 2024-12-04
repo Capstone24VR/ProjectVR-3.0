@@ -189,6 +189,7 @@ public class NewFishingRod : NetworkBehaviour
         SyncFloaterTransformClientRpc(position, rotation);
     }
 
+    [ClientRpc]
     private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
     {
         if (!IsOwner)
