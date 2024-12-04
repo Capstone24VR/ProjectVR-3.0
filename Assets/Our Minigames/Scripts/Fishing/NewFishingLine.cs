@@ -184,7 +184,7 @@ public class NewFishingLine : NetworkBehaviour
             lineRenderer.SetPosition(i, linePoints[i]);
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     private void DrawLineServerRpc(Vector3[] myLine)
     {
         DrawLineClientRpc(myLine);

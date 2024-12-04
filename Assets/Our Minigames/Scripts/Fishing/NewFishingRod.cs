@@ -184,6 +184,11 @@ public class NewFishingRod : NetworkBehaviour
             floater.transform.rotation = rodTipTransform.rotation;
         }
 
+        if (grabCount > 0)
+        {
+            Debug.Log(transform.parent);
+        }
+
         if (grabCount == 0) return;
 
         if (Time.time >= nextSampleTime)
