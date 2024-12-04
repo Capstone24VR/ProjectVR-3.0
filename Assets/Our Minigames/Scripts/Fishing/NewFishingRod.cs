@@ -74,8 +74,20 @@ public class NewFishingRod : NetworkBehaviour
             clientId = NetworkManager.Singleton.LocalClientId;
 
             SetOwnerShipServerRpc(clientId);
+            Debug.Log(transform.parent);
+            if(transform.parent.TryGetComponent(out NetworkObject networkobject))
+            {
+                Debug.Log("I the transform parent have a networkobject i can use");
+            }
+            //SyncParentServerRpc(transform.parent);
         }
         grabCount++;
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SyncParentServerRpc(Transform parent)
+    {
+        Debug.Log($"{parent.name} is this");
     }
 
     [ServerRpc(RequireOwnership = false)]
