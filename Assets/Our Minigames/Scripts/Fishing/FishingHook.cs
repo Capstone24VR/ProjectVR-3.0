@@ -15,7 +15,7 @@ public class FishingHook : NetworkBehaviour
         //}
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.tag == "Fish")
         {
@@ -34,23 +34,26 @@ public class FishingHook : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void CatchFishServerRpc(ulong fishNetworkId)
+    public void CatchFishServerRpc(ulong fishNetworkId)
     {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
+        if(!caughtSomething.Value)
         {
-            caughtSomething.Value = true;
-            caughtObject = fishNetworkObject.gameObject;
+            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
+            {
+                caughtSomething.Value = true;
+                caughtObject = fishNetworkObject.gameObject;
 
-            // Notify clients about the catch
-            NotifyCatchClientRpc(fishNetworkId);
+                // Notify clients about the catch
+                NotifyCatchClientRpc(fishNetworkId);
 
 
-            // Update fish state
-            fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
-        }
-        else
-        {
-            Debug.LogError($"Fish with NetworkObjectId {fishNetworkId} not found!");
+                // Update fish state
+                fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
+            }
+            else
+            {
+                Debug.LogError($"Fish with NetworkObjectId {fishNetworkId} not found!");
+            }
         }
     }
 

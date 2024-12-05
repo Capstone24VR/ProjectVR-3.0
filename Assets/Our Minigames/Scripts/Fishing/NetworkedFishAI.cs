@@ -350,7 +350,7 @@ public class NetworkedFishAI : NetworkBehaviour
     private void ChooseNewRandomposition()
     {
         // Choose a new random position within specified x and z positions
-        target = new Vector3(Random.Range(-20f, 25f), ogHeight, Random.Range(-77f, -32f));
+        target = new Vector3(Random.Range(2f, 29f), ogHeight, Random.Range(39f, 67f));
         wanderDuration = Random.Range(minWanderDuration, maxWanderDuration);
         waitTimer = 0f;
         wanderTimer = 0f;
@@ -372,23 +372,23 @@ public class NetworkedFishAI : NetworkBehaviour
         GetComponent<NetworkObject>().Despawn(true);
     }
 
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    if(collision.gameObject.tag == "Hook")
-    //    {
-    //        Debug.Log($"{name} has touched the {collision.transform.parent.name}");
-    //        SetFishStateServerRpc(FishState.Caught);
-    //    }
-    //}
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Hook")
+        {
+            Debug.Log($"{name} has touched the {collision.transform.parent.name}");
+            //SetFishStateServerRpc(FishState.Caught);
+        }
+    }
 
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Hook")
-        {
-            Debug.Log($"{name} has touched the {other.transform.parent.name}");
-            //SetFishStateServerRpc(FishState.Struggle);
-        }
+        //if (other.gameObject.tag == "Hook")
+        //{
+        //    Debug.Log($"{name} has touched the {other.transform.parent.name}");
+        //    //SetFishStateServerRpc(FishState.Struggle);
+        //}
 
         if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
         {

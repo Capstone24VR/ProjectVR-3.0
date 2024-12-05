@@ -72,7 +72,7 @@ namespace XRMultiplayer.MiniGames
             names.Add("John");
             names.Add("Farquad");
             names.Add("Goku");
-            names.Add("Sturividant");
+            names.Add("Sturdivant");
             names.Add("Chauh");
             names.Add("Thimble");
             names.Add("Enyo");
@@ -83,6 +83,9 @@ namespace XRMultiplayer.MiniGames
             names.Add("Sally");
             names.Add("Trish");
             names.Add("Dela");
+            names.Add("Pubert");
+            names.Add("Whitmer");
+            names.Add("Packer");
         }
 
 
@@ -184,7 +187,7 @@ namespace XRMultiplayer.MiniGames
                     }
 
                     int name = UnityEngine.Random.Range(0, names.Count);
-                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(-20f, 25f), fishPool.position.y, UnityEngine.Random.Range(-77f, -32f));
+                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(2f, 29f), fishPool.position.y, UnityEngine.Random.Range(39f, 67f));
 
                     var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, fishPool);
                     spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishStats>().weight;

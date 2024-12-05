@@ -118,7 +118,7 @@ namespace XRMultiplayer
                 else
                 {
                     //Debug.Log($"Player with ID {interactingPlayerId} is NOT the owner and cannot interact with the card.");
-                    DisableInteraction();
+                    //DisableInteraction();
                 }
             }
         }
