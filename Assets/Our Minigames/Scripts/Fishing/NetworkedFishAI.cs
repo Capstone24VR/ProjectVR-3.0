@@ -242,6 +242,20 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Struggle()
     {
+        if(currentHook == null)
+        {
+            rb.useGravity = true;
+            rb.isKinematic = false;
+
+
+            if(transform.position.y < waterHeight)
+            {
+                SetFishStateServerRpc(FishState.Wander);
+            }
+            return;
+        }
+
+
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
             Debug.Log("IOMG");

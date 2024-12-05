@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Card;
 using Unity.Netcode;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEditor.PackageManager;
-using static XRMultiplayer.MiniGames.MiniGameManager;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
 namespace XRMultiplayer.MiniGames
