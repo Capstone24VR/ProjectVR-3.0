@@ -119,7 +119,7 @@ public class NetworkedFishAI : NetworkBehaviour
                 Struggle();
                 break;
             case FishState.Caught:
-                //Caught();
+                Caught();
                 break;
         }
     }
@@ -305,7 +305,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Caught()
     {
-        if(transform.position.y < waterHeight)
+        if(transform.position.y < waterHeight-0.1)
         {
             rb.useGravity = false;
             rb.isKinematic = false;

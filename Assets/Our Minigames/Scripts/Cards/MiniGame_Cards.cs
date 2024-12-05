@@ -1,5 +1,6 @@
 
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace XRMultiplayer.MiniGames
@@ -11,6 +12,7 @@ namespace XRMultiplayer.MiniGames
     {
 
         NetworkedCards m_NetworkedGameplay;
+        public Dictionary<XRINetworkPlayer, float> scores = new Dictionary<XRINetworkPlayer, float>();
 
         public override void Start()
         {
@@ -85,13 +87,23 @@ namespace XRMultiplayer.MiniGames
                 PlayerHudNotification.Instance.ShowText($"Game Complete! " + winner.name + " has won.");
             }
 
-            if (XRINetworkGameManager.Instance.GetPlayerByID(XRINetworkPlayer.LocalPlayer.OwnerClientId, out XRINetworkPlayer player))
+            if (m_MiniGameManager.IsServer)
             {
-                if(XRINetworkPlayer.LocalPlayer.OwnerClientId == winner.ownerManager.seatHandler.GetClientID()) 
-                    m_MiniGameManager.SubmitScoreServerRpc(m_MiniGameManager.currentPlayerDictionary[player].currentScore + 1, XRINetworkPlayer.LocalPlayer.OwnerClientId);
-                else
-                    m_MiniGameManager.SubmitScoreServerRpc(m_MiniGameManager.currentPlayerDictionary[player].currentScore, XRINetworkPlayer.LocalPlayer.OwnerClientId);
+                if (XRINetworkGameManager.Instance.GetPlayerByID(winner.ownerManager.seatHandler.GetClientID(), out XRINetworkPlayer player))
+                {
+                    if (scores.ContainsKey(player)){
+
+                        scores[player] = scores[player] + 1;
+                    }
+                    else
+                    {
+                        scores.Add(player, 1);
+                    }
+
+                    m_MiniGameManager.SubmitScoreServerRpc(scores[player], winner.ownerManager.seatHandler.GetClientID());
+                }
             }
+
 
 
 
