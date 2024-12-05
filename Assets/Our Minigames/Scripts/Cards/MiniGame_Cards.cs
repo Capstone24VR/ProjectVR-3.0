@@ -1,16 +1,8 @@
-using SerializableCallback;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.IO.LowLevel.Unsafe;
-using Unity.XR.CoreUtils;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using static Card;
-using static XRMultiplayer.MiniGames.MiniGameBase;
 
 namespace XRMultiplayer.MiniGames
 {
