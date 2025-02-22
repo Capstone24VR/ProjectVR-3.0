@@ -42,6 +42,13 @@ public class NetworkedFishAI : NetworkBehaviour
     float maxZ = 0;
 
 
+    // For Wander Movement
+    private float minPoolX = 0;
+    private float maxPoolX = 0;
+    private float minPoolZ = 0;
+    private float maxPoolZ = 0;
+
+
 
     // Parameters
     public float minWanderDuration = 5f;
@@ -122,6 +129,14 @@ public class NetworkedFishAI : NetworkBehaviour
                 Caught();
                 break;
         }
+    }
+
+    public void SetWanderArea(float minX, float maxX, float minZ, float maxZ)
+    {
+        minPoolX = minX;
+        maxPoolX = maxX;
+        minPoolZ = minZ;
+        maxPoolZ = maxZ;
     }
 
     void Wander()
@@ -350,7 +365,7 @@ public class NetworkedFishAI : NetworkBehaviour
     private void ChooseNewRandomposition()
     {
         // Choose a new random position within specified x and z positions
-        target = new Vector3(Random.Range(2f, 29f), ogHeight, Random.Range(39f, 67f));
+        target = new Vector3(Random.Range(minPoolX, maxPoolX), ogHeight, Random.Range(minPoolZ, maxPoolZ));
         wanderDuration = Random.Range(minWanderDuration, maxWanderDuration);
         waitTimer = 0f;
         wanderTimer = 0f;

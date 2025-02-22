@@ -29,7 +29,7 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] Transform fishPool;
 
         public int maxFish = 30;
-        public int currFish = 10;
+        public int currFish = 0;
         public bool gameStart = false;
 
         public float spawnTimer = 0f;
@@ -41,6 +41,10 @@ namespace XRMultiplayer.MiniGames
         private float[] baitChanceArr = { .001f, .05f, .15f, .25f, .35f, .40f, .60f };
         private float totalChance = 1.721f;
 
+        private float minSpawnX = 0;
+        private float maxSpawnX = 0;
+        private float minSpawnZ = 0;
+        private float maxSpawnZ = 0;
 
         /// <summary>
         /// The current message routine being played.
@@ -86,7 +90,15 @@ namespace XRMultiplayer.MiniGames
             names.Add("Pubert");
             names.Add("Whitmer");
             names.Add("Packer");
+
+
+            minSpawnX = fishPool.transform.position.x - (40 / 2);
+            maxSpawnX = fishPool.transform.position.x + (40 / 2);
+            minSpawnZ = fishPool.transform.position.z - (40 / 2);
+            maxSpawnZ = fishPool.transform.position.z + (40 / 2);
         }
+
+
 
 
         IEnumerator WaitForClientConnection()
@@ -162,7 +174,7 @@ namespace XRMultiplayer.MiniGames
         {
             if (IsServer)
             {
-                currFish = this.transform.childCount;
+                currFish = fishPool.transform.childCount;
                 if (currFish <= maxFish)
                 {
 
@@ -187,10 +199,11 @@ namespace XRMultiplayer.MiniGames
                     }
 
                     int name = UnityEngine.Random.Range(0, names.Count);
-                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(2f, 29f), fishPool.position.y, UnityEngine.Random.Range(39f, 67f));
+                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(minSpawnX, minSpawnX), fishPool.position.y, UnityEngine.Random.Range(minSpawnZ, maxSpawnZ));
 
                     var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, fishPool);
                     spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishStats>().weight;
+                    spawn.GetComponent<NetworkedFishAI>().SetWanderArea(minSpawnX, maxSpawnX, minSpawnZ, maxSpawnZ);
 
 
                     spawn.name = names[name] + " the " + fish[type].name;
