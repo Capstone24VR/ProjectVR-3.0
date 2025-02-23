@@ -224,9 +224,9 @@ public class NetworkedFishAI : NetworkBehaviour
         currentHook = activeHooks[hookIndex];
         activeHooks = GetActiveHooks();
 
-        Debug.Log($"Caught Something: {currentHook.GetComponent<FishingHook>().caughtSomething.Value}");
-        Debug.Log($"Caught Object not me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
-        Debug.Log($"Is an activeHook: {activeHooks.Contains(currentHook)}");
+        //Debug.Log($"Caught Something: {currentHook.GetComponent<FishingHook>().caughtSomething.Value}");
+        //Debug.Log($"Caught Object not me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
+        //Debug.Log($"Is an activeHook: {activeHooks.Contains(currentHook)}");
 
         if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
         {
@@ -237,9 +237,9 @@ public class NetworkedFishAI : NetworkBehaviour
         }
         else
         {
-            Debug.Log($"{name} is baited lol");
+            //Debug.Log($"{name} is baited lol");
             target = currentHook.transform.position;
-            Debug.Log("The position: " + target);
+            //Debug.Log("The position: " + target);
             MoveServerRpc(target);
         }
     }
@@ -389,6 +389,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log($"{name} has touched the {collision.transform.parent.name}");
         if (collision.gameObject.tag == "Hook")
         {
             Debug.Log($"{name} has touched the {collision.transform.parent.name}");
@@ -399,11 +400,12 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //if (other.gameObject.tag == "Hook")
-        //{
-        //    Debug.Log($"{name} has touched the {other.transform.parent.name}");
-        //    //SetFishStateServerRpc(FishState.Struggle);
-        //}
+        Debug.Log(other.transform.parent.name);
+        if (other.gameObject.tag == "Hook")
+        {
+            Debug.Log($"{name} has touched the {other.transform.parent.name}");
+            //SetFishStateServerRpc(FishState.Struggle);
+        }
 
         if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
         {

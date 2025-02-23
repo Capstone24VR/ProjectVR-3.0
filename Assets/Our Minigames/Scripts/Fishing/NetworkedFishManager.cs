@@ -175,7 +175,7 @@ namespace XRMultiplayer.MiniGames
             if (IsServer)
             {
                 currFish = fishPool.transform.childCount;
-                if (currFish <= maxFish)
+                if (currFish < maxFish)
                 {
 
                     float currentCheck = 0f;
