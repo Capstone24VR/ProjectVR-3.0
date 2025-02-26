@@ -39,9 +39,15 @@ public class Card : NetworkBehaviour
 
     [SerializeField] protected Vector3 _position = Vector3.zero;
     [SerializeField] protected Vector3 _localScale = Vector3.one;
-
+    
     private XRGrabInteractable _xrInteract;
     private NetworkedCards _cardManager;
+
+    private AudioSource _cardSFX;
+
+    [Header("Sound Clips")]
+    [SerializeField] private AudioClip _cardPickup;
+    [SerializeField] private AudioClip _cardRelease;
 
     public void Awake()
     {
@@ -49,6 +55,7 @@ public class Card : NetworkBehaviour
         _xrInteract = GetComponent<XRGrabInteractable>();
 
         _cardManager = FindAnyObjectByType<NetworkedCards>();
+        _cardSFX = GetComponent<AudioSource>();
     }
 
     public void SetPosition(Vector3 position)
@@ -88,6 +95,11 @@ public class Card : NetworkBehaviour
         transform.localScale = newScale;
     }
 
+    public void PlaySFX(int sfx)
+    {
+        PlaySFXClientRpc(sfx);
+    }
+
     // ServerRpc to inform the server about the hover select event
     [ServerRpc(RequireOwnership = false)]
     private void HoverSelectServerRpc()
@@ -104,6 +116,12 @@ public class Card : NetworkBehaviour
         HoverDeSelectClientRpc();
     }
 
+    //[ServerRpc(RequireOwnership = false)]
+    //private void PlaySFXServerRpc()
+    //{
+    //    PlaySFXClientRpc();
+    //}
+
     // ClientRpc to apply hover select on all clients
     [ClientRpc]
     private void HoverSelectClientRpc()
@@ -116,6 +134,22 @@ public class Card : NetworkBehaviour
     private void HoverDeSelectClientRpc()
     {
         ScaleCard(_localScale); // Apply hover deselect effect on all clients
+    }
+
+    [ClientRpc]
+    private void PlaySFXClientRpc(int clip)
+    {
+        switch (clip)
+        {
+            case 0:
+                _cardSFX.clip = _cardPickup;
+                break;
+            case 1:
+                _cardSFX.clip = _cardRelease;
+                break;
+        }
+
+        _cardSFX.Play();
     }
 
     public void SetCardInteractive(bool value)
@@ -151,6 +185,7 @@ public class Card : NetworkBehaviour
     {
         if(IsSpawned)
             HoverDeSelect();
+            PlaySFX(0); // 0 indicates pickup SFX
     }
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)

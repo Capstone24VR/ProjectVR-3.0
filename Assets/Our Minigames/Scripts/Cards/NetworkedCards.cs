@@ -72,6 +72,7 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] protected List<NetworkedHand> activeHands = new List<NetworkedHand>();
 
         [SerializeField] private MiniGameManager miniManager;
+        [SerializeField] private ParticleSystem _playCardEffect;
 
         void Start()
         {
@@ -815,6 +816,7 @@ namespace XRMultiplayer.MiniGames
 
                         SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
                         SetCardActiveClientRpc(oldTopCardReference.NetworkObjectId, false);
+                        PlayCardEffectClientRpc();
 
                         UpdateCurrentIndexServerRpc();
                     }
@@ -831,6 +833,13 @@ namespace XRMultiplayer.MiniGames
                 cardNetworkObject.GetComponent<Card>().SetPosition(Vector3.zero);
                 cardNetworkObject.GetComponent<Card>().ResetPosition();
             }
+        }
+
+        [ClientRpc]
+        private void PlayCardEffectClientRpc()
+        {
+
+            _playCardEffect.Play();
         }
 
         protected bool IsValidPlayCrazyEights(GameObject card)
