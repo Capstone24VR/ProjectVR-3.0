@@ -9,22 +9,10 @@ namespace XRMultiplayer
     [RequireComponent(typeof(Collider))]
     public class CardOwnerManager : MonoBehaviour
     {
-        [SerializeField]
-        private long _cardOwnerId = -1; // Backing field for the player ID of the owner of this card
         public ulong cardOwnerId = 9999;
 
-        public long CardOwnerId
-        {
-            get => _cardOwnerId;
-            private set
-            {
-                _cardOwnerId = value;
-                //Debug.Log($"Card owner ID changed to {CardOwnerId}");
-            }
-        }
-
         private MiniGameManager miniGameManager; // Reference to MiniGameManager
-        [SerializeField] private HandOwnerManager handOwnerManager; // Reference to HandOwnerManager (parent object)
+        [SerializeField] private NetworkedHand hand; // Reference to HandOwnerManager (parent object)
         private Card card; // Reference to the Card component on this object
 
         [SerializeField] private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable; // Manually assign this in the Inspector
@@ -67,33 +55,19 @@ namespace XRMultiplayer
             {
                 if (card.inHand)
                 {
-
                     // Now attempt to get the HandOwnerManager from the new parent (player's hand)
-                    handOwnerManager = GetComponentInParent<HandOwnerManager>();
-                    if (handOwnerManager != null)
-                    {
-                        SetCardOwnerId(handOwnerManager.TestID);  // Set the CardOwnerId
-                    }
-                    else
-                    {
-                        //Debug.LogError("HandOwnerManager not found on parent.");
-                    }
+                    hand = GetComponentInParent<NetworkedHand>();
+                    if (hand != null)
+                        cardOwnerId = hand.ownerID;
                 }
                 else
-                {
-                    SetCardOwnerId(9999);
-                }
+                    cardOwnerId = 9999;
 
                 // Update the cached inHand state
                 previousInHandState = card.inHand;
             }
         }
 
-        public void SetCardOwnerId(ulong newOwnerId)
-        {
-            cardOwnerId = newOwnerId;
-            //Debug.Log($"CardOwnerManager: Card owner ID set to {CardOwnerId}");
-        }
 
         // This method is triggered when the card is grabbed
         private void OnCardGrabbed(SelectEnterEventArgs args)
@@ -101,16 +75,16 @@ namespace XRMultiplayer
             if (miniGameManager != null)
             {
                 ulong interactingPlayerId = NetworkManager.Singleton.LocalClientId;
-                //Debug.Log($"Player with ID {interactingPlayerId} is interacting with the card.");
+                Debug.Log($"Player with ID {interactingPlayerId} is interacting with the card.");
 
                 // Check if the player is allowed to interact with the card
-                if (IsOwner(interactingPlayerId) || CardOwnerId == 9999)
+                if (IsOwner(interactingPlayerId) || cardOwnerId == 9999)
                 {
-                    //Debug.Log($"Player with ID {interactingPlayerId} is the owner and can interact with the card.");
+                    Debug.Log($"Player with ID {interactingPlayerId} is the owner and can interact with the card.");
                 }
                 else
                 {
-                    //Debug.Log($"Player with ID {interactingPlayerId} is NOT the owner and cannot interact with the card.");
+                    Debug.Log($"Player with ID {interactingPlayerId} is NOT the owner and cannot interact with the card.");
                     //DisableInteraction();
                 }
             }
