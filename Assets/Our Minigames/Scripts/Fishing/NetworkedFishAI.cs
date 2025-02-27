@@ -112,7 +112,6 @@ public class NetworkedFishAI : NetworkBehaviour
                 baited = false;
                 ChooseNewRandomposition();
             }
-            Debug.Log("Erm");
             SetFishStateServerRpc(FishState.Wander);
         }
         switch (state.Value)
@@ -269,7 +268,6 @@ public class NetworkedFishAI : NetworkBehaviour
 
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
-            Debug.Log("IOMG");
             _xrInteract.enabled = true;
             rb.useGravity = true;
             rb.isKinematic = false;
@@ -290,7 +288,7 @@ public class NetworkedFishAI : NetworkBehaviour
             {
                 _xrInteract.enabled = false;
             }
-            MoveServerRpc(currentHook.position);
+            FollowHookServerRpc(currentHook.position);
         }
         //ErraticMove(3f);
     }
@@ -355,6 +353,13 @@ public class NetworkedFishAI : NetworkBehaviour
         MoveClientRpc(transform.position, target);
     }
 
+    [ServerRpc]
+    private void FollowHookServerRpc(Vector3 target)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, target, 6);
+        MoveClientRpc(transform.position, target);
+    }
+
     [ClientRpc]
     private void MoveClientRpc(Vector3 newPosition, Vector3 lookAt)
     {
@@ -381,9 +386,13 @@ public class NetworkedFishAI : NetworkBehaviour
     private void OnGrab(SelectEnterEventArgs args)
     {
         Debug.Log($"{gameObject.name} was grabbed.");
-        currentHook.GetComponent<FishingHook>().caughtObject = null;
-        currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
-        currentHook.GetComponentInParent<NewFishingRod>().ResetCast();
+        if(currentHook != null)
+        {
+            currentHook.GetComponent<FishingHook>().caughtObject = null;
+            currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+            currentHook.GetComponentInParent<NewFishingRod>().ResetCast();
+        }
+  
         currentHook = null;
         rb.useGravity = true;
         rb.isKinematic = true;

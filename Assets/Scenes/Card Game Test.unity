@@ -9099,6 +9099,11 @@ PrefabInstance:
         fish and place it in the cooler to get points! The player with the most points
         wins"
       objectReference: {fileID: 0}
+    - target: {fileID: 624387409617875518, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1068386401887549353, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -9127,6 +9132,21 @@ PrefabInstance:
     - target: {fileID: 1068386401887549353, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1098310353493950883, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1155014307585652383, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1155014307585652383, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1183797159916727719, guid: 58a3d193185889e49a6d65fbf78a0acc,
@@ -9234,6 +9254,11 @@ PrefabInstance:
       propertyPath: m_ProvidesContacts
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2621471401235726808, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2680909843033418947, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -9334,6 +9359,11 @@ PrefabInstance:
       propertyPath: m_ExcludeLayers.m_Bits
       value: 257
       objectReference: {fileID: 0}
+    - target: {fileID: 5553084499324531812, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5741572789870646446, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_TagString
@@ -9393,6 +9423,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_GameType
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885178737153088735, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Convex
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5933746153448013460, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -9557,7 +9592,7 @@ PrefabInstance:
     - target: {fileID: 8138416516428890460, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: maxFish
-      value: 1
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8138416516428890460, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
