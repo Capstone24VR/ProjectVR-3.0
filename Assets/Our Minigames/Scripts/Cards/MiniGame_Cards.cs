@@ -89,7 +89,7 @@ namespace XRMultiplayer.MiniGames
 
             if (m_MiniGameManager.IsServer)
             {
-                if (XRINetworkGameManager.Instance.GetPlayerByID(winner.ownerManager.TestID, out XRINetworkPlayer player))
+                if (XRINetworkGameManager.Instance.GetPlayerByID(winner.ownerID, out XRINetworkPlayer player))
                 {
                     if (scores.ContainsKey(player)){
 
@@ -100,7 +100,7 @@ namespace XRMultiplayer.MiniGames
                         scores.Add(player, 1);
                     }
 
-                    m_MiniGameManager.SubmitScoreServerRpc(scores[player], winner.ownerManager.TestID);
+                    m_MiniGameManager.SubmitScoreServerRpc(scores[player], winner.ownerID);
                 }
             }
 

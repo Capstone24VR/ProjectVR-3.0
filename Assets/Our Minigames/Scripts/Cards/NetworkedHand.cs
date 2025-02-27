@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using XRMultiplayer;
 
 [System.Serializable]
 public class NetworkedHand : NetworkBehaviour
@@ -16,9 +17,14 @@ public class NetworkedHand : NetworkBehaviour
     [SerializeField] public bool active = true;
 
     /// <summary>
-    /// Manager for who can use the hand.
+    /// The Id for who can use the hand.
     /// </summary>
-    public HandOwnerManager ownerManager;
+    public ulong ownerID;
+
+    /// <summary>
+    /// Handles seatTrigger Nonsense
+    /// </summary>
+    public SeatHandler seatHandler;
 
     /// <summary>
     /// How close each card should be

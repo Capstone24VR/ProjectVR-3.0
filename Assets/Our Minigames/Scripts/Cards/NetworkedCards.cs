@@ -84,8 +84,8 @@ namespace XRMultiplayer.MiniGames
 
             for (int i = 0; i < m_hands.Length; i++)
             {
-                m_hands[i].ownerManager.seatHandler.handIndex = i;
-                m_hands[i].ownerManager.seatHandler.OnTriggerReadyState += TriggerReadyState;
+                m_hands[i].seatHandler.handIndex = i;
+                m_hands[i].seatHandler.OnTriggerReadyState += TriggerReadyState;
             }
         }
 
@@ -104,7 +104,7 @@ namespace XRMultiplayer.MiniGames
             if (!gameStarted)
             {
                 m_hands[index].active = isReady;
-                m_hands[index].ownerManager.TestID = clientId;
+                m_hands[index].ownerID = clientId;
                 ToggleHandReadyClientRpc(clientId, isReady, index);
             }
         }
@@ -114,7 +114,7 @@ namespace XRMultiplayer.MiniGames
         {
             Debug.Log($"Synching Clients: Client: {clientId} toggling Hand {index} to {isReady}");
             m_hands[index].active = isReady;
-            m_hands[index].ownerManager.TestID = clientId;
+            m_hands[index].ownerID = clientId;
         }
 
 
@@ -177,7 +177,7 @@ namespace XRMultiplayer.MiniGames
         {
             foreach (var hand in m_hands)
             {
-                hand.ownerManager.seatHandler.GetComponentInParent<TeleportationAnchor>().GetComponentInChildren<UIComponentToggler>().gameObject.SetActive(toggle);
+                hand.seatHandler.GetComponentInParent<TeleportationAnchor>().GetComponentInChildren<UIComponentToggler>().gameObject.SetActive(toggle);
             }
 
         }
@@ -666,7 +666,7 @@ namespace XRMultiplayer.MiniGames
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
 
             // Check if it is said players turn to draw [Comment out if you want to play solo]
-            if (activeHands[currentHandIndex].ownerManager.TestID != NetworkManager.Singleton.LocalClientId)
+            if (activeHands[currentHandIndex].ownerID != NetworkManager.Singleton.LocalClientId)
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId} turn!");
                 string message = "It is not your turn to draw!";
@@ -893,8 +893,8 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
-            Debug.Log($"Current Hand owner id: {activeHands[oldIndex].ownerManager.TestID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
-            if (activeHands[oldIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            Debug.Log($"Current Hand owner id: {activeHands[oldIndex].ownerID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            if (activeHands[oldIndex].ownerID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -907,9 +907,9 @@ namespace XRMultiplayer.MiniGames
             currentHandIndex = newIndex;
 
 
-            Debug.Log($"New Hand owner id: {activeHands[currentHandIndex].ownerManager.TestID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            Debug.Log($"New Hand owner id: {activeHands[currentHandIndex].ownerID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
 
-            if (activeHands[currentHandIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId)
+            if (activeHands[currentHandIndex].ownerID == NetworkManager.Singleton.LocalClientId)
             {
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -1024,7 +1024,7 @@ namespace XRMultiplayer.MiniGames
         {
             foreach (var hand in m_hands)
             {
-                hand.ownerManager.seatHandler.OnTriggerReadyState -= TriggerReadyState;
+                hand.seatHandler.OnTriggerReadyState -= TriggerReadyState;
             }
         }
     }

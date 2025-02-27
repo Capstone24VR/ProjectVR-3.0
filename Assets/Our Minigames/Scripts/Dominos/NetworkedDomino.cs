@@ -1092,9 +1092,9 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
-            if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
-                Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.ClientID}");
+                Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.TestID}");
 
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -1109,9 +1109,9 @@ namespace XRMultiplayer.MiniGames
             if (newIndex >= 0 && newIndex < activeHands.Count)
             {
                 currentHandIndex = newIndex;
-                Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerManager.ClientID}");
+                Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerManager.TestID}");
 
-                if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
+                if (activeHands[currentHandIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId)
                 {
                     if (m_CurrentMessageRoutine != null)
                     {
