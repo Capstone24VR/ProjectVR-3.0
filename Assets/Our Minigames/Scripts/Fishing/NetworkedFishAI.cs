@@ -320,16 +320,22 @@ public class NetworkedFishAI : NetworkBehaviour
         rb.isKinematic = false;
         _xrInteract.enabled = true;
 
-        //if(transform.position.y < waterHeight-0.3)
-        //{
-        //    rb.useGravity = false;
-        //    rb.isKinematic = false;
-        //    _xrInteract.enabled = false;
-        //    Debug.Log("Caught to wander");
-        //    SetFishStateServerRpc(FishState.Wander);
-        //}
+        if (transform.position.y < waterHeight - 1)
+        {
+            ResetFish();
+            SetFishStateServerRpc(FishState.Wander);
+        }
     }
 
+
+    void ResetFish()
+    {
+        rb.useGravity = false;
+        rb.isKinematic = false;
+        _xrInteract.enabled = false;
+        rb.velocity = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+    }
 
     //void Startled()
     //{
@@ -396,9 +402,7 @@ public class NetworkedFishAI : NetworkBehaviour
         if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
         {
             Debug.Log("Somehow touched water trigger");
-            rb.useGravity = false;
-            rb.isKinematic = false;
-            _xrInteract.enabled = false;
+            ResetFish();
             SetFishStateServerRpc(FishState.Wander);
         }
 
