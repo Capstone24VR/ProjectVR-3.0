@@ -2497,7 +2497,7 @@ MonoBehaviour:
   underwater:
     m_InternalValue: 0
   uprightTorqueStrength: 10
-  splashSFX: {fileID: 0}
+  splashSFX: {fileID: 8398983950364876484}
   minSplashVelocity: 3
 --- !u!114 &8561199845938542332
 MonoBehaviour:

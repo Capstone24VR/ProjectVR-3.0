@@ -1865,7 +1865,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3619692493702732211}
   - component: {fileID: 3217680987139134583}
-  - component: {fileID: 2448177125459441810}
   - component: {fileID: 8210478412973625272}
   m_Layer: 0
   m_Name: Hand1
@@ -1903,21 +1902,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _xOffset: 0.1
   bunching: 0.12
---- !u!114 &2448177125459441810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1121429926642718499}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff6e66c3bc7ac4449fb15e5c9650ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _handOwnerId: -2
-  TestID: 9999
-  seatHandler: {fileID: 1464560885245823502}
 --- !u!114 &8210478412973625272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1933,7 +1917,7 @@ MonoBehaviour:
   maxCards: 9999
   active: 0
   ownerID: 0
-  seatHandler: {fileID: 0}
+  seatHandler: {fileID: 1464560885245823502}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &1130388963677982382
@@ -5532,7 +5516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 380579746
+  GlobalObjectIdHash: 60182095
   InScenePlacedSourceGlobalObjectIdHash: 972031874
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -6487,7 +6471,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6878371031456107215}
   - component: {fileID: 2378326456123441178}
-  - component: {fileID: 7005988922746108436}
   - component: {fileID: 9019743253576399132}
   m_Layer: 0
   m_Name: Hand2
@@ -6525,21 +6508,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _xOffset: 0.1
   bunching: 0.12
---- !u!114 &7005988922746108436
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6399144878095114301}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff6e66c3bc7ac4449fb15e5c9650ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _handOwnerId: -2
-  TestID: 9999
-  seatHandler: {fileID: 7952287907531958978}
 --- !u!114 &9019743253576399132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6555,7 +6523,7 @@ MonoBehaviour:
   maxCards: 9999
   active: 0
   ownerID: 0
-  seatHandler: {fileID: 0}
+  seatHandler: {fileID: 7952287907531958978}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &6444485540900342425
@@ -7693,7 +7661,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8897903121794697365}
   - component: {fileID: 8145768873166685355}
-  - component: {fileID: 7910696088979206178}
   - component: {fileID: 587244399508225944}
   m_Layer: 0
   m_Name: Hand4
@@ -7731,21 +7698,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _xOffset: 0.1
   bunching: 0.12
---- !u!114 &7910696088979206178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7026339669944766029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff6e66c3bc7ac4449fb15e5c9650ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _handOwnerId: -2
-  TestID: 9999
-  seatHandler: {fileID: 4370140628277816567}
 --- !u!114 &587244399508225944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7761,7 +7713,7 @@ MonoBehaviour:
   maxCards: 9999
   active: 0
   ownerID: 0
-  seatHandler: {fileID: 0}
+  seatHandler: {fileID: 4370140628277816567}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &7076568236661814040
@@ -9493,7 +9445,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1189080129819166772}
   - component: {fileID: 5928043075072778431}
-  - component: {fileID: 6183062544163982714}
   - component: {fileID: 2253780174552333039}
   m_Layer: 0
   m_Name: Hand3
@@ -9531,21 +9482,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _xOffset: 0.1
   bunching: 0.12
---- !u!114 &6183062544163982714
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8483534692503510103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff6e66c3bc7ac4449fb15e5c9650ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _handOwnerId: -2
-  TestID: 9999
-  seatHandler: {fileID: 8399329142115475429}
 --- !u!114 &2253780174552333039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9561,7 +9497,7 @@ MonoBehaviour:
   maxCards: 9999
   active: 0
   ownerID: 0
-  seatHandler: {fileID: 0}
+  seatHandler: {fileID: 8399329142115475429}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &8494727692186573962

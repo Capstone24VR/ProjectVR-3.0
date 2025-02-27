@@ -3316,32 +3316,10 @@ PrefabInstance:
       propertyPath: seatHandler
       value: 
       objectReference: {fileID: 173494368}
-    - target: {fileID: 2759488708728784206, guid: 71a39736388285d409d5ee9502f0901f,
-        type: 3}
-      propertyPath: m_GameType
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3531178947710221530, guid: 71a39736388285d409d5ee9502f0901f,
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 60182095
-      objectReference: {fileID: 0}
-    - target: {fileID: 5178899802028235783, guid: 71a39736388285d409d5ee9502f0901f,
-        type: 3}
-      propertyPath: m_text
-      value: "<b><u>Game Rules</u></b>\n\nMove to the start position to begin the
-        countdown. \n\nYou start with 3 Dominoes. The player with the highest double
-        starts, if there are no doubles, the player with the piece with the highest
-        combined total starts\n\nGoing clockwise, each player take turns playing
-        a domino on the *ENDS*. You can play off the sides of the ends but it has
-        to be on the ends. \n\nIf you cannot play a domino, draw dominoes until you
-        have one that you can play.\n\nThe first player to play all their dominoes
-        win"
-      objectReference: {fileID: 0}
-    - target: {fileID: 5276148540437052329, guid: 71a39736388285d409d5ee9502f0901f,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 330
       objectReference: {fileID: 0}
     - target: {fileID: 5282048978985738646, guid: 71a39736388285d409d5ee9502f0901f,
         type: 3}
@@ -3363,11 +3341,7 @@ PrefabInstance:
       propertyPath: seatHandler
       value: 
       objectReference: {fileID: 1906739617}
-    m_RemovedComponents:
-    - {fileID: 7005988922746108436, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
-    - {fileID: 7910696088979206178, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
-    - {fileID: 6183062544163982714, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
-    - {fileID: 2448177125459441810, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4097,7 +4071,7 @@ PrefabInstance:
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.51
+      value: -0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -4107,27 +4081,27 @@ PrefabInstance:
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -50.1
+      value: -49.23
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: -0.23147826
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -1
+      value: -0.97284013
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -4137,7 +4111,7 @@ PrefabInstance:
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -180
+      value: -206.768
       objectReference: {fileID: 0}
     - target: {fileID: 5764492501415091734, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}

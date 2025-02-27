@@ -92,10 +92,10 @@ namespace XRMultiplayer.MiniGames
             names.Add("Packer");
 
 
-            minSpawnX = fishPool.transform.position.x - (40 / 2);
-            maxSpawnX = fishPool.transform.position.x + (40 / 2);
-            minSpawnZ = fishPool.transform.position.z - (40 / 2);
-            maxSpawnZ = fishPool.transform.position.z + (40 / 2);
+            minSpawnX = fishPool.transform.position.x - (25 / 2);
+            maxSpawnX = fishPool.transform.position.x + (25 / 2);
+            minSpawnZ = fishPool.transform.position.z - (25 / 2);
+            maxSpawnZ = fishPool.transform.position.z + (25 / 2);
         }
 
         private void Update()
