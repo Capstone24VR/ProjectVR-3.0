@@ -50,6 +50,7 @@ public class Card : NetworkBehaviour
     [Header("Sound Clips")]
     [SerializeField] private AudioClip _cardPickup;
     [SerializeField] private AudioClip _cardRelease;
+    [SerializeField] private AudioClip _cardPlayed;
 
     public void Awake()
     {
@@ -175,6 +176,9 @@ public class Card : NetworkBehaviour
                 break;
             case 1:
                 _cardSFX.clip = _cardRelease;
+                break;
+            case 2:
+                _cardSFX.clip = _cardPlayed;
                 break;
         }
 

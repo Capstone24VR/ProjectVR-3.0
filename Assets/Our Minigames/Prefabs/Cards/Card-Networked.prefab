@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2903874211
+  GlobalObjectIdHash: 601723046
   InScenePlacedSourceGlobalObjectIdHash: 2609386950
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -357,6 +357,7 @@ MonoBehaviour:
   _localScale: {x: 0, y: 0, z: 0}
   _cardPickup: {fileID: 8300000, guid: 163adbb42d5ef83469567f46fa13f0cf, type: 3}
   _cardRelease: {fileID: 8300000, guid: 064cd5dba90549f42a118c33f2ec65b8, type: 3}
+  _cardPlayed: {fileID: 8300000, guid: 5310bce827b64f741b1638fa65a35341, type: 3}
 --- !u!114 &6056674718462824903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,8 +370,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b825686309853714fbf023d0f066d8d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardOwnerId: -1
-  handOwnerManager: {fileID: 0}
+  cardOwnerId: 9999
+  hand: {fileID: 0}
   grabInteractable: {fileID: 5917317354783822192}
 --- !u!82 &86731496040679410
 AudioSource:

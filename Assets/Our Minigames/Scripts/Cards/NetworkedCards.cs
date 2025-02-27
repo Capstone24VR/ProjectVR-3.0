@@ -249,6 +249,8 @@ namespace XRMultiplayer.MiniGames
                             Debug.Log("FATAL ERROR: Card not found at start");
                         }
                     }
+
+                    hand.ConfigureChildPositions();
                 }
             }
 
@@ -771,6 +773,7 @@ namespace XRMultiplayer.MiniGames
 
             if (networkObject != null)
             {
+                networkObject.gameObject.GetComponent<Card>().PlaySFXAll(2);
                 PlayCardServerRpc(networkObjectId);
             }
             else
