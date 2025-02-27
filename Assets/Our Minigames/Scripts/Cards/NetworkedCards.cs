@@ -88,29 +88,29 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        void TriggerReadyState(Collider other, bool entered, int handIndex)
+        void TriggerReadyState(Collider other, ulong clientId, bool entered, int handIndex)
         {
             if (other.TryGetComponent(out CharacterController controller))
             {
-                ToggleHandReadyServerRpc(entered, handIndex);
+                ToggleHandReadyServerRpc(clientId, entered, handIndex);
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        void ToggleHandReadyServerRpc(bool isReady, int index)
+        void ToggleHandReadyServerRpc(ulong clientId, bool isReady, int index)
         {
-            Debug.Log($"Server recieved request: Toggling Hand {index} to {isReady}");
+            Debug.Log($"Server recieved request: Client: {clientId} toggling Hand {index} to {isReady}");
             if (!gameStarted)
             {
                 m_hands[index].active = isReady;
-                ToggleHandReadyClientRpc(isReady, index);
+                ToggleHandReadyClientRpc(clientId, isReady, index);
             }
         }
 
         [ClientRpc]
-        void ToggleHandReadyClientRpc(bool isReady, int index)
+        void ToggleHandReadyClientRpc(ulong clientId, bool isReady, int index)
         {
-            Debug.Log($"Synching Clients: toggling Hand {index} to {isReady}");
+            Debug.Log($"Synching Clients: Client: {clientId} toggling Hand {index} to {isReady}");
             m_hands[index].active = isReady;
         }
 
