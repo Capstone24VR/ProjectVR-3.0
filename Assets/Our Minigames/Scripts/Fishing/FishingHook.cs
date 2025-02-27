@@ -15,17 +15,12 @@ public class FishingHook : NetworkBehaviour
         //}
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.gameObject.name);
         if (other.gameObject.tag == "Fish")
         {
             if (!caughtSomething.Value)
             {
-                //caughtObject = other.transform.parent.gameObject;
-                //caughtObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle); 
-                //caughtSomething.Value = true;
-
                 ulong fishNetworkId = other.transform.parent.GetComponent<NetworkObject>().NetworkObjectId;
                 CatchFishServerRpc(fishNetworkId);
 

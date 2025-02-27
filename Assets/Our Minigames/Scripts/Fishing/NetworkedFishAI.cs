@@ -112,6 +112,7 @@ public class NetworkedFishAI : NetworkBehaviour
                 baited = false;
                 ChooseNewRandomposition();
             }
+            Debug.Log("Erm");
             SetFishStateServerRpc(FishState.Wander);
         }
         switch (state.Value)
@@ -224,10 +225,6 @@ public class NetworkedFishAI : NetworkBehaviour
         currentHook = activeHooks[hookIndex];
         activeHooks = GetActiveHooks();
 
-        //Debug.Log($"Caught Something: {currentHook.GetComponent<FishingHook>().caughtSomething.Value}");
-        //Debug.Log($"Caught Object not me: {currentHook.GetComponent<FishingHook>().caughtObject != this}");
-        //Debug.Log($"Is an activeHook: {activeHooks.Contains(currentHook)}");
-
         if (currentHook.GetComponent<FishingHook>().caughtSomething.Value && currentHook.GetComponent<FishingHook>().caughtObject != this || !activeHooks.Contains(currentHook))
         {
             Debug.Log($"{name} is no longer baited");
@@ -237,9 +234,7 @@ public class NetworkedFishAI : NetworkBehaviour
         }
         else
         {
-            //Debug.Log($"{name} is baited lol");
             target = currentHook.transform.position;
-            //Debug.Log("The position: " + target);
             MoveServerRpc(target);
         }
     }
@@ -265,6 +260,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
             if(transform.position.y < waterHeight)
             {
+                Debug.Log("Struggle to wander");
                 SetFishStateServerRpc(FishState.Wander);
             }
             return;
@@ -320,13 +316,18 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Caught()
     {
-        if(transform.position.y < waterHeight-0.1)
-        {
-            rb.useGravity = false;
-            rb.isKinematic = false;
-            _xrInteract.enabled = false;
-            SetFishStateServerRpc(FishState.Wander);
-        }
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        _xrInteract.enabled = true;
+
+        //if(transform.position.y < waterHeight-0.3)
+        //{
+        //    rb.useGravity = false;
+        //    rb.isKinematic = false;
+        //    _xrInteract.enabled = false;
+        //    Debug.Log("Caught to wander");
+        //    SetFishStateServerRpc(FishState.Wander);
+        //}
     }
 
 
@@ -373,11 +374,13 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
+        Debug.Log($"{gameObject.name} was grabbed.");
         currentHook.GetComponent<FishingHook>().caughtObject = null;
         currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+        currentHook.GetComponentInParent<NewFishingRod>().ResetCast();
         currentHook = null;
         rb.useGravity = true;
-        rb.isKinematic = false;
+        rb.isKinematic = true;
         SetFishStateServerRpc(FishState.Caught);   
     }
 
@@ -387,28 +390,15 @@ public class NetworkedFishAI : NetworkBehaviour
         GetComponent<NetworkObject>().Despawn(true);
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log($"{name} has touched the {collision.transform.parent.name}");
-        if (collision.gameObject.tag == "Hook")
-        {
-            Debug.Log($"{name} has touched the {collision.transform.parent.name}");
-            //SetFishStateServerRpc(FishState.Caught);
-        }
-    }
-
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.transform.parent.name);
-        if (other.gameObject.tag == "Hook")
-        {
-            Debug.Log($"{name} has touched the {other.transform.parent.name}");
-            //SetFishStateServerRpc(FishState.Struggle);
-        }
-
         if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
         {
+            Debug.Log("Somehow touched water trigger");
+            rb.useGravity = false;
+            rb.isKinematic = false;
+            _xrInteract.enabled = false;
             SetFishStateServerRpc(FishState.Wander);
         }
 

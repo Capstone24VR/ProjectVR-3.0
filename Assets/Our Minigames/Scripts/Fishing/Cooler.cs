@@ -12,7 +12,6 @@ public class Cooler : NetworkBehaviour
 
     public void OnFishCatch(ulong networkObjectId)
     {
-        Debug.Log("Here!");
         NetworkObject newFish = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
 
         if(newFish != null)

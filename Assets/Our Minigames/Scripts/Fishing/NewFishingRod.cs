@@ -181,7 +181,7 @@ public class NewFishingRod : NetworkBehaviour
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
-    void ResetCast()
+    public void ResetCast()
     {
         floater.mass = 1;
         floater.useGravity = false;

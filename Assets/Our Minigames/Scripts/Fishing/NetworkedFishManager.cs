@@ -98,7 +98,10 @@ namespace XRMultiplayer.MiniGames
             maxSpawnZ = fishPool.transform.position.z + (40 / 2);
         }
 
-
+        private void Update()
+        {
+            currFish = fishPool.childCount;
+        }
 
 
         IEnumerator WaitForClientConnection()
@@ -281,6 +284,8 @@ namespace XRMultiplayer.MiniGames
                     }
                 }
                 _spawnedFish.Clear();
+
+                currFish = 0;
             }
         }
 
