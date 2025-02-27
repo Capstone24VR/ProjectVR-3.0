@@ -103,6 +103,11 @@ public class Card : NetworkBehaviour
         PlaySFXServerRpc(clip, clientId);
     }
 
+    public void PlaySFXAll(int clip)
+    {
+        PlaySFXAllServerRpc(clip);
+    }
+
     // ServerRpc to inform the server about the hover select event
     [ServerRpc(RequireOwnership = false)]
     private void HoverSelectServerRpc()
@@ -145,18 +150,35 @@ public class Card : NetworkBehaviour
     {
         if (NetworkManager.Singleton.LocalClientId == clientId)
         {
-            switch (clip)
-            {
-                case 0:
-                    _cardSFX.clip = _cardPickup;
-                    break;
-                case 1:
-                    _cardSFX.clip = _cardRelease;
-                    break;
-            }
-
-            _cardSFX.Play();
+            PlayAudioClip(clip);
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaySFXAllServerRpc(int clip)
+    {
+        PlaySFXAllClientRpc(clip);
+    }
+
+
+    [ClientRpc]
+    private void PlaySFXAllClientRpc(int clip)
+    {
+        PlayAudioClip(clip);
+    }
+
+    private void PlayAudioClip(int clip) {
+        switch (clip)
+        {
+            case 0:
+                _cardSFX.clip = _cardPickup;
+                break;
+            case 1:
+                _cardSFX.clip = _cardRelease;
+                break;
+        }
+
+        _cardSFX.Play();
     }
 
     public void SetCardInteractive(bool value)
