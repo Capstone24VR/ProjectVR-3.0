@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using XRMultiplayer;
 using XRMultiplayer.MiniGames;
 
 public class Card : NetworkBehaviour
@@ -185,13 +186,16 @@ public class Card : NetworkBehaviour
     {
         if(IsSpawned)
             HoverDeSelect();
-            PlaySFX(0); // 0 indicates pickup SFX
+        if(GetComponent<CardOwnerManager>().cardOwnerId == NetworkManager.Singleton.LocalClientId)
+            PlaySFXClientRpc(0); // 0 indicates pickup SFX
     }
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)
     {
         if (IsSpawned)
         {
+            if (inHand)
+                PlaySFXClientRpc(1);
             ResetPosition();
             HoverDeSelect();
             _cardManager.RequestDrawCard(gameObject);
