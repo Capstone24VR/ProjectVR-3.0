@@ -235,8 +235,8 @@ Transform:
   - {fileID: 1969170444382368025}
   - {fileID: 6879806280617351827}
   - {fileID: 3619692493702732211}
-  - {fileID: 1189080129819166772}
   - {fileID: 6878371031456107215}
+  - {fileID: 1189080129819166772}
   - {fileID: 8897903121794697365}
   - {fileID: 6307573107940707815}
   m_Father: {fileID: 3344833824025362781}
@@ -1916,7 +1916,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _handOwnerId: -2
-  _localClientId: 9999
+  TestID: 9999
   seatHandler: {fileID: 1464560885245823502}
 --- !u!114 &8210478412973625272
 MonoBehaviour:
@@ -1932,7 +1932,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCards: 9999
   active: 0
-  ownerManager: {fileID: 2448177125459441810}
+  ownerID: 0
+  seatHandler: {fileID: 0}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &1130388963677982382
@@ -5531,7 +5532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1017053273
+  GlobalObjectIdHash: 380579746
   InScenePlacedSourceGlobalObjectIdHash: 972031874
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -6537,7 +6538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _handOwnerId: -2
-  _localClientId: 9999
+  TestID: 9999
   seatHandler: {fileID: 7952287907531958978}
 --- !u!114 &9019743253576399132
 MonoBehaviour:
@@ -6553,7 +6554,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCards: 9999
   active: 0
-  ownerManager: {fileID: 7005988922746108436}
+  ownerID: 0
+  seatHandler: {fileID: 0}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &6444485540900342425
@@ -7742,7 +7744,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _handOwnerId: -2
-  _localClientId: 9999
+  TestID: 9999
   seatHandler: {fileID: 4370140628277816567}
 --- !u!114 &587244399508225944
 MonoBehaviour:
@@ -7758,7 +7760,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCards: 9999
   active: 0
-  ownerManager: {fileID: 7910696088979206178}
+  ownerID: 0
+  seatHandler: {fileID: 0}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &7076568236661814040
@@ -9541,7 +9544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _handOwnerId: -2
-  _localClientId: 9999
+  TestID: 9999
   seatHandler: {fileID: 8399329142115475429}
 --- !u!114 &2253780174552333039
 MonoBehaviour:
@@ -9557,7 +9560,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCards: 9999
   active: 0
-  ownerManager: {fileID: 6183062544163982714}
+  ownerID: 0
+  seatHandler: {fileID: 0}
   bunching: 0.12
   heldDominosObj: []
 --- !u!1 &8494727692186573962

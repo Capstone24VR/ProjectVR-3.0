@@ -255,6 +255,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1091854621}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &173494368 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8399329142115475429, guid: 71a39736388285d409d5ee9502f0901f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279626534}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7acce6b4926d0ac4b9d6cfe6624b8f0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &192015816
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,6 +395,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ResetTransform: {fileID: 1519829579}
+--- !u!114 &218112515 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1464560885245823502, guid: 71a39736388285d409d5ee9502f0901f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279626534}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7acce6b4926d0ac4b9d6cfe6624b8f0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &261513340 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6208097378541615985, guid: 1168545f41604bf438a112291fd57ce0,
@@ -3394,6 +3418,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 587244399508225944, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: seatHandler
+      value: 
+      objectReference: {fileID: 1992858177}
+    - target: {fileID: 2253780174552333039, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: seatHandler
+      value: 
+      objectReference: {fileID: 173494368}
     - target: {fileID: 2759488708728784206, guid: 71a39736388285d409d5ee9502f0901f,
         type: 3}
       propertyPath: m_GameType
@@ -3431,6 +3465,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mini Game - Domino
       objectReference: {fileID: 0}
+    - target: {fileID: 8210478412973625272, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: seatHandler
+      value: 
+      objectReference: {fileID: 218112515}
+    - target: {fileID: 9019743253576399132, guid: 71a39736388285d409d5ee9502f0901f,
+        type: 3}
+      propertyPath: seatHandler
+      value: 
+      objectReference: {fileID: 1906739617}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9770,6 +9814,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7582645653763257442}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1906739617 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7952287907531958978, guid: 71a39736388285d409d5ee9502f0901f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279626534}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7acce6b4926d0ac4b9d6cfe6624b8f0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1941090859 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6017625838319997903, guid: 1168545f41604bf438a112291fd57ce0,
@@ -9877,6 +9933,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ResetTransform: {fileID: 1519829579}
+--- !u!114 &1992858177 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4370140628277816567, guid: 71a39736388285d409d5ee9502f0901f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279626534}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7acce6b4926d0ac4b9d6cfe6624b8f0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2008523592 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5087823492143518475, guid: 3967f87296c892e40b57e37bc8601550,

@@ -85,7 +85,7 @@ namespace XRMultiplayer.MiniGames
             for (int i = 0; i < m_hands.Length; i++)
             {
                 m_hands[i].seatHandler.handIndex = i;
-                m_hands[i].seatHandler.OnTriggerReadyState += TriggerReadyState;
+                m_hands[i].seatHandler.OnTriggerAction += TriggerReadyState;
             }
         }
 
@@ -1024,7 +1024,7 @@ namespace XRMultiplayer.MiniGames
         {
             foreach (var hand in m_hands)
             {
-                hand.seatHandler.OnTriggerReadyState -= TriggerReadyState;
+                hand.seatHandler.OnTriggerAction -= TriggerReadyState;
             }
         }
     }

@@ -94,8 +94,8 @@ namespace XRMultiplayer.MiniGames
 
             for (int i = 0; i < m_hands.Length; i++)
             {
-                m_hands[i].ownerManager.seatHandler.handIndex = i;
-                m_hands[i].ownerManager.seatHandler.OnTriggerReadyState += TriggerReadyState;
+                m_hands[i].seatHandler.handIndex = i;
+                m_hands[i].seatHandler.OnTriggerAction += TriggerReadyState;
             }
         }
 
@@ -233,7 +233,7 @@ namespace XRMultiplayer.MiniGames
         {
             foreach(var hand in m_hands)
             {
-                hand.ownerManager.seatHandler.GetComponentInParent<TeleportationAnchor>().GetComponentInChildren<UIComponentToggler>().gameObject.SetActive(toggle);
+                hand.seatHandler.GetComponentInParent<TeleportationAnchor>().GetComponentInChildren<UIComponentToggler>().gameObject.SetActive(toggle);
             }
 
         }
@@ -1092,9 +1092,9 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
-            if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            if (oldIndex >= 0 && oldIndex < activeHands.Count && activeHands[oldIndex].ownerID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
-                Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerManager.TestID}");
+                Debug.Log($"Ending turn for hand owner with ID: {activeHands[oldIndex].ownerID}");
 
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -1109,9 +1109,9 @@ namespace XRMultiplayer.MiniGames
             if (newIndex >= 0 && newIndex < activeHands.Count)
             {
                 currentHandIndex = newIndex;
-                Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerManager.TestID}");
+                Debug.Log($"New hand owner ID: {activeHands[currentHandIndex].ownerID}");
 
-                if (activeHands[currentHandIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId)
+                if (activeHands[currentHandIndex].ownerID == NetworkManager.Singleton.LocalClientId)
                 {
                     if (m_CurrentMessageRoutine != null)
                     {

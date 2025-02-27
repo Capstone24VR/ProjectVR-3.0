@@ -85,7 +85,7 @@ namespace XRMultiplayer
                 else
                 {
                     Debug.Log($"Player with ID {interactingPlayerId} is NOT the owner and cannot interact with the card.");
-                    //DisableInteraction();
+                    ForceRelease();
                 }
             }
         }
@@ -102,15 +102,9 @@ namespace XRMultiplayer
             return cardOwnerId == playerId;
         }
 
-        private void DisableInteraction()
+        private void ForceRelease()
         {
-            //Debug.Log("Interaction disabled for non-owner.");
-
-            // You can forcefully release the card or disable the grab functionality.
-            if (grabInteractable.isSelected)
-            {
-                grabInteractable.interactionManager.SelectExit(grabInteractable.firstInteractorSelecting, grabInteractable);
-            }
+            grabInteractable.interactionManager.SelectExit(grabInteractable.firstInteractorSelecting, grabInteractable);
         }
     }
 }
