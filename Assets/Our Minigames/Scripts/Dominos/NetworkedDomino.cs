@@ -95,7 +95,7 @@ namespace XRMultiplayer.MiniGames
             for (int i = 0; i < m_hands.Length; i++)
             {
                 m_hands[i].ownerManager.seatHandler.handIndex = i;
-                m_hands[i].ownerManager.seatHandler.OnTriggerAction += TriggerReadyState;
+                m_hands[i].ownerManager.seatHandler.OnTriggerReadyState += TriggerReadyState;
             }
         }
 
