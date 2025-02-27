@@ -5,6 +5,7 @@ using UnityEngine;
 using static Card;
 using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
+using UnityEditor.PackageManager;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -103,6 +104,7 @@ namespace XRMultiplayer.MiniGames
             if (!gameStarted)
             {
                 m_hands[index].active = isReady;
+                m_hands[index].ownerManager.TestID = clientId;
                 ToggleHandReadyClientRpc(clientId, isReady, index);
             }
         }
@@ -112,6 +114,7 @@ namespace XRMultiplayer.MiniGames
         {
             Debug.Log($"Synching Clients: Client: {clientId} toggling Hand {index} to {isReady}");
             m_hands[index].active = isReady;
+            m_hands[index].ownerManager.TestID = clientId;
         }
 
 

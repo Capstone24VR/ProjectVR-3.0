@@ -10,6 +10,8 @@ public class HandOwnerManager : MonoBehaviour
     private long _handOwnerId = -2; // Backing field for the player ID that is allowed to interact with the cards
     public ulong _localClientId = 9999;
 
+    public ulong TestID = 9999;
+
 
 
     // Public property for HandOwnerId with getter and setter
