@@ -3475,7 +3475,11 @@ PrefabInstance:
       propertyPath: seatHandler
       value: 
       objectReference: {fileID: 1906739617}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7005988922746108436, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
+    - {fileID: 7910696088979206178, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
+    - {fileID: 6183062544163982714, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
+    - {fileID: 2448177125459441810, guid: 71a39736388285d409d5ee9502f0901f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -10539,7 +10543,11 @@ PrefabInstance:
       propertyPath: m_StartZoneTrigger.Array.data[3]
       value: 
       objectReference: {fileID: 3033602598113946716}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5764772820167438069, guid: 1168545f41604bf438a112291fd57ce0, type: 3}
+    - {fileID: 7824189554804118511, guid: 1168545f41604bf438a112291fd57ce0, type: 3}
+    - {fileID: 5550182844825408592, guid: 1168545f41604bf438a112291fd57ce0, type: 3}
+    - {fileID: 6211676028065807045, guid: 1168545f41604bf438a112291fd57ce0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6724672344648656752, guid: 1168545f41604bf438a112291fd57ce0,
