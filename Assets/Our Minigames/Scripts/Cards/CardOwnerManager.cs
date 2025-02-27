@@ -11,6 +11,7 @@ namespace XRMultiplayer
     {
         [SerializeField]
         private long _cardOwnerId = -1; // Backing field for the player ID of the owner of this card
+        public ulong cardOwnerId = 9999;
 
         public long CardOwnerId
         {
@@ -71,7 +72,7 @@ namespace XRMultiplayer
                     handOwnerManager = GetComponentInParent<HandOwnerManager>();
                     if (handOwnerManager != null)
                     {
-                        SetCardOwnerId(handOwnerManager.HandOwnerId);  // Set the CardOwnerId
+                        SetCardOwnerId(handOwnerManager.TestID);  // Set the CardOwnerId
                     }
                     else
                     {
@@ -80,7 +81,7 @@ namespace XRMultiplayer
                 }
                 else
                 {
-                    SetCardOwnerId(-1);
+                    SetCardOwnerId(9999);
                 }
 
                 // Update the cached inHand state
@@ -88,17 +89,9 @@ namespace XRMultiplayer
             }
         }
 
-
-        // New method to set the card owner ID from the HandOwnerManager (parent)
-        public void SetCardOwnerId()
+        public void SetCardOwnerId(ulong newOwnerId)
         {
-
-            SetCardOwnerId(handOwnerManager.HandOwnerId);
-
-        }
-        public void SetCardOwnerId(long newOwnerId)
-        {
-            CardOwnerId = newOwnerId;
+            cardOwnerId = newOwnerId;
             //Debug.Log($"CardOwnerManager: Card owner ID set to {CardOwnerId}");
         }
 
@@ -107,11 +100,11 @@ namespace XRMultiplayer
         {
             if (miniGameManager != null)
             {
-                long interactingPlayerId = miniGameManager.GetLocalPlayerID();
+                ulong interactingPlayerId = NetworkManager.Singleton.LocalClientId;
                 //Debug.Log($"Player with ID {interactingPlayerId} is interacting with the card.");
 
                 // Check if the player is allowed to interact with the card
-                if (IsOwner(interactingPlayerId) || CardOwnerId == -1)
+                if (IsOwner(interactingPlayerId) || CardOwnerId == 9999)
                 {
                     //Debug.Log($"Player with ID {interactingPlayerId} is the owner and can interact with the card.");
                 }
@@ -130,9 +123,9 @@ namespace XRMultiplayer
         }
 
         // Method to check if the player interacting is the owner of the card
-        public bool IsOwner(long playerId)
+        public bool IsOwner(ulong playerId)
         {
-            return CardOwnerId == playerId;
+            return cardOwnerId == playerId;
         }
 
         private void DisableInteraction()

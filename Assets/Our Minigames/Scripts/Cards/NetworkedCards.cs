@@ -666,7 +666,7 @@ namespace XRMultiplayer.MiniGames
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
 
             // Check if it is said players turn to draw [Comment out if you want to play solo]
-            if (activeHands[currentHandIndex].ownerManager.ClientID != NetworkManager.Singleton.LocalClientId)
+            if (activeHands[currentHandIndex].ownerManager.TestID != NetworkManager.Singleton.LocalClientId)
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId} turn!");
                 string message = "It is not your turn to draw!";
@@ -893,8 +893,8 @@ namespace XRMultiplayer.MiniGames
         [ClientRpc]
         private void UpdateCurrentIndexClientRpc(int newIndex, int oldIndex)
         {
-            Debug.Log($"Current Hand owner id: {activeHands[oldIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
-            if (activeHands[oldIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId && gameStarted)
+            Debug.Log($"Current Hand owner id: {activeHands[oldIndex].ownerManager.TestID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            if (activeHands[oldIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId && gameStarted)
             {
                 if (m_CurrentMessageRoutine != null)
                 {
@@ -907,9 +907,9 @@ namespace XRMultiplayer.MiniGames
             currentHandIndex = newIndex;
 
 
-            Debug.Log($"New Hand owner id: {activeHands[currentHandIndex].ownerManager.ClientID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
+            Debug.Log($"New Hand owner id: {activeHands[currentHandIndex].ownerManager.TestID}  \tClientid:  {NetworkManager.Singleton.LocalClientId}  \tGame Started: {gameStarted}");
 
-            if (activeHands[currentHandIndex].ownerManager.ClientID == NetworkManager.Singleton.LocalClientId)
+            if (activeHands[currentHandIndex].ownerManager.TestID == NetworkManager.Singleton.LocalClientId)
             {
                 if (m_CurrentMessageRoutine != null)
                 {
