@@ -43,6 +43,7 @@ public class Card : NetworkBehaviour
     
     private XRGrabInteractable _xrInteract;
     private NetworkedCards _cardManager;
+    private CardOwnerManager _ownerManger;
 
     private AudioSource _cardSFX;
 
@@ -57,6 +58,7 @@ public class Card : NetworkBehaviour
 
         _cardManager = FindAnyObjectByType<NetworkedCards>();
         _cardSFX = GetComponent<AudioSource>();
+        _ownerManger = GetComponent<CardOwnerManager>();
     }
 
     public void SetPosition(Vector3 position)
@@ -96,9 +98,9 @@ public class Card : NetworkBehaviour
         transform.localScale = newScale;
     }
 
-    public void PlaySFX(int sfx)
+    public void PlaySFX(int clip, ulong clientId)
     {
-        PlaySFXClientRpc(sfx);
+        PlaySFXServerRpc(clip, clientId);
     }
 
     // ServerRpc to inform the server about the hover select event
@@ -109,25 +111,19 @@ public class Card : NetworkBehaviour
         HoverSelectClientRpc();
     }
 
+    // ClientRpc to apply hover select on all clients
+    [ClientRpc]
+    private void HoverSelectClientRpc()
+    {
+        ScaleCard(_localScale * 1.25f); // Apply hover select effect on all clients
+    }
+
     // ServerRpc to inform the server about the hover deselect event
     [ServerRpc(RequireOwnership = false)]
     private void HoverDeSelectServerRpc()
     {
         // Server will inform all clients to apply the hover deselect effect
         HoverDeSelectClientRpc();
-    }
-
-    //[ServerRpc(RequireOwnership = false)]
-    //private void PlaySFXServerRpc()
-    //{
-    //    PlaySFXClientRpc();
-    //}
-
-    // ClientRpc to apply hover select on all clients
-    [ClientRpc]
-    private void HoverSelectClientRpc()
-    {
-        ScaleCard(_localScale * 1.25f); // Apply hover select effect on all clients
     }
 
     // ClientRpc to apply hover deselect on all clients
@@ -137,20 +133,30 @@ public class Card : NetworkBehaviour
         ScaleCard(_localScale); // Apply hover deselect effect on all clients
     }
 
-    [ClientRpc]
-    private void PlaySFXClientRpc(int clip)
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaySFXServerRpc(int clip, ulong clientId)
     {
-        switch (clip)
-        {
-            case 0:
-                _cardSFX.clip = _cardPickup;
-                break;
-            case 1:
-                _cardSFX.clip = _cardRelease;
-                break;
-        }
+        PlaySFXClientRpc(clip, clientId);
+    }
 
-        _cardSFX.Play();
+
+    [ClientRpc]
+    private void PlaySFXClientRpc(int clip, ulong clientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+        {
+            switch (clip)
+            {
+                case 0:
+                    _cardSFX.clip = _cardPickup;
+                    break;
+                case 1:
+                    _cardSFX.clip = _cardRelease;
+                    break;
+            }
+
+            _cardSFX.Play();
+        }
     }
 
     public void SetCardInteractive(bool value)
@@ -163,10 +169,9 @@ public class Card : NetworkBehaviour
     {
         inHand = isInHand;
     }
-
-    public string GetCardId()
+    private bool HeldByOwner()
     {
-        return suit.ToString() + value.ToString();
+        return _ownerManger.cardOwnerId == NetworkManager.Singleton.LocalClientId;
     }
 
     // Use XR Interaction Toolkit's hover callbacks to trigger hover effects
@@ -186,16 +191,16 @@ public class Card : NetworkBehaviour
     {
         if(IsSpawned)
             HoverDeSelect();
-        if(GetComponent<CardOwnerManager>().cardOwnerId == NetworkManager.Singleton.LocalClientId)
-            PlaySFXClientRpc(0); // 0 indicates pickup SFX
+        if(HeldByOwner())
+            PlaySFXServerRpc(0, _ownerManger.cardOwnerId); // 0 indicates pickup SFX
     }
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)
     {
         if (IsSpawned)
         {
-            if (inHand)
-                PlaySFXClientRpc(1);
+            if (inHand && HeldByOwner())
+                PlaySFXServerRpc(1, _ownerManger.cardOwnerId);
             ResetPosition();
             HoverDeSelect();
             _cardManager.RequestDrawCard(gameObject);

@@ -683,6 +683,7 @@ namespace XRMultiplayer.MiniGames
 
             if (networkObject != null)
             {
+                card.GetComponent<Card>().PlaySFX(0, NetworkManager.Singleton.LocalClientId);
                 DrawTopCardServerRpc(networkObject.NetworkObjectId);
             }
             else
