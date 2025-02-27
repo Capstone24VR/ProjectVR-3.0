@@ -20,6 +20,9 @@ public class BuoyancyObject : NetworkBehaviour
 
     private Rigidbody rb;
 
+    public AudioSource splashSFX;
+    public float minSplashVelocity = 3f; // Minimum downward velocity to trigger splash
+
     public void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -81,11 +84,32 @@ public class BuoyancyObject : NetworkBehaviour
         {
             rb.drag = underWaterDrag;
             rb.angularDrag = underWaterAngularDrag;
+
+            if (rb.velocity.y < -minSplashVelocity)
+            {
+                GetComponentInParent<NewFishingRod>().PlayLineCastSFX(false);
+                PlaySplashSoundServerRpc();
+            }
         }
         else
         {
             rb.drag = airDrag;
             rb.angularDrag = airAngularDrag;
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaySplashSoundServerRpc()
+    {
+        PlaySplashSoundClientRpc();
+    }
+
+    [ClientRpc]
+    private void PlaySplashSoundClientRpc()
+    {
+        if (splashSFX)
+        {
+            splashSFX.Play();
         }
     }
 }

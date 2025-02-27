@@ -37,6 +37,11 @@ public class NewFishingRod : NetworkBehaviour
 
     public ulong clientId = 9999;
 
+    [Header("Sound Effects")]
+    public AudioSource rodswishSfx;
+    public AudioSource reelSFX;
+    public AudioSource lineCast;
+
 
     private void Awake()
     {
@@ -178,11 +183,14 @@ public class NewFishingRod : NetworkBehaviour
         float launchForce = castingQuality * castingMultiplier;
 
         SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
+        PlayLineCastSFX(true);
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
     public void ResetCast()
     {
+        PlayLineCastSFX(false);
+
         floater.mass = 1;
         floater.useGravity = false;
         floater.isKinematic = true;
@@ -205,7 +213,44 @@ public class NewFishingRod : NetworkBehaviour
         prevReelChange = change;
         fishingLine.Reel(reelChange);
     }
+    
+    public void PlayLineCastSFX(bool play)
+    {
+        PlayLineCastSFXServerRpc(play);
+    }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayLineCastSFXServerRpc(bool play)
+    {
+        PlayLineCastSFXClientRpc(play);
+    }
+
+    [ClientRpc]
+    private void PlayLineCastSFXClientRpc(bool play)
+    {
+        if(play)
+            lineCast.Play();
+        else lineCast.Stop();
+    }
+
+    public void PlayRodSwishSFX(bool play)
+    {
+        PlayRodSwishSFXServerRpc(play);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayRodSwishSFXServerRpc(bool play)
+    {
+        PlayRodSwishSFXClientRpc(play);
+    }
+
+    [ClientRpc]
+    private void PlayRodSwishSFXClientRpc(bool play)
+    {
+        if (play)
+            rodswishSfx.Play();
+        else rodswishSfx.Stop();
+    }
 
 
     [ServerRpc(RequireOwnership = false)]
