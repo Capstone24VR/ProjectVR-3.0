@@ -80,8 +80,6 @@ public class NewFishingRod : NetworkBehaviour
             SampleRodPositions();
             nextSampleTime = Time.time + sampleInterval;
         }
-
-        SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
     }
 
     private void OnGrab(SelectEnterEventArgs args)
@@ -95,6 +93,7 @@ public class NewFishingRod : NetworkBehaviour
             clientId = NetworkManager.Singleton.LocalClientId;
 
             SetOwnerShipServerRpc(clientId);
+            SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
         }
         grabCount++;
     }
@@ -176,8 +175,9 @@ public class NewFishingRod : NetworkBehaviour
         ToggleRodDroppedServerRpc(false);
 
         Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
-
         float launchForce = castingQuality * castingMultiplier;
+
+        SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
 
@@ -212,14 +212,21 @@ public class NewFishingRod : NetworkBehaviour
     private void SetOwnerShipServerRpc(ulong clientId)
     {
         NetworkObject networkObject = GetComponent<NetworkObject>();
-        if (networkObject.OwnerClientId != clientId) networkObject.ChangeOwnership(clientId);
+        if (networkObject.OwnerClientId != clientId) 
+            networkObject.ChangeOwnership(clientId);
+        if (floater.GetComponent<NetworkObject>().OwnerClientId != clientId) 
+            floater.GetComponent<NetworkObject>().ChangeOwnership(clientId);
     }
 
 
     [ServerRpc(RequireOwnership = false)]
     private void ResetOwnerShipServerRpc()
     {
-        GetComponent<NetworkObject>().RemoveOwnership();
+        NetworkObject networkObject = GetComponent<NetworkObject>();
+        if (networkObject.IsOwnedByServer) return;
+
+        networkObject.RemoveOwnership();
+        floater.GetComponent<NetworkObject>().RemoveOwnership();
     }
 
 
