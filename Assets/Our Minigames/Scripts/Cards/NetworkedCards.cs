@@ -1021,7 +1021,7 @@ namespace XRMultiplayer.MiniGames
         {
             foreach (var hand in m_hands)
             {
-                hand.ownerManager.seatHandler.OnTriggerAction -= TriggerReadyState;
+                hand.ownerManager.seatHandler.OnTriggerReadyState -= TriggerReadyState;
             }
         }
     }
