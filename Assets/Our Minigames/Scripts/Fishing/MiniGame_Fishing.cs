@@ -33,10 +33,11 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         readonly Dictionary<XRBaseInteractable, Pose> m_InteractablePoses = new();
 
+
         /// <summary>
         /// The interactable objects to use for the mini-game.
         /// </summary>
-        readonly Dictionary<XRBaseInteractable, Pose> m_HookPoses = new();
+        readonly Dictionary<XRBaseInteractable, (Transform, Pose)> m_HookPoses = new();
 
         /// <summary>
         /// The current score of the mini-game.
@@ -55,7 +56,7 @@ namespace XRMultiplayer.MiniGames
                 if (!m_InteractablePoses.ContainsKey(m_GameInteractables[i]))
                 {
                     m_InteractablePoses.Add(m_GameInteractables[i], new Pose(m_GameInteractables[i].transform.position, m_GameInteractables[i].transform.rotation));
-                    //m_HookPoses.Add(m_GameInteractables[i], new Pose(m_Hooks[i].transform.position, m_Hooks[i].transform.rotation));
+                    m_HookPoses.Add(m_GameInteractables[i], (m_Hooks[i], new Pose(m_Hooks[i].transform.position, m_Hooks[i].transform.rotation)));
                     m_GameInteractables[i].selectExited.AddListener(RodDropped);
                 }
             }
@@ -107,7 +108,7 @@ namespace XRMultiplayer.MiniGames
         void RodDropped(BaseInteractionEventArgs args)
         {
             XRBaseInteractable interactable = (XRBaseInteractable)args.interactableObject;
-            if (m_InteractablePoses.ContainsKey(interactable))
+            if (m_InteractablePoses.ContainsKey(interactable) && m_HookPoses.ContainsKey(interactable))
             {
                 StartCoroutine(DropRodAfterTimeRoutine(interactable));
             }
@@ -126,8 +127,13 @@ namespace XRMultiplayer.MiniGames
                 bool wasKinematic = body.isKinematic;
                 body.isKinematic = true;
                 interactable.transform.SetPositionAndRotation(m_InteractablePoses[interactable].position, m_InteractablePoses[interactable].rotation);
+                
+
+                m_HookPoses[interactable].Item1.SetPositionAndRotation(m_HookPoses[interactable].Item2.position, m_HookPoses[interactable].Item2.rotation);
+
+
                 yield return new WaitForFixedUpdate();
-                //body.isKinematic = wasKinematic;
+                body.isKinematic = wasKinematic;
                 foreach (var collider in interactable.colliders)
                 {
                     collider.enabled = true;
