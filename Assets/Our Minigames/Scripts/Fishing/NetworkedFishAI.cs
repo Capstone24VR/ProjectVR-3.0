@@ -254,6 +254,7 @@ public class NetworkedFishAI : NetworkBehaviour
         if(currentHook == null)
         {
             EnableFishPhysicsServerRpc();
+            ResetOwnershipServerRpc();
 
 
             if(transform.position.y < waterHeight)
@@ -271,6 +272,7 @@ public class NetworkedFishAI : NetworkBehaviour
             currentHook.GetComponent<FishingHook>().caughtObject = null;
             currentHook = null;
 
+            ResetOwnershipServerRpc();
             EnableFishPhysicsServerRpc();
             ToggleFishXRInteractableServerRpc(true);
             SetFishStateServerRpc(FishState.Caught);
@@ -316,6 +318,12 @@ public class NetworkedFishAI : NetworkBehaviour
             ResetFishServerRpc();
             SetFishStateServerRpc(FishState.Wander);
         }
+    }
+
+    [ServerRpc]
+    private void ResetOwnershipServerRpc()
+    {
+        GetComponent<NetworkObject>().RemoveOwnership();
     }
 
 
