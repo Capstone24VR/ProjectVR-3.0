@@ -18,6 +18,8 @@ public class NewFishingRod : NetworkBehaviour
     public Transform rodTipTransform;
     public Transform rodBaseTransform;
 
+    private Vector3 localOffset;
+
     private List<Vector3> basePositions = new List<Vector3>();
     private List<Vector3> tipPositions = new List<Vector3>();
     private float sampleInterval = 0.05f;
@@ -47,6 +49,8 @@ public class NewFishingRod : NetworkBehaviour
     {
         hook = GetComponentInChildren<FishingHook>();
         fishingLine = GetComponent<NewFishingLine>();
+
+        localOffset = rodTipTransform.InverseTransformPoint(rodTipTransform.position);
     }
 
     private void OnEnable()
@@ -74,7 +78,7 @@ public class NewFishingRod : NetworkBehaviour
 
         if (!isCasting)
         {
-            floater.transform.position = rodTipTransform.position;
+            floater.transform.position = rodTipTransform.TransformPoint(localOffset);
             floater.transform.rotation = rodTipTransform.rotation;
         }
 
