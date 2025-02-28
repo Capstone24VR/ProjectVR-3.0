@@ -253,8 +253,7 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         if(currentHook == null)
         {
-            rb.useGravity = true;
-            rb.isKinematic = false;
+            EnableFishPhysicsServerRpc();
 
 
             if(transform.position.y < waterHeight)
@@ -272,7 +271,8 @@ public class NetworkedFishAI : NetworkBehaviour
             currentHook.GetComponent<FishingHook>().caughtObject = null;
             currentHook = null;
 
-            SetFishInteractableServerRpc();
+            EnableFishPhysicsServerRpc();
+            ToggleFishXRInteractableServerRpc(true);
             SetFishStateServerRpc(FishState.Caught);
         }
         else
@@ -336,17 +336,16 @@ public class NetworkedFishAI : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void SetFishInteractableServerRpc()
+    private void EnableFishPhysicsServerRpc()
     {
-        SetFishInteractableClientRpc();
+        EnableFishPhysicsClientRpc();
     }
 
     [ClientRpc]
-    private void SetFishInteractableClientRpc()
+    private void EnableFishPhysicsClientRpc()
     {
         rb.useGravity = true;
         rb.isKinematic = false;
-        _xrInteract.enabled = true;
     }
 
     [ServerRpc]
