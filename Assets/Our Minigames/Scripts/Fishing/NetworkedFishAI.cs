@@ -128,7 +128,7 @@ public class NetworkedFishAI : NetworkBehaviour
                 Baited();
                 break;
             case FishState.Struggle:
-                //Struggle();
+                Struggle();
                 break;
             case FishState.Caught:
                 Caught();
@@ -301,6 +301,7 @@ public class NetworkedFishAI : NetworkBehaviour
             {
                 ToggleFishXRInteractableServerRpc(false);
             }
+            transform.position = Vector3.MoveTowards(transform.position, target, 6);
             FollowHookServerRpc(currentHook.position);
         }
         //ErraticMove(3f);
@@ -342,14 +343,14 @@ public class NetworkedFishAI : NetworkBehaviour
         currentHook = null;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = true)]
     private void ResetOwnershipServerRpc()
     {
         GetComponent<NetworkObject>().RemoveOwnership();
     }
 
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = true)]
     private void ResetFishServerRpc()
     {
         ResetFishClientRpc();
@@ -365,7 +366,7 @@ public class NetworkedFishAI : NetworkBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = true)]
     private void EnableFishPhysicsServerRpc()
     {
         EnableFishPhysicsClientRpc();
@@ -378,7 +379,7 @@ public class NetworkedFishAI : NetworkBehaviour
         rb.isKinematic = false;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = true)]
     private void ToggleFishXRInteractableServerRpc(bool enabled)
     {
         ToggleFishXRInteractableClientRpc(enabled);
@@ -408,7 +409,7 @@ public class NetworkedFishAI : NetworkBehaviour
         MoveClientRpc(transform.position, target);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = true)]
     private void FollowHookServerRpc(Vector3 target)
     {
         transform.position = Vector3.MoveTowards(transform.position, target, 6);
