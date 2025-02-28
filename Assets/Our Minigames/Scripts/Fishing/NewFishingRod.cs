@@ -140,21 +140,18 @@ public class NewFishingRod : NetworkBehaviour
             else if (castingQuality < 2.5f)
             {
                 Debug.Log("Weak Cast");
-                SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
                 LaunchCast(castingQuality);
             }
             else if (castingQuality >= 2.5f && castingQuality < 5.0f)
             {
                 Debug.Log("Medium Cast");
                 hapticFeedback?.SendHapticImpulse(0.3f, 0.2f, 0.5f);
-                SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
                 LaunchCast(castingQuality * 2);
             }
             else if (castingQuality >= 5.0f)
             {
                 Debug.Log("Strong Cast");
                 hapticFeedback?.SendHapticImpulse(0.6f, 0.4f, 1f);
-                SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
                 LaunchCast(castingQuality * 5);
             }
         }
@@ -172,6 +169,9 @@ public class NewFishingRod : NetworkBehaviour
 
     void LaunchCast(float castingQuality)
     {
+        SyncFloaterTransformServerRpc(floater.transform.position, floater.transform.rotation);
+
+
         floater.mass = 15;
         floater.isKinematic = false;
         floater.useGravity = true;
@@ -182,7 +182,6 @@ public class NewFishingRod : NetworkBehaviour
         Vector3 castDirection = (tipPositions[tipPositions.Count - 1] - tipPositions[0]).normalized;
         float launchForce = castingQuality * castingMultiplier;
 
-        SyncFloaterTransformClientRpc(floater.transform.position, floater.transform.rotation);
         PlayLineCastSFX(true);
         floater.AddForce(castDirection * launchForce, ForceMode.Impulse);
     }
