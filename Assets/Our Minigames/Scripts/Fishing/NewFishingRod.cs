@@ -283,8 +283,11 @@ public class NewFishingRod : NetworkBehaviour
     [ClientRpc]
     private void SyncFloaterTransformClientRpc(Vector3 position, Quaternion rotation)
     {
+        if (IsOwner)
+            Debug.Log("I the owner called this sync");
         if (!IsOwner)
         {
+            Debug.Log($"I the client have recieved a sync to this position: {position} and rotation: {rotation}");
             floater.transform.position = position;
             floater.transform.rotation = rotation;
         }
