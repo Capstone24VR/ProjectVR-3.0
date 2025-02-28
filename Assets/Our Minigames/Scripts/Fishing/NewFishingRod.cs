@@ -258,6 +258,7 @@ public class NewFishingRod : NetworkBehaviour
         NetworkObject networkObject = GetComponent<NetworkObject>();
         if (networkObject.OwnerClientId != clientId) 
             networkObject.ChangeOwnership(clientId);
+        Debug.Log(floater.GetComponent<NetworkObject>().OwnerClientId);
         if (floater.GetComponent<NetworkObject>().OwnerClientId != clientId) 
             floater.GetComponent<NetworkObject>().ChangeOwnership(clientId);
     }
