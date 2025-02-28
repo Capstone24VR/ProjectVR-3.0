@@ -100,11 +100,6 @@ public class NetworkedFishAI : NetworkBehaviour
         {
             ServerUpdate();
         }
-
-        if (IsOwner)
-        {
-            OwnerUpdate();
-        }
     }
 
     private void ServerUpdate()
@@ -132,16 +127,6 @@ public class NetworkedFishAI : NetworkBehaviour
                 break;
             case FishState.Caught:
                 Caught();
-                break;
-        }
-    }
-
-    private void OwnerUpdate()
-    {
-        switch (state.Value)
-        {
-            case FishState.Struggle:
-                Struggle();
                 break;
         }
     }
@@ -301,7 +286,6 @@ public class NetworkedFishAI : NetworkBehaviour
             {
                 ToggleFishXRInteractableServerRpc(false);
             }
-            transform.position = Vector3.MoveTowards(transform.position, target, 6);
             FollowHookServerRpc(currentHook.position);
         }
         //ErraticMove(3f);
@@ -343,14 +327,14 @@ public class NetworkedFishAI : NetworkBehaviour
         currentHook = null;
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc]
     private void ResetOwnershipServerRpc()
     {
         GetComponent<NetworkObject>().RemoveOwnership();
     }
 
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc]
     private void ResetFishServerRpc()
     {
         ResetFishClientRpc();
@@ -366,7 +350,7 @@ public class NetworkedFishAI : NetworkBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc]
     private void EnableFishPhysicsServerRpc()
     {
         EnableFishPhysicsClientRpc();
@@ -379,7 +363,7 @@ public class NetworkedFishAI : NetworkBehaviour
         rb.isKinematic = false;
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc]
     private void ToggleFishXRInteractableServerRpc(bool enabled)
     {
         ToggleFishXRInteractableClientRpc(enabled);
@@ -409,7 +393,7 @@ public class NetworkedFishAI : NetworkBehaviour
         MoveClientRpc(transform.position, target);
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc]
     private void FollowHookServerRpc(Vector3 target)
     {
         transform.position = Vector3.MoveTowards(transform.position, target, 6);
