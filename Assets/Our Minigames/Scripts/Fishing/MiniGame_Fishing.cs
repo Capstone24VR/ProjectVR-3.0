@@ -33,6 +33,10 @@ namespace XRMultiplayer.MiniGames
         /// </summary>
         readonly Dictionary<XRBaseInteractable, Pose> m_InteractablePoses = new();
 
+        /// <summary>
+        /// The interactable objects to use for the mini-game.
+        /// </summary>
+        readonly Dictionary<XRBaseInteractable, Pose> m_HookPoses = new();
 
         /// <summary>
         /// The current score of the mini-game.
@@ -46,14 +50,25 @@ namespace XRMultiplayer.MiniGames
 
             TryGetComponent(out m_NetworkedGameplay);
 
-            foreach (var interactable in m_GameInteractables)
+            for(int i = 0; i < m_GameInteractables.Length; i++)
             {
-                if (!m_InteractablePoses.ContainsKey(interactable))
+                if (!m_InteractablePoses.ContainsKey(m_GameInteractables[i]))
                 {
-                    m_InteractablePoses.Add(interactable, new Pose(interactable.transform.position, interactable.transform.rotation));
-                    interactable.selectExited.AddListener(RodDropped);
+                    m_InteractablePoses.Add(m_GameInteractables[i], new Pose(m_GameInteractables[i].transform.position, m_GameInteractables[i].transform.rotation));
+                    //m_HookPoses.Add(m_GameInteractables[i], new Pose(m_Hooks[i].transform.position, m_Hooks[i].transform.rotation));
+                    m_GameInteractables[i].selectExited.AddListener(RodDropped);
                 }
             }
+
+            //foreach (var interactable in m_GameInteractables)
+            //{
+            //    if (!m_InteractablePoses.ContainsKey(interactable))
+            //    {
+            //        m_InteractablePoses.Add(interactable, new Pose(interactable.transform.position, interactable.transform.rotation));
+            //        interactable.selectExited.AddListener(RodDropped);
+            //    }
+            //}
+
         }
 
         void OnDestroy()
