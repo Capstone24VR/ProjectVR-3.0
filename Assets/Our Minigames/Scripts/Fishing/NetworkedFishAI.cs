@@ -77,7 +77,7 @@ public class NetworkedFishAI : NetworkBehaviour
         state.Value = FishState.Wander;
     }
 
-     private void OnEnable()
+    private void OnEnable()
     {
         if (_xrInteract != null)
         {
@@ -208,7 +208,7 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         var res = new List<Transform>(hooks);
 
-        for(int i = res.Count-1; i >= 0; i--)
+        for (int i = res.Count - 1; i >= 0; i--)
         {
             if (res[i].transform.position.y > waterHeight && !res[i].GetComponent<FishingHook>().caughtSomething.Value)
             {
@@ -251,13 +251,13 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Struggle()
     {
-        if(currentHook == null)
+        if (currentHook == null)
         {
             EnableFishPhysicsServerRpc();
             ResetOwnershipServerRpc();
 
 
-            if(transform.position.y < waterHeight)
+            if (transform.position.y < waterHeight)
             {
                 Debug.Log("Struggle to wander");
                 SetFishStateServerRpc(FishState.Wander);
@@ -268,12 +268,13 @@ public class NetworkedFishAI : NetworkBehaviour
 
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
-            ResetHookServerRpc();
-            ResetOwnershipServerRpc();
+            currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+            currentHook.GetComponent<FishingHook>().caughtObject = null;
+            currentHook = null;
 
+            ResetOwnershipServerRpc();
             EnableFishPhysicsServerRpc();
             ToggleFishXRInteractableServerRpc(true);
-            
             SetFishStateServerRpc(FishState.Caught);
         }
         else
@@ -317,14 +318,6 @@ public class NetworkedFishAI : NetworkBehaviour
             ResetFishServerRpc();
             SetFishStateServerRpc(FishState.Wander);
         }
-    }
-
-    [ServerRpc(RequireOwnership = true)]
-    private void ResetHookServerRpc()
-    {
-        currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
-        currentHook.GetComponent<FishingHook>().caughtObject = null;
-        currentHook = null;
     }
 
     [ServerRpc]
@@ -407,7 +400,7 @@ public class NetworkedFishAI : NetworkBehaviour
         transform.LookAt(lookAt);
     }
 
-    [ServerRpc(RequireOwnership=false)]
+    [ServerRpc(RequireOwnership = false)]
     public void SetFishStateServerRpc(FishState newState)
     {
         state.Value = newState;
@@ -426,17 +419,17 @@ public class NetworkedFishAI : NetworkBehaviour
     private void OnGrab(SelectEnterEventArgs args)
     {
         Debug.Log($"{gameObject.name} was grabbed.");
-        if(currentHook != null)
+        if (currentHook != null)
         {
             currentHook.GetComponent<FishingHook>().caughtObject = null;
             currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
             currentHook.GetComponentInParent<NewFishingRod>().ResetCast();
         }
-  
+
         currentHook = null;
         rb.useGravity = true;
         rb.isKinematic = true;
-        SetFishStateServerRpc(FishState.Caught);   
+        SetFishStateServerRpc(FishState.Caught);
     }
 
     [ServerRpc(RequireOwnership = false)]

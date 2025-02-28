@@ -32,7 +32,7 @@ public class FishingHook : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void CatchFishServerRpc(ulong fishNetworkId)
     {
-        if(!caughtSomething.Value)
+        if (!caughtSomething.Value)
         {
             if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
             {
@@ -41,6 +41,9 @@ public class FishingHook : NetworkBehaviour
 
                 // Notify clients about the catch
                 NotifyCatchClientRpc(fishNetworkId);
+
+                Debug.Log($"Fish got caught, Setting owner to Client: {GetComponent<NetworkObject>().OwnerClientId}");
+                //fishNetworkObject.ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
 
                 // Update fish state
                 fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
