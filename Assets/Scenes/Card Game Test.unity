@@ -237,6 +237,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 95679560}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &100164159 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3590600460635074470, guid: 58a3d193185889e49a6d65fbf78a0acc,
+    type: 3}
+  m_PrefabInstance: {fileID: 1568443580}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &126385794 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5022951133931981650, guid: 1168545f41604bf438a112291fd57ce0,
@@ -962,9 +968,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ResetTransform: {fileID: 1519829579}
---- !u!82 &429778773 stripped
-AudioSource:
-  m_CorrespondingSourceObject: {fileID: 5742279206519636324, guid: 58a3d193185889e49a6d65fbf78a0acc,
+--- !u!4 &429778780 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5714270763768693619, guid: 58a3d193185889e49a6d65fbf78a0acc,
     type: 3}
   m_PrefabInstance: {fileID: 1568443580}
   m_PrefabAsset: {fileID: 0}
@@ -3566,6 +3572,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1386312551}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1395972594 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 537951469773251307, guid: 58a3d193185889e49a6d65fbf78a0acc,
+    type: 3}
+  m_PrefabInstance: {fileID: 1568443580}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1402408714
 GameObject:
   m_ObjectHideFlags: 0
@@ -3980,6 +3992,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1433617930}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1549384664 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 630310205764319998, guid: 58a3d193185889e49a6d65fbf78a0acc,
+    type: 3}
+  m_PrefabInstance: {fileID: 1568443580}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1568443580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4058,10 +4076,20 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 981601748
       objectReference: {fileID: 0}
+    - target: {fileID: 3953295752231057816, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 851887721
+      objectReference: {fileID: 0}
     - target: {fileID: 4713586297179578718, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 4155755978
+      objectReference: {fileID: 0}
+    - target: {fileID: 5207752614101275981, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2091844455
       objectReference: {fileID: 0}
     - target: {fileID: 5553084499324531812, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -4118,6 +4146,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Hooks.Array.data[0]
+      value: 
+      objectReference: {fileID: 1395972594}
+    - target: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Hooks.Array.data[1]
+      value: 
+      objectReference: {fileID: 1549384664}
+    - target: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Hooks.Array.data[2]
+      value: 
+      objectReference: {fileID: 100164159}
+    - target: {fileID: 5794879609507435599, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Hooks.Array.data[3]
+      value: 
+      objectReference: {fileID: 429778780}
     - target: {fileID: 5933746153448013460, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -4147,7 +4195,7 @@ PrefabInstance:
         type: 3}
       propertyPath: splashSFX
       value: 
-      objectReference: {fileID: 429778773}
+      objectReference: {fileID: 0}
     - target: {fileID: 8048367219698203908, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -4157,6 +4205,16 @@ PrefabInstance:
         type: 3}
       propertyPath: currFish
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8155606314437640213, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3173990329
+      objectReference: {fileID: 0}
+    - target: {fileID: 9144268169083639808, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1131789520
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
