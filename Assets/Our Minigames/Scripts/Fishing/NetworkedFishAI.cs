@@ -279,11 +279,11 @@ public class NetworkedFishAI : NetworkBehaviour
         {
             if (transform.position.y >= waterHeight)
             {
-                _xrInteract.enabled = true;
+                ToggleFishXRInteractableServerRpc(true);
             }
             else
             {
-                _xrInteract.enabled = false;
+                ToggleFishXRInteractableServerRpc(false);
             }
             FollowHookServerRpc(currentHook.position);
         }
@@ -347,6 +347,18 @@ public class NetworkedFishAI : NetworkBehaviour
         rb.useGravity = true;
         rb.isKinematic = false;
         _xrInteract.enabled = true;
+    }
+
+    [ServerRpc]
+    private void ToggleFishXRInteractableServerRpc(bool enabled)
+    {
+        ToggleFishXRInteractableClientRpc(enabled);
+    }
+
+    [ClientRpc]
+    private void ToggleFishXRInteractableClientRpc(bool enabled)
+    {
+        _xrInteract.enabled = enabled;
     }
 
     //void Startled()
