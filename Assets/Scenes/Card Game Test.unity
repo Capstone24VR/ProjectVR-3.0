@@ -974,6 +974,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1568443580}
   m_PrefabAsset: {fileID: 0}
+--- !u!82 &429778781 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 5742279206519636324, guid: 58a3d193185889e49a6d65fbf78a0acc,
+    type: 3}
+  m_PrefabInstance: {fileID: 1568443580}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &452005596
 GameObject:
   m_ObjectHideFlags: 0
@@ -4195,7 +4201,7 @@ PrefabInstance:
         type: 3}
       propertyPath: splashSFX
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 429778781}
     - target: {fileID: 8048367219698203908, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: GlobalObjectIdHash

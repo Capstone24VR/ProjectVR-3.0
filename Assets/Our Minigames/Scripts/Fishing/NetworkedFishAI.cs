@@ -100,6 +100,11 @@ public class NetworkedFishAI : NetworkBehaviour
         {
             ServerUpdate();
         }
+
+        if (IsOwner)
+        {
+            OwnerUpdate();
+        }
     }
 
     private void ServerUpdate()
@@ -123,10 +128,20 @@ public class NetworkedFishAI : NetworkBehaviour
                 Baited();
                 break;
             case FishState.Struggle:
-                Struggle();
+                //Struggle();
                 break;
             case FishState.Caught:
                 Caught();
+                break;
+        }
+    }
+
+    private void OwnerUpdate()
+    {
+        switch (state.Value)
+        {
+            case FishState.Struggle:
+                Struggle();
                 break;
         }
     }
@@ -268,13 +283,12 @@ public class NetworkedFishAI : NetworkBehaviour
 
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
-            currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
-            currentHook.GetComponent<FishingHook>().caughtObject = null;
-            currentHook = null;
-
+            ResetHookServerRpc();
             ResetOwnershipServerRpc();
+
             EnableFishPhysicsServerRpc();
             ToggleFishXRInteractableServerRpc(true);
+            
             SetFishStateServerRpc(FishState.Caught);
         }
         else
@@ -318,6 +332,14 @@ public class NetworkedFishAI : NetworkBehaviour
             ResetFishServerRpc();
             SetFishStateServerRpc(FishState.Wander);
         }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void ResetHookServerRpc()
+    {
+        currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+        currentHook.GetComponent<FishingHook>().caughtObject = null;
+        currentHook = null;
     }
 
     [ServerRpc]

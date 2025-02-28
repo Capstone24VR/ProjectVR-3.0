@@ -43,7 +43,8 @@ public class FishingHook : NetworkBehaviour
                 NotifyCatchClientRpc(fishNetworkId);
 
                 Debug.Log($"Fish got caught, Setting owner to Client: {GetComponent<NetworkObject>().OwnerClientId}");
-                //fishNetworkObject.ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+                if(fishNetworkObject.OwnerClientId != GetComponent<NetworkObject>().OwnerClientId)
+                    fishNetworkObject.ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
 
                 // Update fish state
                 fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
