@@ -268,14 +268,11 @@ public class NetworkedFishAI : NetworkBehaviour
 
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
-            _xrInteract.enabled = true;
-            rb.useGravity = true;
-            rb.isKinematic = false;
-
             currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
             currentHook.GetComponent<FishingHook>().caughtObject = null;
             currentHook = null;
 
+            SetFishInteractableServerRpc();
             SetFishStateServerRpc(FishState.Caught);
         }
         else
@@ -314,25 +311,42 @@ public class NetworkedFishAI : NetworkBehaviour
 
     void Caught()
     {
-        rb.useGravity = true;
-        rb.isKinematic = false;
-        _xrInteract.enabled = true;
-
         if (transform.position.y < waterHeight - 1)
         {
-            ResetFish();
+            ResetFishServerRpc();
             SetFishStateServerRpc(FishState.Wander);
         }
     }
 
 
-    void ResetFish()
+    [ServerRpc]
+    private void ResetFishServerRpc()
+    {
+        ResetFishClientRpc();
+    }
+
+    [ClientRpc]
+    private void ResetFishClientRpc()
     {
         rb.useGravity = false;
         rb.isKinematic = false;
         _xrInteract.enabled = false;
         rb.velocity = Vector3.zero;
         transform.rotation = Quaternion.identity;
+    }
+
+    [ServerRpc]
+    private void SetFishInteractableServerRpc()
+    {
+        SetFishInteractableClientRpc();
+    }
+
+    [ClientRpc]
+    private void SetFishInteractableClientRpc()
+    {
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        _xrInteract.enabled = true;
     }
 
     //void Startled()
@@ -411,7 +425,7 @@ public class NetworkedFishAI : NetworkBehaviour
         if (other.gameObject.tag == "Water" && (state.Value == FishState.Struggle || state.Value == FishState.Caught))
         {
             Debug.Log("Somehow touched water trigger");
-            ResetFish();
+            ResetFishServerRpc();
             SetFishStateServerRpc(FishState.Wander);
         }
 
