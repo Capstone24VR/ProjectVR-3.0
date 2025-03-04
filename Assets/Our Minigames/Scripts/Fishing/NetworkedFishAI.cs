@@ -433,7 +433,7 @@ public class NetworkedFishAI : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void DestroyServerRpc()
+    public void DestroyServerRpc()
     {
         GetComponent<NetworkObject>().Despawn(true);
     }
@@ -455,7 +455,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
             m_MiniGame.LocalPlayerScored((int)(stats.weight * stats.multiplier * 100));
 
-            DestroyServerRpc();
+            //DestroyServerRpc();
         }
     }
 }

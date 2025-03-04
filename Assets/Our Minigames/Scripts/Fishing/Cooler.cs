@@ -24,7 +24,8 @@ public class Cooler : NetworkBehaviour
             fishStatCanvas.transform.Find("Weight").GetComponent<TextMeshProUGUI>().text = "Weight " + System.Math.Round(newFishStats.weight, 2) + " lb";
             fishStatCanvas.transform.Find("Worth").GetComponent<TextMeshProUGUI>().text = "Worth: " + System.Math.Round(newFishStats.weight * newFishStats.multiplier, 2) + "$";
             fishStatCanvas.SetActive(true);
-        }
 
+            newFish.GetComponent<NetworkedFishAI>().DestroyServerRpc();
+        }
     }
 }
