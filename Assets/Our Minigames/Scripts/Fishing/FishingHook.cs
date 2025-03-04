@@ -62,6 +62,7 @@ public class FishingHook : NetworkBehaviour
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
         {
             caughtObject = fishNetworkObject.gameObject;
+            fishNetworkObject.GetComponent<NetworkedFishAI>().currentHook = transform;
             Debug.Log($"Caught fish: {caughtObject.name} on client.");
         }
         else
