@@ -375,14 +375,14 @@ public class NetworkedFishAI : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void ResetOwnershipServerRpc()
     {
         GetComponent<NetworkObject>().RemoveOwnership();
     }
 
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void ResetFishServerRpc()
     {
         ResetFishClientRpc();
@@ -398,7 +398,7 @@ public class NetworkedFishAI : NetworkBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void EnableFishPhysicsServerRpc()
     {
         EnableFishPhysicsClientRpc();
@@ -411,7 +411,7 @@ public class NetworkedFishAI : NetworkBehaviour
         rb.isKinematic = false;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void ToggleFishXRInteractableServerRpc(bool enabled)
     {
         ToggleFishXRInteractableClientRpc(enabled);
