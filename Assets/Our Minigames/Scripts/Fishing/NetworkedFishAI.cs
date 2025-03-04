@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -444,7 +445,7 @@ public class NetworkedFishAI : NetworkBehaviour
     private void FollowHook(Vector3 target)
     {
         transform.position = Vector3.MoveTowards(transform.position, target, 6);
-        MoveClientRpc(transform.position, target);
+        transform.LookAt(target);
     }
 
     [ClientRpc]
