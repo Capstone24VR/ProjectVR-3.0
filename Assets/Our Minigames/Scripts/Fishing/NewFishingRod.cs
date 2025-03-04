@@ -308,7 +308,7 @@ public class NewFishingRod : NetworkBehaviour
         floater.useGravity = true;
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     void SyncResetFloaterServerRpc()
     {
         SyncResetFloaterClientRpc();
