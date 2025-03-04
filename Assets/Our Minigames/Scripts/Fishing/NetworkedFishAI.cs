@@ -410,7 +410,7 @@ public class NetworkedFishAI : NetworkBehaviour
     private void EnableFishPhysicsClientRpc()
     {
         rb.useGravity = true;
-        rb.isKinematic = false;
+        rb.isKinematic = true;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -492,15 +492,26 @@ public class NetworkedFishAI : NetworkBehaviour
         Debug.Log($"{gameObject.name} was grabbed.");
         if (currentHook != null)
         {
-            currentHook.GetComponent<FishingHook>().caughtObject = null;
-            currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+            currentHook.GetComponent<FishingHook>().ResetHookServerRpc();
             currentHook.GetComponentInParent<NewFishingRod>().ResetCast();
         }
 
-        currentHook = null;
-        rb.useGravity = true;
-        rb.isKinematic = true;
+        SetHookNullServerRpc();
+        EnableFishPhysicsServerRpc();
         SetFishStateServerRpc(FishState.Caught);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetHookNullServerRpc()
+    {
+        currentHook = null;
+        SetHookNullClientRpc();
+    }
+
+    [ClientRpc]
+    void SetHookNullClientRpc()
+    {
+        currentHook = null;
     }
 
     [ServerRpc(RequireOwnership = false)]

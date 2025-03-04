@@ -30,6 +30,20 @@ public class FishingHook : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
+    public void ResetHookServerRpc()
+    {
+        caughtSomething.Value = false;
+        caughtObject = null;
+        ResetHookClientRpc();
+    }
+
+    [ClientRpc]
+    public void ResetHookClientRpc()
+    {
+        caughtObject = null;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     public void CatchFishServerRpc(ulong fishNetworkId)
     {
         if (!caughtSomething.Value)
