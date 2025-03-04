@@ -100,6 +100,11 @@ public class NetworkedFishAI : NetworkBehaviour
         {
             ServerUpdate();
         }
+
+        if(IsOwner && state.Value == FishState.Struggle)
+        {
+            FollowHook(currentHook.position);
+        }
     }
 
     private void ServerUpdate()
@@ -287,15 +292,15 @@ public class NetworkedFishAI : NetworkBehaviour
                 ToggleFishXRInteractableServerRpc(false);
             }
 
-            // If the client owns the fish, let them control movement
-            if (IsOwner)
-            {
-                FollowHook(currentHook.position);
-            }
-            else
-            {
-                FollowHook(currentHook.position);
-            }
+            //// If the client owns the fish, let them control movement
+            //if (IsOwner)
+            //{
+            //    FollowHook(currentHook.position);
+            //}
+            //else
+            //{
+            //    FollowHook(currentHook.position);
+            //}
         }
     }
 
