@@ -101,7 +101,7 @@ public class NetworkedFishAI : NetworkBehaviour
             ServerUpdate();
         }
 
-        if(IsOwner && state.Value == FishState.Struggle)
+        if(IsOwner && state.Value == FishState.Struggle && currentHook != null)
         {
             FollowHook(currentHook.position);
         }
