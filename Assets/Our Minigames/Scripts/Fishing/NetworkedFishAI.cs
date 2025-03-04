@@ -104,7 +104,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
         if(IsOwner && state.Value == FishState.Struggle && currentHook != null)
         {
-            FollowHook(currentHook.position);
+            FollowHookServerRpc(currentHook.position);
         }
     }
 
@@ -442,7 +442,8 @@ public class NetworkedFishAI : NetworkBehaviour
         MoveClientRpc(transform.position, target);
     }
 
-    private void FollowHook(Vector3 target)
+    [ServerRpc(RequireOwnership = false)]
+    private void FollowHookServerRpc(Vector3 target)
     {
         transform.position = Vector3.MoveTowards(transform.position, target, 6);
         transform.LookAt(target);
