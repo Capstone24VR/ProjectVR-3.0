@@ -46,7 +46,7 @@ public class FishingHook : NetworkBehaviour
                 //fishNetworkObject.ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
 
                 // Update fish state
-                fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle);
+                fishNetworkObject.GetComponent<NetworkedFishAI>().SetFishStateServerRpc(NetworkedFishAI.FishState.Struggle, GetComponent<NetworkObject>().OwnerClientId);
             }
             else
             {

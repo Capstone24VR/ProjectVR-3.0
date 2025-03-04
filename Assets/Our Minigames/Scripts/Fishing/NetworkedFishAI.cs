@@ -256,7 +256,6 @@ public class NetworkedFishAI : NetworkBehaviour
             EnableFishPhysicsServerRpc();
             ResetOwnershipServerRpc();
 
-
             if (transform.position.y < waterHeight)
             {
                 Debug.Log("Struggle to wander");
@@ -265,9 +264,9 @@ public class NetworkedFishAI : NetworkBehaviour
             return;
         }
 
-
         if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
         {
+            // Fish escaped, return ownership to the server
             currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
             currentHook.GetComponent<FishingHook>().caughtObject = null;
             currentHook = null;
@@ -287,10 +286,61 @@ public class NetworkedFishAI : NetworkBehaviour
             {
                 ToggleFishXRInteractableServerRpc(false);
             }
-            FollowHookServerRpc(currentHook.position);
+
+            // If the client owns the fish, let them control movement
+            if (IsOwner)
+            {
+                FollowHook(currentHook.position);
+            }
+            else
+            {
+                FollowHook(currentHook.position);
+            }
         }
-        //ErraticMove(3f);
     }
+
+    //void Struggle()
+    //{
+    //    if (currentHook == null)
+    //    {
+    //        EnableFishPhysicsServerRpc();
+    //        ResetOwnershipServerRpc();
+
+
+    //        if (transform.position.y < waterHeight)
+    //        {
+    //            Debug.Log("Struggle to wander");
+    //            SetFishStateServerRpc(FishState.Wander);
+    //        }
+    //        return;
+    //    }
+
+
+    //    if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
+    //    {
+    //        currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
+    //        currentHook.GetComponent<FishingHook>().caughtObject = null;
+    //        currentHook = null;
+
+    //        ResetOwnershipServerRpc();
+    //        EnableFishPhysicsServerRpc();
+    //        ToggleFishXRInteractableServerRpc(true);
+    //        SetFishStateServerRpc(FishState.Caught);
+    //    }
+    //    else
+    //    {
+    //        if (transform.position.y >= waterHeight)
+    //        {
+    //            ToggleFishXRInteractableServerRpc(true);
+    //        }
+    //        else
+    //        {
+    //            ToggleFishXRInteractableServerRpc(false);
+    //        }
+    //        FollowHookServerRpc(currentHook.position);
+    //    }
+    //    //ErraticMove(3f);
+    //}
 
     void ErraticMove(float distance)
     {
@@ -386,8 +436,7 @@ public class NetworkedFishAI : NetworkBehaviour
         MoveClientRpc(transform.position, target);
     }
 
-    [ServerRpc]
-    private void FollowHookServerRpc(Vector3 target)
+    private void FollowHook(Vector3 target)
     {
         transform.position = Vector3.MoveTowards(transform.position, target, 6);
         MoveClientRpc(transform.position, target);
@@ -401,10 +450,25 @@ public class NetworkedFishAI : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SetFishStateServerRpc(FishState newState)
+    public void SetFishStateServerRpc(FishState newState, ulong clientId = 0)
     {
-        state.Value = newState;
+        if (state.Value != newState)
+        {
+            state.Value = newState;
+
+            // Transfer ownership to the client when the fish starts struggling
+            if (newState == FishState.Struggle && clientId != 0)
+            {
+                GetComponent<NetworkObject>().ChangeOwnership(clientId);
+            }
+            // Remove ownership if it's no longer struggling
+            else if (newState != FishState.Struggle && !GetComponent<NetworkObject>().IsOwnedByServer)
+            {
+                GetComponent<NetworkObject>().RemoveOwnership();
+            }
+        }
     }
+
 
 
     private void ChooseNewRandomposition()
