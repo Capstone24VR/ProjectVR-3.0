@@ -202,7 +202,7 @@ namespace XRMultiplayer.MiniGames
                     }
 
                     int name = UnityEngine.Random.Range(0, names.Count);
-                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(minSpawnX, minSpawnX), fishPool.position.y, UnityEngine.Random.Range(minSpawnZ, maxSpawnZ));
+                    Vector3 spawnPoint = new Vector3(UnityEngine.Random.Range(minSpawnX, maxSpawnX), fishPool.position.y, UnityEngine.Random.Range(minSpawnZ, maxSpawnZ));
 
                     var spawn = Instantiate(fish[type], spawnPoint, Quaternion.identity, fishPool);
                     spawn.transform.localScale = Vector3.one * spawn.GetComponent<FishStats>().weight;
