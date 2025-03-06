@@ -489,6 +489,7 @@ public class NetworkedFishAI : NetworkBehaviour
 
     private void OnGrab(SelectEnterEventArgs args)
     {
+        ResetOwnershipServerRpc();
         Debug.Log($"{gameObject.name} was grabbed.");
         if (currentHook != null)
         {
