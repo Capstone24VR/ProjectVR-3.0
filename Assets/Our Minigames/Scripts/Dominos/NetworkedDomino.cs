@@ -784,20 +784,20 @@ namespace XRMultiplayer.MiniGames
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
 
             // Check if it is said players turn to draw [Comment out if you want to play solo]
-            //if (activeHands[currentHandIndex].ownerManager.ClientID != NetworkManager.Singleton.LocalClientId)
-            //{
-            //    Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId} turn!");
-            //    string message = "It is not your turn to draw!";
+            if (activeHands[currentHandIndex].ownerID != NetworkManager.Singleton.LocalClientId)
+            {
+                Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId} turn!");
+                string message = "It is not your turn to draw!";
 
-            //    if (m_CurrentMessageRoutine != null)
-            //    {
-            //        StopCoroutine(m_CurrentMessageRoutine);
-            //    }
-            //    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, NetworkManager.Singleton.LocalClientId, 3);
-            //    StartCoroutine(m_CurrentMessageRoutine);
+                if (m_CurrentMessageRoutine != null)
+                {
+                    StopCoroutine(m_CurrentMessageRoutine);
+                }
+                m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, NetworkManager.Singleton.LocalClientId, 3);
+                StartCoroutine(m_CurrentMessageRoutine);
 
-            //    return;
-            //}
+                return;
+            }
 
             if (networkObject != null)
             {
@@ -844,7 +844,7 @@ namespace XRMultiplayer.MiniGames
                                 UpdateCurrentIndexServerRpc();
                         }
                         else {
-                            string message = domino.name + "cannot be played! Keep drawing lmao";
+                            string message = domino.name + " cannot be played! Keep drawing.";
 
                             if (m_CurrentMessageRoutine != null)
                             {
