@@ -979,7 +979,11 @@ namespace XRMultiplayer.MiniGames
                     }
                 }
 
-                SetOpenHitboxesClientRpc(dominoStill.NetworkObjectId);
+                if(playObject.Count > 2)
+                    SetAllHitboxesOffClientRpc(dominoStill.NetworkObjectId);      
+                else
+                    SetOpenHitboxesClientRpc(dominoStill.NetworkObjectId);
+
                 SetSnapHitboxesClientRpc(dominoSnap.NetworkObjectId, isTopSide);
 
 
@@ -1038,20 +1042,6 @@ namespace XRMultiplayer.MiniGames
                 NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
                 if (dominoNetworkObject != null)
                 {
-
-                    //if (!IsValidPlayCrazyEights(cardNetworkObject.gameObject))
-                    //{
-                    //    string message = cardNetworkObject.gameObject.name + "is not a valid play!";
-
-                    //    if (m_CurrentMessageRoutine != null)
-                    //    {
-                    //        StopCoroutine(m_CurrentMessageRoutine);
-                    //    }
-                    //    m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, clientId, 3);
-                    //    StartCoroutine(m_CurrentMessageRoutine);
-                    //    return;
-                    //}
-
                     dominoNetworkObject.GetComponent<Domino_data>().played = true;
                     NetworkObjectReference dominoReference = new NetworkObjectReference(dominoNetworkObject);
 
