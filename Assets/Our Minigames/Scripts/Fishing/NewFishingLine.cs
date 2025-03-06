@@ -177,13 +177,6 @@ public class NewFishingLine : NetworkBehaviour
         }
     }
 
-    private void DrawLine()
-    {
-        // Render line based on the position of each segment
-        for (int i = 0; i < lineSegmentCount; i++)
-            lineRenderer.SetPosition(i, linePoints[i]);
-    }
-
     [ServerRpc(RequireOwnership = false)]
     private void DrawLineServerRpc(Vector3[] myLine)
     {

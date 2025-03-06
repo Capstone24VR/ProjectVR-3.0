@@ -44,6 +44,9 @@ public class NewFishingRod : NetworkBehaviour
     public AudioSource reelSFX;
     public AudioSource lineCast;
 
+    private float stopDelay = 0.1f;
+    private float lastChangeTime;
+
 
     private void Awake()
     {
@@ -88,6 +91,11 @@ public class NewFishingRod : NetworkBehaviour
         {
             SampleRodPositions();
             nextSampleTime = Time.time + sampleInterval;
+        }
+
+        if(reelSFX.isPlaying && Time.time - lastChangeTime > stopDelay)
+        {
+            PlayReelSFX(false);
         }
     }
 
@@ -215,6 +223,13 @@ public class NewFishingRod : NetworkBehaviour
         var reelChange = change - prevReelChange;
         prevReelChange = change;
         fishingLine.Reel(reelChange);
+
+        lastChangeTime = Time.time;
+
+        if(!reelSFX.isPlaying)
+        {
+            PlayReelSFX(true);
+        }
     }
     
     public void PlayLineCastSFX(bool play)
@@ -253,6 +268,25 @@ public class NewFishingRod : NetworkBehaviour
         if (play)
             rodswishSfx.Play();
         else rodswishSfx.Stop();
+    }
+
+    public void PlayReelSFX(bool play)
+    {
+        PlayReelSFXServerRpc(play);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayReelSFXServerRpc(bool play)
+    {
+        PlayReelSFXClientRpc(play);
+    }
+
+    [ClientRpc]
+    private void PlayReelSFXClientRpc(bool play)
+    {
+        if (play)
+            reelSFX.Play();
+        else reelSFX.Stop();
     }
 
 

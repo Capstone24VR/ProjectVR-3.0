@@ -7,6 +7,8 @@ public class FishingHook : NetworkBehaviour
     public GameObject caughtObject = null;
     public NetworkVariable<bool> rodDropped = new NetworkVariable<bool>(false);
     public NetworkVariable<bool> caughtSomething = new NetworkVariable<bool>(false);
+    public AudioSource fishBaitSFX;
+
     private void Update()
     {
         //if (caughtSomething.Value)
@@ -50,6 +52,7 @@ public class FishingHook : NetworkBehaviour
         {
             if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(fishNetworkId, out NetworkObject fishNetworkObject))
             {
+                PlayBaitSoundClientRpc();
                 caughtSomething.Value = true;
                 caughtObject = fishNetworkObject.gameObject;
 
@@ -82,6 +85,15 @@ public class FishingHook : NetworkBehaviour
         else
         {
             Debug.LogError($"Fish with NetworkObjectId {fishNetworkId} not found on client!");
+        }
+    }
+
+    [ClientRpc]
+    private void PlayBaitSoundClientRpc()
+    {
+        if (fishBaitSFX)
+        {
+            fishBaitSFX.Play();
         }
     }
 }
