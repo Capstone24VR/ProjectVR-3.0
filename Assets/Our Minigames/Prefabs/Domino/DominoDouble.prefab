@@ -816,14 +816,15 @@ GameObject:
   - component: {fileID: 7072622950481673043}
   - component: {fileID: 2629291501845384226}
   - component: {fileID: 384002898639516328}
-  - component: {fileID: 1151139214914679581}
-  - component: {fileID: 8616151299039600717}
+  - component: {fileID: 3472793599446787005}
   - component: {fileID: 3520430618443808131}
   - component: {fileID: 3665018375642103795}
+  - component: {fileID: 1151139214914679581}
   - component: {fileID: 908786269226572939}
   - component: {fileID: 4675781241569951582}
+  - component: {fileID: 8616151299039600717}
   - component: {fileID: 5830378600058158599}
-  - component: {fileID: 3472793599446787005}
+  - component: {fileID: 4676766320684975798}
   m_Layer: 0
   m_Name: DominoDouble
   m_TagString: Untagged
@@ -904,79 +905,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1151139214914679581
-MonoBehaviour:
+--- !u!65 &3472793599446787005
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7596677248850878953}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2835681519
-  InScenePlacedSourceGlobalObjectIdHash: 1503632336
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 1
-  AutoObjectParentSync: 0
---- !u!114 &8616151299039600717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7596677248850878953}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47624880e1cd3c040b315e398c7e6167, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Top_side: 1
-  But_side: 3
-  played: 0
-  inHand: 1
-  isFirstDomino: 0
-  dominoPrefabs:
-  - {fileID: 7596677248850878953, guid: 1aee00ac14bccd84e8ba00f48ae7b1a5, type: 3}
-  - {fileID: 4450686720179388927, guid: 519815ae2696ba540acdf5afc3f841cd, type: 3}
-  - {fileID: 7729289915743583368, guid: 94f25d45d700d1d4788f743dd85215dd, type: 3}
-  - {fileID: 8634413477337168290, guid: 1c6eaacaadfbfe14ab29339a1829c6d9, type: 3}
-  - {fileID: 4915164121653878159, guid: d034a83c4c4ea6349b9bde9d32c369e8, type: 3}
-  - {fileID: 202023189518006140, guid: f04568196db44f7479f267ed905daf08, type: 3}
-  - {fileID: 7058299606381253482, guid: ecc2d2d16d926a74b8620902547c1ca9, type: 3}
-  - {fileID: 4419794833279925571, guid: 6332ae34d6d1951468e5948eaf3e6569, type: 3}
-  - {fileID: 7627669479768885117, guid: 2fd8df3778080f945a79965635c3e9a4, type: 3}
-  - {fileID: 4305183247124719677, guid: c8e20dd454a01d6459923c2576d5bf37, type: 3}
-  - {fileID: 1523781853182354506, guid: b1951c0158f62e940a4a4ea8a3e03f14, type: 3}
-  - {fileID: 4778947401176546207, guid: bd87ef74aeeb0d941be9f5649e8c9f81, type: 3}
-  - {fileID: 5146618930997398832, guid: 89be5c9d60d02894fb6068620e18057d, type: 3}
-  - {fileID: 7470919646529212875, guid: a40aef6acebd9e04298b848d9b0820b4, type: 3}
-  - {fileID: 8949782479513200791, guid: 9b0f348bb7855e94cba123456b83da5d, type: 3}
-  - {fileID: 2254731131128738785, guid: 7e5dcb505c6fd9443be8739a93b4ce9d, type: 3}
-  - {fileID: 7867680925670945047, guid: 45a8264d321bd8a4a9c45d564284321b, type: 3}
-  - {fileID: 4483473424688672467, guid: 4f614fcf1af053f4e95a8e069ec68a1b, type: 3}
-  - {fileID: 1390155946942754904, guid: 6896d70b9d1e7ae4bb61aa517da058f9, type: 3}
-  - {fileID: 5481582300767826508, guid: 70867612d079d934783680552365926c, type: 3}
-  - {fileID: 1732833958931282582, guid: 5c5ab50c48f5c244cbf2945a475d78bd, type: 3}
-  - {fileID: 8924730642476854895, guid: 75b422f70ef805b4482891678ccd8c5b, type: 3}
-  - {fileID: 7986212616487633504, guid: 9bc6b35bbb8c49b498290c0b0863bf69, type: 3}
-  - {fileID: 3554854476720068227, guid: ffad497096f291648b4c5fc98fcacccf, type: 3}
-  - {fileID: 184370313558611119, guid: 4a174cf8b7957bc479eeb1066239ed9e, type: 3}
-  - {fileID: 5732426520356963536, guid: e6d07c9e1ff57b64ab616ca8b9c3882b, type: 3}
-  - {fileID: 3086699415144875470, guid: ad6aef6a2fbc87f4bb1a3b2bbc4a4fe2, type: 3}
-  - {fileID: 3899557546983461283, guid: c79fa8a13d8702749b6dc9037cfa5f9a, type: 3}
-  _position: {x: 0, y: 0, z: 0}
-  _localScale: {x: 0, y: 0, z: 0}
-  canBePlayed: 0
-  stillDominoId: 9999
-  playHitboxIndex: -1
-  isTopSide: 0
+  serializedVersion: 3
+  m_Size: {x: 0.07554728, y: 0.14294112, z: 0.017830849}
+  m_Center: {x: 0.00061914325, y: -0.00015670061, z: 0.0037178993}
 --- !u!114 &3520430618443808131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1194,6 +1143,27 @@ MonoBehaviour:
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
   m_FarAttachMode: 0
+--- !u!114 &1151139214914679581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7596677248850878953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1784746754
+  InScenePlacedSourceGlobalObjectIdHash: 1503632336
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 1
+  AutoObjectParentSync: 0
 --- !u!114 &908786269226572939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1276,6 +1246,58 @@ MonoBehaviour:
   m_AllowCollisionOwnershipExchange: 1
   m_MinExchangeVelocityMagitude: 0.025
   spawnLocked: 0
+--- !u!114 &8616151299039600717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7596677248850878953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47624880e1cd3c040b315e398c7e6167, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Top_side: 1
+  But_side: 3
+  played: 0
+  inHand: 1
+  isFirstDomino: 0
+  dominoPrefabs:
+  - {fileID: 7596677248850878953, guid: 1aee00ac14bccd84e8ba00f48ae7b1a5, type: 3}
+  - {fileID: 4450686720179388927, guid: 519815ae2696ba540acdf5afc3f841cd, type: 3}
+  - {fileID: 7729289915743583368, guid: 94f25d45d700d1d4788f743dd85215dd, type: 3}
+  - {fileID: 8634413477337168290, guid: 1c6eaacaadfbfe14ab29339a1829c6d9, type: 3}
+  - {fileID: 4915164121653878159, guid: d034a83c4c4ea6349b9bde9d32c369e8, type: 3}
+  - {fileID: 202023189518006140, guid: f04568196db44f7479f267ed905daf08, type: 3}
+  - {fileID: 7058299606381253482, guid: ecc2d2d16d926a74b8620902547c1ca9, type: 3}
+  - {fileID: 4419794833279925571, guid: 6332ae34d6d1951468e5948eaf3e6569, type: 3}
+  - {fileID: 7627669479768885117, guid: 2fd8df3778080f945a79965635c3e9a4, type: 3}
+  - {fileID: 4305183247124719677, guid: c8e20dd454a01d6459923c2576d5bf37, type: 3}
+  - {fileID: 1523781853182354506, guid: b1951c0158f62e940a4a4ea8a3e03f14, type: 3}
+  - {fileID: 4778947401176546207, guid: bd87ef74aeeb0d941be9f5649e8c9f81, type: 3}
+  - {fileID: 5146618930997398832, guid: 89be5c9d60d02894fb6068620e18057d, type: 3}
+  - {fileID: 7470919646529212875, guid: a40aef6acebd9e04298b848d9b0820b4, type: 3}
+  - {fileID: 8949782479513200791, guid: 9b0f348bb7855e94cba123456b83da5d, type: 3}
+  - {fileID: 2254731131128738785, guid: 7e5dcb505c6fd9443be8739a93b4ce9d, type: 3}
+  - {fileID: 7867680925670945047, guid: 45a8264d321bd8a4a9c45d564284321b, type: 3}
+  - {fileID: 4483473424688672467, guid: 4f614fcf1af053f4e95a8e069ec68a1b, type: 3}
+  - {fileID: 1390155946942754904, guid: 6896d70b9d1e7ae4bb61aa517da058f9, type: 3}
+  - {fileID: 5481582300767826508, guid: 70867612d079d934783680552365926c, type: 3}
+  - {fileID: 1732833958931282582, guid: 5c5ab50c48f5c244cbf2945a475d78bd, type: 3}
+  - {fileID: 8924730642476854895, guid: 75b422f70ef805b4482891678ccd8c5b, type: 3}
+  - {fileID: 7986212616487633504, guid: 9bc6b35bbb8c49b498290c0b0863bf69, type: 3}
+  - {fileID: 3554854476720068227, guid: ffad497096f291648b4c5fc98fcacccf, type: 3}
+  - {fileID: 184370313558611119, guid: 4a174cf8b7957bc479eeb1066239ed9e, type: 3}
+  - {fileID: 5732426520356963536, guid: e6d07c9e1ff57b64ab616ca8b9c3882b, type: 3}
+  - {fileID: 3086699415144875470, guid: ad6aef6a2fbc87f4bb1a3b2bbc4a4fe2, type: 3}
+  - {fileID: 3899557546983461283, guid: c79fa8a13d8702749b6dc9037cfa5f9a, type: 3}
+  _position: {x: 0, y: 0, z: 0}
+  _localScale: {x: 0, y: 0, z: 0}
+  canBePlayed: 0
+  stillDominoId: 9999
+  playHitboxIndex: -1
+  isTopSide: 0
 --- !u!114 &5830378600058158599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1295,27 +1317,21 @@ MonoBehaviour:
   - {fileID: 8132936425993974517}
   highlightColor: {r: 0.09301472, g: 1, b: 0, a: 0.5}
   defaultColor: {r: 0.254717, g: 0.21266466, b: 0.21266466, a: 0}
---- !u!65 &3472793599446787005
-BoxCollider:
+--- !u!114 &4676766320684975798
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7596677248850878953}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.07554728, y: 0.14294112, z: 0.017830849}
-  m_Center: {x: 0.00061914325, y: -0.00015670061, z: 0.0037178993}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8b874d270c754b4db53792167f1faf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dominoOwnerId: 9999
+  hand: {fileID: 0}
+  grabInteractable: {fileID: 3665018375642103795}
 --- !u!1 &8278810976823939011
 GameObject:
   m_ObjectHideFlags: 0
