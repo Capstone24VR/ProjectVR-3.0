@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using Domino;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
+using Unity.Mathematics;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -31,12 +32,12 @@ namespace XRMultiplayer.MiniGames
         [SerializeField] GameObject dominoDouble;
 
         /// <summary>
-        /// The card prefab to spawn.
+        /// The domino prefab to spawn.
         /// </summary>
         [SerializeField] GameObject drawPileObj;
 
         /// <summary>
-        /// The card prefab to spawn.
+        /// The domino prefab to spawn.
         /// </summary>
         [SerializeField] GameObject playPileObj;
 
@@ -61,7 +62,7 @@ namespace XRMultiplayer.MiniGames
         private HashSet<ulong> clientsThatHaveCompletedDeck = new HashSet<ulong>();
 
         /// <summary>
-        /// The number of starting cards
+        /// The number of starting dominos
         /// </summary>
         [SerializeField] int startingHand = 5;
 
@@ -158,7 +159,7 @@ namespace XRMultiplayer.MiniGames
 
             Debug.Log($"Playable sides is clear (count: {_playSides.Count})");
 
-            yield return new WaitForSeconds(0.5f); // Give time to remove all cards
+            yield return new WaitForSeconds(0.5f); // Give time to remove all dominos
 
             activeHands.Clear();
 
@@ -199,21 +200,21 @@ namespace XRMultiplayer.MiniGames
                 {
                     if (hand.canDraw())
                     {
-                        NetworkObjectReference topCard = _drawPile[_drawPile.Count - 1];
+                        NetworkObjectReference topDomino = _drawPile[_drawPile.Count - 1];
 
-                        if (topCard.TryGet(out NetworkObject networkCard))
+                        if (topDomino.TryGet(out NetworkObject networkDomino))
                         {
-                            _drawPile.Remove(topCard);
+                            _drawPile.Remove(topDomino);
 
-                            if (!networkCard.IsSpawned)
+                            if (!networkDomino.IsSpawned)
                             {
-                                networkCard.Spawn();
+                                networkDomino.Spawn();
                             }
-                            hand.DrawCardServerRpc(topCard);
+                            hand.DrawDominoServerRpc(topDomino);
                         }
                         else
                         {
-                            Debug.Log("FATAL ERROR: Card not found at start");
+                            Debug.Log("FATAL ERROR: Domino not found at start");
                         }
                     }
                 }
@@ -362,7 +363,7 @@ namespace XRMultiplayer.MiniGames
         {
             Debug.Log("Client received deck creation. Waiting for server to finish...");
 
-            yield return new WaitForSeconds(1.0f); // Ensure enough delay for server to fully spawn cards
+            yield return new WaitForSeconds(1.0f); // Ensure enough delay for server to fully spawn dominos
 
             Debug.Log("Creating Deck on Client...");
 
@@ -372,22 +373,22 @@ namespace XRMultiplayer.MiniGames
                 int bottomSide = bottomSides[i];
 
 
-                // Find the card by NetworkObjectId and use its existing reference
-                NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
-                if (cardNetworkObject != null)
+                // Find the domino by NetworkObjectId and use its existing reference
+                NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
+                if (dominoNetworkObject != null)
                 {
-                    Domino_data dominoComponent = cardNetworkObject.GetComponent<Domino_data>();
+                    Domino_data dominoComponent = dominoNetworkObject.GetComponent<Domino_data>();
 
                     dominoComponent.InitializeDomino(topSide, bottomSide);
                     dominoComponent.AssignDominoVisual();
 
-                    // Ensuring Card value and name is set correctly
-                    cardNetworkObject.gameObject.name = $"Domino: [{topSide}-{bottomSide}]";
-                    cardNetworkObject.TrySetParent(drawPileObj, false);
+                    // Ensuring Domino value and name is set correctly
+                    dominoNetworkObject.gameObject.name = $"Domino: [{topSide}-{bottomSide}]";
+                    dominoNetworkObject.TrySetParent(drawPileObj, false);
 
-                    // Ensuring Card position is set correctly
-                    cardNetworkObject.transform.localPosition = Vector3.zero;
-                    cardNetworkObject.transform.localRotation = Quaternion.identity;
+                    // Ensuring Domino position is set correctly
+                    dominoNetworkObject.transform.localPosition = Vector3.zero;
+                    dominoNetworkObject.transform.localRotation = Quaternion.identity;
 
 
                     if(topSide == bottomSide)
@@ -454,10 +455,10 @@ namespace XRMultiplayer.MiniGames
                 _drawPile.Clear(); // Clear previous draw pile if any
 
                 // Copy shuffled deck into the draw pile
-                foreach (var cardReference in deck)
+                foreach (var dominoReference in deck)
                 {
-                    AddToDrawPileServer(cardReference);
-                    SetCardActiveClientRpc(cardReference.NetworkObjectId, false);
+                    AddToDrawPileServer(dominoReference);
+                    SetDominoActiveClientRpc(dominoReference.NetworkObjectId, false);
                 }
 
                 Debug.Log("Draw Pile created.");
@@ -467,15 +468,15 @@ namespace XRMultiplayer.MiniGames
 
 
         [ClientRpc]
-        void SetCardActiveClientRpc(ulong networkObjectId, bool value)
+        void SetDominoActiveClientRpc(ulong networkObjectId, bool value)
         {
 
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
+            NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (dominoNetworkObject != null && dominoNetworkObject.IsSpawned)
             {
-                Debug.Log($"Server attempting to set {cardNetworkObject.gameObject.name} active to {value} on clients");
-                cardNetworkObject.gameObject.SetActive(value);
-                Debug.Log($"Checking if domino is active: {cardNetworkObject.isActiveAndEnabled}");
+                Debug.Log($"Server attempting to set {dominoNetworkObject.gameObject.name} active to {value} on clients");
+                dominoNetworkObject.gameObject.SetActive(value);
+                Debug.Log($"Checking if domino is active: {dominoNetworkObject.isActiveAndEnabled}");
             }
             else
             {
@@ -532,67 +533,66 @@ namespace XRMultiplayer.MiniGames
             }
         }
 
-        private void AddToPlayPileServer(GameObject card)
+        private void AddToPlayPileServer(GameObject domino)
         {
             if (IsServer)
             {
-                NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
+                NetworkObjectReference dominoReference = new NetworkObjectReference(domino.GetComponent<NetworkObject>());
 
                 // Use the SetPlayed method to properly mark the domino as played and disable interaction
-                var dominoData = card.GetComponent<Domino_data>();
+                var dominoData = domino.GetComponent<Domino_data>();
                 if (dominoData != null)
                 {
-                    dominoData.SetPlayed();
                     dominoData.inHand = false;
                 }
                 else
                 {
-                    Debug.LogError($"{card.name}: Domino_data component is missing. Cannot set as played.");
+                    Debug.LogError($"{domino.name}: Domino_data component is missing. Cannot set as played.");
                 }
 
-                _playPile.Add(cardReference);
-                AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, true);
+                _playPile.Add(dominoReference);
+                AddToPileClientRpc(domino.GetComponent<NetworkObject>().NetworkObjectId, true);
             }
         }
-        private void AddToPlayPileServer(NetworkObjectReference cardReference)
+        private void AddToPlayPileServer(NetworkObjectReference dominoReference)
         {
             if (IsServer)
             {
-                if (cardReference.TryGet(out NetworkObject networkObject))
+                if (dominoReference.TryGet(out NetworkObject networkObject))
                 {
-                    _playPile.Add(cardReference);
+                    _playPile.Add(dominoReference);
                     AddToPileClientRpc(networkObject.NetworkObjectId, true);
                 }
             }
         }
 
-        private void AddToDrawPileServer(GameObject card)
+        private void AddToDrawPileServer(GameObject domino)
         {
             if (IsServer)
             {
-                NetworkObjectReference cardReference = new NetworkObjectReference(card.GetComponent<NetworkObject>());
+                NetworkObjectReference dominoReference = new NetworkObjectReference(domino.GetComponent<NetworkObject>());
 
-                _drawPile.Add(cardReference);
-                AddToPileClientRpc(card.GetComponent<NetworkObject>().NetworkObjectId, false);
+                _drawPile.Add(dominoReference);
+                AddToPileClientRpc(domino.GetComponent<NetworkObject>().NetworkObjectId, false);
             }
         }
 
-        private void AddToDrawPileServer(NetworkObjectReference cardReference)
+        private void AddToDrawPileServer(NetworkObjectReference dominoReference)
         {
             if (IsServer)
             {
-                if (cardReference.TryGet(out NetworkObject networkObject))
+                if (dominoReference.TryGet(out NetworkObject networkObject))
                 {
-                    _drawPile.Add(cardReference);
+                    _drawPile.Add(dominoReference);
                     AddToPileClientRpc(networkObject.NetworkObjectId, false);
                 }
             }
         }
 
         /// <summary>
-        /// Adds Card to selected pile for client(purely visual)
+        /// Adds Domino to selected pile for client(purely visual)
         /// </summary>
-        /// <param name="networkObjectId"> the id of the card you are adding to the pile</param>
+        /// <param name="networkObjectId"> the id of the domino you are adding to the pile</param>
         /// <param name="isPlay">If you are adding to the play pile else draw pile</param>
         [ClientRpc]
         private void AddToPileClientRpc(ulong networkObjectId, bool isPlay)
@@ -604,18 +604,18 @@ namespace XRMultiplayer.MiniGames
         {
             GameObject pileObj = isPlay ? playPileObj : drawPileObj;
 
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-            if (cardNetworkObject != null && cardNetworkObject.IsSpawned)
+            NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+            if (dominoNetworkObject != null && dominoNetworkObject.IsSpawned)
             {
                 if (isPlay) // Set played to true to stop Play function from playing and disable XR grab interactable
                 {
-                    cardNetworkObject.gameObject.GetComponent<Domino_data>().played = true;
+                    dominoNetworkObject.gameObject.GetComponent<Domino_data>().played = true;
                 }
 
-                cardNetworkObject.gameObject.transform.parent = pileObj.transform;
-                cardNetworkObject.gameObject.transform.localPosition = Vector3.zero;
-                cardNetworkObject.gameObject.transform.localRotation = Quaternion.identity;
-                cardNetworkObject.gameObject.GetComponent<Domino_data>().inHand = false;
+                dominoNetworkObject.gameObject.transform.parent = pileObj.transform;
+                dominoNetworkObject.gameObject.transform.localPosition = Vector3.zero;
+                dominoNetworkObject.gameObject.transform.localRotation = Quaternion.identity;
+                dominoNetworkObject.gameObject.GetComponent<Domino_data>().inHand = false;
             }
 
 
@@ -627,7 +627,7 @@ namespace XRMultiplayer.MiniGames
         {
             if (IsServer)
             {
-                // Notify clients to clear their hands and card visuals
+                // Notify clients to clear their hands and domino visuals
                 ClearAllClientHandsClientRpc();
 
                 foreach (NetworkedHandDomino hand in activeHands)
@@ -645,13 +645,13 @@ namespace XRMultiplayer.MiniGames
                 _playSides.Clear();
 
 
-                foreach (NetworkObjectReference cardRef in deck)
+                foreach (NetworkObjectReference dominoRef in deck)
                 {
-                    if (cardRef.TryGet(out NetworkObject networkCard) && networkCard.IsSpawned)
+                    if (dominoRef.TryGet(out NetworkObject networkDomino) && networkDomino.IsSpawned)
                     {
-                        networkCard.gameObject.SetActive(true);
-                        SetCardActiveClientRpc(networkCard.NetworkObjectId, true);
-                        networkCard.Despawn(true); // Despawn the card across the network
+                        networkDomino.gameObject.SetActive(true);
+                        SetDominoActiveClientRpc(networkDomino.NetworkObjectId, true);
+                        networkDomino.Despawn(true); // Despawn the domino across the network
                     }
                 }
                 deck.Clear();
@@ -679,33 +679,33 @@ namespace XRMultiplayer.MiniGames
             Debug.Log($"{activeHands[FindStartingPlayer()]} has the highest hands");
             currentHandIndex = FindStartingPlayer();
 
-            if (firstReference.TryGet(out NetworkObject networkCardDraw))
+            if (firstReference.TryGet(out NetworkObject networkDominoDraw))
             {
                 _drawPile.Remove(firstReference);
-                GameObject firstCard = networkCardDraw.gameObject;
-                Debug.Log("Drawing First card(" + firstCard.name + ") for Domino . . . ");
-                AddToPlayPileServer(firstCard);
-                SetCardActiveClientRpc(firstReference.NetworkObjectId, true);
+                GameObject firstDomino = networkDominoDraw.gameObject;
+                Debug.Log("Drawing First domino(" + firstDomino.name + ") for Domino . . . ");
+                AddToPlayPileServer(firstDomino);
+                SetDominoActiveClientRpc(firstReference.NetworkObjectId, true);
                 SetOpenHitboxesClientRpc(firstReference.NetworkObjectId);
 
-                _playSides.Add(networkCardDraw.GetComponent<Domino_data>().But_side);
-                _playSides.Add(networkCardDraw.GetComponent<Domino_data>().Top_side);
+                _playSides.Add(networkDominoDraw.GetComponent<Domino_data>().But_side);
+                _playSides.Add(networkDominoDraw.GetComponent<Domino_data>().Top_side);
             }
             else
             {
-                Debug.Log("FATAL ERROR: Card not found at drawPiile(Domino)");
+                Debug.Log("FATAL ERROR: Domino not found at drawPiile(Domino)");
                 return;
             }
 
-            NetworkObjectReference cardReference = _drawPile[_drawPile.Count - 1];
-            if (!cardReference.TryGet(out NetworkObject res))
+            NetworkObjectReference dominoReference = _drawPile[_drawPile.Count - 1];
+            if (!dominoReference.TryGet(out NetworkObject res))
             {
-                Debug.Log("FATAL ERROR: Card not found at playPile(Domino)");
+                Debug.Log("FATAL ERROR: Domino not found at playPile(Domino)");
                 return;
             }
-            SetCardActiveClientRpc(cardReference.NetworkObjectId, true);
+            SetDominoActiveClientRpc(dominoReference.NetworkObjectId, true);
 
-            //Debug.Log("First card drawn.");
+            //Debug.Log("First domino drawn.");
             UpdateCurrentIndexClientRpc(currentHandIndex, 0);
 
             gameStarted = true;
@@ -767,21 +767,21 @@ namespace XRMultiplayer.MiniGames
         }
 
         [ClientRpc]
-        public void UpdatePlayerHandClientRpc(NetworkObjectReference cardReference, int index)
+        public void UpdatePlayerHandClientRpc(NetworkObjectReference dominoReference, int index)
         {
-            activeHands[index].DrawCardClientRpc(cardReference);  // Add card to the correct hand on the client side
+            activeHands[index].DrawDominoClientRpc(dominoReference);  // Add domino to the correct hand on the client side
         }
 
-        public void RequestDrawDomino(GameObject card)
+        public void RequestDrawDomino(GameObject domino)
         {
-            if (!_drawPile.Contains(card.GetComponent<NetworkObject>()))
+            if (!_drawPile.Contains(domino.GetComponent<NetworkObject>()))
             {
-                Debug.Log($"Requesting to draw {card.name} not in pile");
+                Debug.Log($"Requesting to draw {domino.name} not in pile");
                 return;
             }
 
-            NetworkObject networkObject = card.GetComponent<NetworkObject>();
-            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {card.name}");
+            NetworkObject networkObject = domino.GetComponent<NetworkObject>();
+            Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to Draw {domino.name}");
 
             // Check if it is said players turn to draw [Comment out if you want to play solo]
             if (activeHands[currentHandIndex].ownerID != NetworkManager.Singleton.LocalClientId)
@@ -801,11 +801,12 @@ namespace XRMultiplayer.MiniGames
 
             if (networkObject != null)
             {
+                domino.GetComponent<Domino_data>().PlaySFXAll(0);
                 DrawTopDominoServerRpc(networkObject.NetworkObjectId);
             }
             else
             {
-                Debug.Log("Error on request, card DNE");
+                Debug.Log("Error on request, domino DNE");
             }
 
         }
@@ -816,7 +817,7 @@ namespace XRMultiplayer.MiniGames
             // To do Draw Dominoes from boneyard until you can play
             // To Do  Scoring: 
             ulong clientId = rpcParams.Receive.SenderClientId;
-            Debug.Log($"Server processing card draw request from client {clientId}.");
+            Debug.Log($"Server processing domino draw request from client {clientId}.");
 
             if (IsServer)
             {
@@ -828,9 +829,9 @@ namespace XRMultiplayer.MiniGames
                     if (_drawPile.Contains(dominoReference))
                     {
                         _drawPile.Remove(dominoReference);  // Remove from draw pile
-                        Debug.Log($"Card {domino.name} picked from draw pile.");
+                        Debug.Log($"Domino {domino.name} picked from draw pile.");
 
-                        activeHands[currentHandIndex].DrawCardServerRpc(dominoReference); // This method is from NetworkedHand.cs
+                        activeHands[currentHandIndex].DrawDominoServerRpc(dominoReference); // This method is from NetworkedHand.cs
 
                         Debug.Log($"the current hand is: {currentHandIndex}. Server attempting to move {domino.name} to {activeHands[currentHandIndex].name} with id of {activeHands[currentHandIndex].NetworkObjectId}");
 
@@ -838,7 +839,7 @@ namespace XRMultiplayer.MiniGames
                         UpdatePlayerHandClientRpc(dominoReference, currentHandIndex);
 
 
-                        // ToDO: implement checking if card is valid don't skip turn
+                        // ToDO: implement checking if domino is valid don't skip turn
                         if (_playSides.Contains(domino.GetComponent<Domino_data>().But_side) || _playSides.Contains(domino.GetComponent<Domino_data>().Top_side))
                         {
                                 UpdateCurrentIndexServerRpc();
@@ -859,14 +860,14 @@ namespace XRMultiplayer.MiniGames
                         {
                             if (_drawPile[_drawPile.Count - 1].TryGet(out NetworkObject nextDomino))
                             {
-                                SetCardActiveClientRpc(nextDomino.NetworkObjectId, true);
+                                SetDominoActiveClientRpc(nextDomino.NetworkObjectId, true);
                             }
                         }
 
                     }
                     else
                     {
-                        Debug.Log("Card not found in draw pile.");
+                        Debug.Log("Domino not found in draw pile.");
                     }
 
                 }
@@ -889,7 +890,7 @@ namespace XRMultiplayer.MiniGames
             }
 
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {dominoSnap.name}");
-            if (!activeHands[currentHandIndex].heldDominos.Contains(dominoSnap)) // Card from wrong hand do not accept
+            if (!activeHands[currentHandIndex].heldDominos.Contains(dominoSnap)) // Domino from wrong hand do not accept
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId}'s turn!");
                 return;
@@ -897,11 +898,12 @@ namespace XRMultiplayer.MiniGames
 
             if (dominoSnap != null && dominoStill != null)
             {
+                dominoStill.GetComponent<Domino_data>().PlaySFXAll(UnityEngine.Random.Range(2, 4));
                 PlayDominoServerRpc(networkObjectIdsnap, networkObjectIdstill, hitbox, isTopSide);
             }
             else
             {
-                Debug.Log("Error on request, card DNE");
+                Debug.Log("Error on request, domino DNE");
             }
         }
 
@@ -909,7 +911,7 @@ namespace XRMultiplayer.MiniGames
         public void PlayDominoServerRpc(ulong networkObjectIdsnap, ulong networkObjectIdstill, int hitbox, bool isTopSide, ServerRpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
-            Debug.Log($"Server processing card play request from client {clientId}.");
+            Debug.Log($"Server processing domino play request from client {clientId}.");
 
             if (IsServer)
             {
@@ -920,7 +922,7 @@ namespace XRMultiplayer.MiniGames
                     dominoSnap.GetComponent<Domino_data>().played = true;
                     NetworkObjectReference dominoReference = new NetworkObjectReference(dominoSnap);
 
-                    activeHands[currentHandIndex].RemoveCardServerRpc(dominoReference.NetworkObjectId);
+                    activeHands[currentHandIndex].RemoveDominoServerRpc(dominoReference.NetworkObjectId);
 
                     _playSides.Remove(dominoStill.GetComponent<SnapManager>().hitboxes[hitbox].sideValue);
                     _playSides.Add(isTopSide ? dominoSnap.GetComponent<Domino_data>().But_side : dominoSnap.GetComponent<Domino_data>().Top_side);
@@ -939,7 +941,6 @@ namespace XRMultiplayer.MiniGames
         {
             NetworkObject dominoSnap = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdsnap];
             NetworkObject dominoStill = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIdstill];
-
 
             if (dominoSnap != null && dominoStill != null)
             {
@@ -979,10 +980,13 @@ namespace XRMultiplayer.MiniGames
                     }
                 }
 
-                if(playObject.Count > 2)
+                dominoSnap.GetComponent<Domino_data>().SetPlayed();
+
+                if (playObject.Count > 2)
                     SetAllHitboxesOffClientRpc(dominoStill.NetworkObjectId);      
                 else
                     SetOpenHitboxesClientRpc(dominoStill.NetworkObjectId);
+
 
                 SetSnapHitboxesClientRpc(dominoSnap.NetworkObjectId, isTopSide);
 
@@ -1015,7 +1019,7 @@ namespace XRMultiplayer.MiniGames
             }
 
             Debug.Log($"Client: {NetworkManager.Singleton.LocalClientId} is attempting to play {networkObject.name}");
-            if (!activeHands[currentHandIndex].heldDominos.Contains(networkObject)) // Card from wrong hand do not accept
+            if (!activeHands[currentHandIndex].heldDominos.Contains(networkObject)) // Domino from wrong hand do not accept
             {
                 Debug.Log($"It is not Client: {NetworkManager.Singleton.LocalClientId}'s turn!");
                 return;
@@ -1027,7 +1031,7 @@ namespace XRMultiplayer.MiniGames
             }
             else
             {
-                Debug.Log("Error on request, card DNE");
+                Debug.Log("Error on request, domino DNE");
             }
         }
 
@@ -1045,7 +1049,7 @@ namespace XRMultiplayer.MiniGames
                     dominoNetworkObject.GetComponent<Domino_data>().played = true;
                     NetworkObjectReference dominoReference = new NetworkObjectReference(dominoNetworkObject);
 
-                    activeHands[currentHandIndex].RemoveCardServerRpc(dominoReference.NetworkObjectId);
+                    activeHands[currentHandIndex].RemoveDominoServerRpc(dominoReference.NetworkObjectId);
 
 
                     dominoNetworkObject.GetComponent<Domino_data>().isFirstDomino = true;
@@ -1160,13 +1164,13 @@ namespace XRMultiplayer.MiniGames
             switch (changeEvent.Type)
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
-                    // A new card was added to the draw pile
-                    Debug.Log($"Card added to Deck: {changeEvent.Value}");
+                    // A new domino was added to the draw pile
+                    Debug.Log($"Domino added to Deck: {changeEvent.Value}");
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
-                    // A card was removed from the draw pile
-                    Debug.Log($"Card removed from Deck: {changeEvent.Value}");
+                    // A domino was removed from the draw pile
+                    Debug.Log($"Domino removed from Deck: {changeEvent.Value}");
                     break;
             }
         }
@@ -1175,8 +1179,8 @@ namespace XRMultiplayer.MiniGames
             switch (changeEvent.Type)
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
-                    // A new card was added to the draw pile
-                    Debug.Log($"Card added to draw pile: {changeEvent.Value}");
+                    // A new domino was added to the draw pile
+                    Debug.Log($"Domino added to draw pile: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noA))
                     {
                         drawObject.Add(noA.gameObject);
@@ -1184,8 +1188,8 @@ namespace XRMultiplayer.MiniGames
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
-                    // A card was removed from the draw pile
-                    Debug.Log($"Card removed from draw pile: {changeEvent.Value}");
+                    // A domino was removed from the draw pile
+                    Debug.Log($"Domino removed from draw pile: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noR))
                     {
                         drawObject.Remove(noR.gameObject);
@@ -1198,8 +1202,8 @@ namespace XRMultiplayer.MiniGames
             switch (changeEvent.Type)
             {
                 case NetworkListEvent<NetworkObjectReference>.EventType.Add:
-                    // A new card was added to the draw pile
-                    Debug.Log($"Card added to play pile: {changeEvent.Value}");
+                    // A new domino was added to the draw pile
+                    Debug.Log($"Domino added to play pile: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noA))
                     {
                         playObject.Add(noA.gameObject);
@@ -1207,8 +1211,8 @@ namespace XRMultiplayer.MiniGames
                     break;
 
                 case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
-                    // A card was removed from the draw pile
-                    Debug.Log($"Card removed from play pile: {changeEvent.Value}");
+                    // A domino was removed from the draw pile
+                    Debug.Log($"Domino removed from play pile: {changeEvent.Value}");
                     if (changeEvent.Value.TryGet(out NetworkObject noR))
                     {
                         playObject.Remove(noR.gameObject);
@@ -1222,13 +1226,13 @@ namespace XRMultiplayer.MiniGames
             switch (changeEvent.Type)
             {
                 case NetworkListEvent<int>.EventType.Add:
-                    // A new card was added to the draw pile
+                    // A new domino was added to the draw pile
                     Debug.Log($"Play Side added to List: {changeEvent.Value}");
                     playSidesList.Add(changeEvent.Value);
                     break;
 
                 case NetworkListEvent<int>.EventType.Remove:
-                    // A card was removed from the draw pile
+                    // A domino was removed from the draw pile
                     Debug.Log($"Play Side removed from List: {changeEvent.Value}");
                     playSidesList.Remove(changeEvent.Value);
                     break;

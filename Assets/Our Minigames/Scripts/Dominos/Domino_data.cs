@@ -10,6 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRMultiplayer.MiniGames;
 
 using Domino;
+using XRMultiplayer;
 
 public class Domino_data : NetworkBehaviour
 {
@@ -32,20 +33,34 @@ public class Domino_data : NetworkBehaviour
 
     private XRGrabInteractable _xrInteract;
     private NetworkedDomino _dominoManager;
+    private DominoOwnerManager _ownerManager;
     private Rigidbody _rb;
 
     // Stuff needed to snap domino!
+    [Header("HitBox and Snapping")]
     public bool canBePlayed = false;
     public ulong stillDominoId = 9999;
     public int playHitboxIndex = -1;
     public bool isTopSide = false;
 
+    private AudioSource _dominoSFX;
+
+    [Header("Sound Clips")]
+    [SerializeField] private AudioClip _dominoPickup;
+    [SerializeField] private AudioClip _dominoReleased;
+    [SerializeField] private AudioClip _dominoPlayed1;
+    [SerializeField] private AudioClip _dominoPlayed2;
+
     private void Awake()
     {
         _xrInteract = GetComponent<XRGrabInteractable>();
-        _dominoManager = FindAnyObjectByType<NetworkedDomino>();
         _rb = GetComponent<Rigidbody>();
 
+        _dominoManager = FindAnyObjectByType<NetworkedDomino>();
+        _ownerManager = GetComponent<DominoOwnerManager>();
+
+        _dominoSFX = GetComponent<AudioSource>();
+          
 
         _rb.useGravity = false;  // Ensure gravity is disabled
         _rb.isKinematic = true;  // Make the Rigidbody kinematic to ignore all physical forces
@@ -139,6 +154,16 @@ public class Domino_data : NetworkBehaviour
         transform.localScale = newScale;
     }
 
+    public void PlaySFX(int clip, ulong clientId)
+    {
+        PlaySFXServerRpc(clip, clientId);
+    }
+
+    public void PlaySFXAll(int clip)
+    {
+        PlaySFXAllServerRpc(clip);
+    }
+
     // ServerRpc to inform the server about the hover select event
     [ServerRpc(RequireOwnership = false)]
     private void HoverSelectServerRpc()
@@ -169,6 +194,57 @@ public class Domino_data : NetworkBehaviour
         ScaleCard(_localScale); // Apply hover deselect effect on all clients
     }
 
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaySFXServerRpc(int clip, ulong clientId)
+    {
+        PlaySFXClientRpc(clip, clientId);
+    }
+
+
+    [ClientRpc]
+    private void PlaySFXClientRpc(int clip, ulong clientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+        {
+            PlayAudioClip(clip);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaySFXAllServerRpc(int clip)
+    {
+        PlaySFXAllClientRpc(clip);
+    }
+
+
+    [ClientRpc]
+    private void PlaySFXAllClientRpc(int clip)
+    {
+        PlayAudioClip(clip);
+    }
+
+    private void PlayAudioClip(int clip)
+    {
+        switch (clip)
+        {
+            case 0:
+                _dominoSFX.clip = _dominoPickup;
+                break;
+            case 1:
+                _dominoSFX.clip = _dominoReleased;
+                break;
+            case 2:
+                _dominoSFX.clip = _dominoPlayed1;
+                break;
+            case 3:
+                _dominoSFX.clip = _dominoPlayed2;
+                break;
+        }
+
+        _dominoSFX.Play();
+    }
+
     public void SetCardInteractive(bool value)
     {
         _xrInteract.trackPosition = value;
@@ -195,39 +271,58 @@ public class Domino_data : NetworkBehaviour
     {
         inHand = isInHand;
     }
+
+    private bool HeldByOwner()
+    {
+        return _ownerManager.dominoOwnerId == NetworkManager.Singleton.LocalClientId;
+    }
+
     protected virtual void OnHoverEntered(HoverEnterEventArgs args)
     {
-        HoverSelect(); // Trigger hover select effect
+        if (IsSpawned)
+            HoverSelect(); // Trigger hover select effect
     }
 
     protected virtual void OnHoverExited(HoverExitEventArgs args)
     {
-        HoverDeSelect(); // Trigger hover deselect effect
+        if (IsSpawned)
+            HoverDeSelect(); // Trigger hover deselect effect
     }
 
     protected virtual void OnSelectEntered(SelectEnterEventArgs args)
     {
-        HoverDeSelect();
+
+        if (IsSpawned)
+            HoverDeSelect();
+        if (HeldByOwner())
+            PlaySFXServerRpc(0, _ownerManager.dominoOwnerId); // 0 indicates pickup SFX
     }
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)
     {
-        if(isFirstDomino)
-            return;
-        
-        ResetPosition();
-        HoverDeSelect();
-        if (canBePlayed && stillDominoId != 9999 && playHitboxIndex != -1)
+        if (IsSpawned)
         {
-            NetworkObject stillDomino = NetworkManager.Singleton.SpawnManager.SpawnedObjects[stillDominoId];
-            Debug.Log($"Attempting to play {name} with {stillDomino.name} with Id of: {stillDominoId} and conneting to hitbox: {playHitboxIndex}");
-            _dominoManager.RequestPlayDomino(GetComponent<NetworkObject>().NetworkObjectId, stillDominoId, playHitboxIndex, isTopSide);
-            playHitboxIndex = -1;
-            canBePlayed = false;
-            stillDominoId = 9999;
-            Debug.Log($"Resetting all values: canBePlayed: {canBePlayed}, playHitBoxIndex: {playHitboxIndex}, stillDominoId: {stillDominoId}");
+            if (isFirstDomino)
+                return;
+
+            if (inHand && HeldByOwner())
+                PlaySFXServerRpc(1, _ownerManager.dominoOwnerId);
+
+            ResetPosition();
+            HoverDeSelect();
+            if (canBePlayed && stillDominoId != 9999 && playHitboxIndex != -1)
+            {
+                NetworkObject stillDomino = NetworkManager.Singleton.SpawnManager.SpawnedObjects[stillDominoId];
+                Debug.Log($"Attempting to play {name} with {stillDomino.name} with Id of: {stillDominoId} and conneting to hitbox: {playHitboxIndex}");
+                _dominoManager.RequestPlayDomino(GetComponent<NetworkObject>().NetworkObjectId, stillDominoId, playHitboxIndex, isTopSide);
+                playHitboxIndex = -1;
+                canBePlayed = false;
+                stillDominoId = 9999;
+                Debug.Log($"Resetting all values: canBePlayed: {canBePlayed}, playHitBoxIndex: {playHitboxIndex}, stillDominoId: {stillDominoId}");
+            }
+            _dominoManager.RequestDrawDomino(gameObject);
         }
-        _dominoManager.RequestDrawDomino(gameObject);
+        
     }
 
     private void OnEnable()

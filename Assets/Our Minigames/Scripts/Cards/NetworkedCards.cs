@@ -5,7 +5,6 @@ using UnityEngine;
 using static Card;
 using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
-using UnityEditor.PackageManager;
 
 namespace XRMultiplayer.MiniGames
 {
@@ -773,7 +772,7 @@ namespace XRMultiplayer.MiniGames
 
             if (networkObject != null)
             {
-                networkObject.gameObject.GetComponent<Card>().PlaySFXAll(2);
+                networkObject.GetComponent<Card>().PlaySFXAll(UnityEngine.Random.Range(2, 5));
                 PlayCardServerRpc(networkObjectId);
             }
             else

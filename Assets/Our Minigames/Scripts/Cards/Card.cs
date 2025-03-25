@@ -37,20 +37,23 @@ public class Card : NetworkBehaviour
 
     public bool inHand = false;
     public bool canBePlayed = false;
+    public bool played = false;
 
     [SerializeField] protected Vector3 _position = Vector3.zero;
     [SerializeField] protected Vector3 _localScale = Vector3.one;
     
     private XRGrabInteractable _xrInteract;
     private NetworkedCards _cardManager;
-    private CardOwnerManager _ownerManger;
+    private CardOwnerManager _ownerManager;
 
     private AudioSource _cardSFX;
 
     [Header("Sound Clips")]
     [SerializeField] private AudioClip _cardPickup;
     [SerializeField] private AudioClip _cardRelease;
-    [SerializeField] private AudioClip _cardPlayed;
+    [SerializeField] private AudioClip _cardPlayed1;
+    [SerializeField] private AudioClip _cardPlayed2;
+    [SerializeField] private AudioClip _cardPlayed3;
 
     public void Awake()
     {
@@ -58,8 +61,9 @@ public class Card : NetworkBehaviour
         _xrInteract = GetComponent<XRGrabInteractable>();
 
         _cardManager = FindAnyObjectByType<NetworkedCards>();
+        _ownerManager = GetComponent<CardOwnerManager>();
+
         _cardSFX = GetComponent<AudioSource>();
-        _ownerManger = GetComponent<CardOwnerManager>();
     }
 
     public void SetPosition(Vector3 position)
@@ -178,7 +182,13 @@ public class Card : NetworkBehaviour
                 _cardSFX.clip = _cardRelease;
                 break;
             case 2:
-                _cardSFX.clip = _cardPlayed;
+                _cardSFX.clip = _cardPlayed1;
+                break;
+            case 3:
+                _cardSFX.clip = _cardPlayed2;
+                break;
+            case 4:
+                _cardSFX.clip = _cardPlayed3;
                 break;
         }
 
@@ -191,13 +201,29 @@ public class Card : NetworkBehaviour
         _xrInteract.trackRotation = value;
     }
 
+    public void SetPlayed()
+    {
+        // Mark the card as played
+        played = true;
+
+        if (_xrInteract != null)
+        {
+            _xrInteract.enabled = false;
+            Debug.Log($"{gameObject.name}: XRGrabInteractable has been disabled as the domino is played.");
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name}: XRGrabInteractable component is missing. Cannot disable interaction.");
+        }
+    }
+
     public void SetInHand(bool isInHand)
     {
         inHand = isInHand;
     }
     private bool HeldByOwner()
     {
-        return _ownerManger.cardOwnerId == NetworkManager.Singleton.LocalClientId;
+        return _ownerManager.cardOwnerId == NetworkManager.Singleton.LocalClientId;
     }
 
     // Use XR Interaction Toolkit's hover callbacks to trigger hover effects
@@ -218,7 +244,7 @@ public class Card : NetworkBehaviour
         if(IsSpawned)
             HoverDeSelect();
         if(HeldByOwner())
-            PlaySFXServerRpc(0, _ownerManger.cardOwnerId); // 0 indicates pickup SFX
+            PlaySFXServerRpc(0, _ownerManager.cardOwnerId); // 0 indicates pickup SFX
     }
 
     protected virtual void OnSelectExited(SelectExitEventArgs args)
@@ -226,7 +252,7 @@ public class Card : NetworkBehaviour
         if (IsSpawned)
         {
             if (inHand && HeldByOwner())
-                PlaySFXServerRpc(1, _ownerManger.cardOwnerId);
+                PlaySFXServerRpc(1, _ownerManager.cardOwnerId);
             ResetPosition();
             HoverDeSelect();
             _cardManager.RequestDrawCard(gameObject);

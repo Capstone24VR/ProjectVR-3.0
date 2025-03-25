@@ -7,9 +7,9 @@ using XRMultiplayer;
 public class NetworkedHandDomino : NetworkBehaviour
 {
     /// <summary>
-    /// The max number of cards a player can hold.
+    /// The max number of dominos a player can hold.
     /// </summary>
-    [SerializeField] public int maxCards = 9999;
+    [SerializeField] public int maxDominos = 9999;
 
     /// <summary>
     /// Whether someone is playing with this hand
@@ -27,17 +27,17 @@ public class NetworkedHandDomino : NetworkBehaviour
     public SeatHandler seatHandler;
 
     /// <summary>
-    /// How close each card should be
+    /// How close each domino should be
     /// </summary>
     [SerializeField] float bunching = .12f;
 
     /// <summary>
-    /// The Reference to cards the hand holds
+    /// The Reference to dominos the hand holds
     /// </summary>
     [SerializeField] public NetworkList<NetworkObjectReference> heldDominos = new NetworkList<NetworkObjectReference>();
 
     /// <summary>
-    /// FOR RESTING PURPOSES: the gameobject of the cards
+    /// FOR RESTING PURPOSES: the gameobject of the dominos
     /// </summary>
     [SerializeField] public List<GameObject> heldDominosObj = new List<GameObject>();
 
@@ -53,84 +53,84 @@ public class NetworkedHandDomino : NetworkBehaviour
         heldDominos.OnListChanged += OnheldDominosChange;
     }
 
-    public bool isFull() { return heldDominos.Count == maxCards; }
+    public bool isFull() { return heldDominos.Count == maxDominos; }
     public bool isEmpty() { return heldDominos.Count == 0; }
-    public bool canDraw() { return heldDominos.Count < maxCards; }
+    public bool canDraw() { return heldDominos.Count < maxDominos; }
     public void ConfigureChildPositions()
     {
-        List<ulong> cardObjectsIds = new List<ulong>();
-        foreach (var cardReference in heldDominos)  // Transform references into actual game Objects to use
+        List<ulong> dominoObjectsIds = new List<ulong>();
+        foreach (var dominoReference in heldDominos)  // Transform references into actual game Objects to use
         {
-            if (cardReference.TryGet(out NetworkObject card))
+            if (dominoReference.TryGet(out NetworkObject domino))
             {
-                cardObjectsIds.Add(card.NetworkObjectId);
+                dominoObjectsIds.Add(domino.NetworkObjectId);
             }
         }
-        ConfigureChildrenPositionsClientRpc(cardObjectsIds.ToArray());
+        ConfigureChildrenPositionsClientRpc(dominoObjectsIds.ToArray());
     }
 
     [ServerRpc]
-    public void DrawCardServerRpc(NetworkObjectReference cardReference)
+    public void DrawDominoServerRpc(NetworkObjectReference dominoReference)
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            // Draw the card on the server and update all clients
-            DrawCardOnServer(cardReference);
-            DrawCardClientRpc(cardReference);  // Notify clients to update visuals
+            // Draw the domino on the server and update all clients
+            DrawDominoOnServer(dominoReference);
+            DrawDominoClientRpc(dominoReference);  // Notify clients to update visuals
         }
     }
 
-    public void DrawCardOnServer(NetworkObjectReference cardReference)
+    public void DrawDominoOnServer(NetworkObjectReference dominoReference)
     {
-        if (cardReference.TryGet(out NetworkObject card))
+        if (dominoReference.TryGet(out NetworkObject domino))
         {
-            // The server adds the card to the heldDominos list
-            heldDominos.Add(cardReference);
-            ConfigureChildPositions();  // Re-arrange cards in hand
+            // The server adds the domino to the heldDominos list
+            heldDominos.Add(dominoReference);
+            ConfigureChildPositions();  // Re-arrange dominos in hand
         }
     }
 
     [ClientRpc]
-    public void DrawCardClientRpc(NetworkObjectReference cardReference)
+    public void DrawDominoClientRpc(NetworkObjectReference dominoReference)
     {
         // Only update the visuals on the client side
-        if (cardReference.TryGet(out NetworkObject card))
+        if (dominoReference.TryGet(out NetworkObject domino))
         {
-            card.transform.SetParent(transform, true);
-            card.transform.localRotation = Quaternion.identity;
-            card.transform.localPosition = Vector3.zero;
-            card.gameObject.SetActive(true);
-            ConfigureChildPositions();  // Update positions of cards
+            domino.transform.SetParent(transform, true);
+            domino.transform.localRotation = Quaternion.identity;
+            domino.transform.localPosition = Vector3.zero;
+            domino.gameObject.SetActive(true);
+            ConfigureChildPositions();  // Update positions of dominos
             
-            Domino_data cardComponent = card.GetComponent<Domino_data>();
-            if (cardComponent != null)
+            Domino_data dominoComponent = domino.GetComponent<Domino_data>();
+            if (dominoComponent != null)
             {
-                cardComponent.SetInHand(true);
+                dominoComponent.SetInHand(true);
             }
         }
     }
 
     [ServerRpc]
-    public void RemoveCardServerRpc(ulong networkObjectId)
+    public void RemoveDominoServerRpc(ulong networkObjectId)
     {
-        NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-        if (cardNetworkObject != null)
+        NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
+        if (dominoNetworkObject != null)
         {
-            NetworkObjectReference cardReference = new NetworkObjectReference(cardNetworkObject);
+            NetworkObjectReference dominoReference = new NetworkObjectReference(dominoNetworkObject);
 
-            // Remove the card from the hand on the server
-            heldDominos.Remove(cardReference);
+            // Remove the domino from the hand on the server
+            heldDominos.Remove(dominoReference);
 
             // Call the ClientRpc to update the hand positions on all clients
-            RemoveCardClientRpc(networkObjectId);
+            RemoveDominoClientRpc(networkObjectId);
         }
     }
 
-    // ClientRpc to handle card removal and reconfiguration on all clients
+    // ClientRpc to handle domino removal and reconfiguration on all clients
     [ClientRpc]
-    public void RemoveCardClientRpc(ulong networkObjectId)
+    public void RemoveDominoClientRpc(ulong networkObjectId)
     {
-        // Reconfigure child positions after card removal
+        // Reconfigure child positions after domino removal
         ConfigureChildPositions();
     }
 
@@ -140,19 +140,19 @@ public class NetworkedHandDomino : NetworkBehaviour
     }
 
 
-    public void ConfigureChildrenPositions(List<GameObject> cards)
+    public void ConfigureChildrenPositions(List<GameObject> dominos)
     {
-        float startingPos = -cards.Count / 2;
+        float startingPos = -dominos.Count / 2;
 
-        if (cards.Count == 1) { startingPos = 0; }
-        if (cards.Count % 2 == 0) { startingPos += 0.5f; }
+        if (dominos.Count == 1) { startingPos = 0; }
+        if (dominos.Count % 2 == 0) { startingPos += 0.5f; }
 
-        for (int i = 0; i < cards.Count; i++)
+        for (int i = 0; i < dominos.Count; i++)
         {
-            cards[i].transform.localRotation = Quaternion.identity;
+            dominos[i].transform.localRotation = Quaternion.identity;
             Vector3 newPosition = new Vector3(startingPos * bunching, 0, 0);
-            cards[i].transform.localPosition = newPosition;
-            cards[i].GetComponent<Domino_data>().SetPosition(newPosition);
+            dominos[i].transform.localPosition = newPosition;
+            dominos[i].GetComponent<Domino_data>().SetPosition(newPosition);
 
             startingPos++;
         }
@@ -168,14 +168,14 @@ public class NetworkedHandDomino : NetworkBehaviour
 
         for (int i = 0; i < networkObjectIds.Length; i++)
         {
-            NetworkObject cardNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
-            if (cardNetworkObject != null)
+            NetworkObject dominoNetworkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectIds[i]];
+            if (dominoNetworkObject != null)
             {
-                GameObject card = cardNetworkObject.gameObject;
-                card.transform.localRotation = Quaternion.identity;
+                GameObject domino = dominoNetworkObject.gameObject;
+                domino.transform.localRotation = Quaternion.identity;
                 Vector3 newPosition = new Vector3(startingPos * bunching, 0, 0);
-                card.transform.localPosition = newPosition;
-                card.GetComponent<Domino_data>().SetPosition(newPosition);
+                domino.transform.localPosition = newPosition;
+                domino.GetComponent<Domino_data>().SetPosition(newPosition);
 
                 startingPos++;
             }
@@ -187,14 +187,14 @@ public class NetworkedHandDomino : NetworkBehaviour
         switch (changeEvent.Type)
         {
             case NetworkListEvent<NetworkObjectReference>.EventType.Add:
-                //Debug.Log($"Card added: {changeEvent.Value}");
+                //Debug.Log($"Domino added: {changeEvent.Value}");
                 if (changeEvent.Value.TryGet(out NetworkObject noA))
                 {
                     heldDominosObj.Add(noA.gameObject);
                 }
                 break;
             case NetworkListEvent<NetworkObjectReference>.EventType.Remove:
-                //Debug.Log($"Card removed: {changeEvent.Value}");
+                //Debug.Log($"Domino removed: {changeEvent.Value}");
                 if (changeEvent.Value.TryGet(out NetworkObject noR))
                 {
                     heldDominosObj.Remove(noR.gameObject);

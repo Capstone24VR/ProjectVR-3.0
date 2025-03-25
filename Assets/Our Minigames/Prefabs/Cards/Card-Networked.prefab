@@ -357,7 +357,9 @@ MonoBehaviour:
   _localScale: {x: 0, y: 0, z: 0}
   _cardPickup: {fileID: 8300000, guid: 163adbb42d5ef83469567f46fa13f0cf, type: 3}
   _cardRelease: {fileID: 8300000, guid: 064cd5dba90549f42a118c33f2ec65b8, type: 3}
-  _cardPlayed: {fileID: 8300000, guid: 5310bce827b64f741b1638fa65a35341, type: 3}
+  _cardPlayed1: {fileID: 8300000, guid: 4665ff94b4af7a74ea50cac48a5ba297, type: 3}
+  _cardPlayed2: {fileID: 8300000, guid: 2dce54eb592434e47a0335c43fcb9ed9, type: 3}
+  _cardPlayed3: {fileID: 8300000, guid: 50d9d6c88e120fa49bf86b492b12850e, type: 3}
 --- !u!114 &6056674718462824903
 MonoBehaviour:
   m_ObjectHideFlags: 0
