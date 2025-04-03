@@ -2356,6 +2356,11 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 790775118
       objectReference: {fileID: 0}
+    - target: {fileID: 1486905364161399345, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: waterHeight
+      value: 1.37
+      objectReference: {fileID: 0}
     - target: {fileID: 1526946478747469123, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_SizeDelta.y
@@ -2370,6 +2375,11 @@ PrefabInstance:
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2811582158
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450482210441824124, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: waterHeight
+      value: 1.37
       objectReference: {fileID: 0}
     - target: {fileID: 2541814798767193039, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -2495,6 +2505,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3274575625303122831, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 5.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3274575625303122831, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 3.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3274575625303122831, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 3274575625303122831, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.178
+      objectReference: {fileID: 0}
+    - target: {fileID: 3299347827474685801, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: waterHeight
+      value: 1.37
       objectReference: {fileID: 0}
     - target: {fileID: 3953295752231057816, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
@@ -2645,6 +2680,11 @@ PrefabInstance:
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 767341217
+      objectReference: {fileID: 0}
+    - target: {fileID: 7654930173151815396, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: waterHeight
+      value: 1.37
       objectReference: {fileID: 0}
     - target: {fileID: 7698505369250192658, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}

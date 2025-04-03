@@ -292,61 +292,8 @@ public class NetworkedFishAI : NetworkBehaviour
             {
                 ToggleFishXRInteractableServerRpc(false);
             }
-
-            //// If the client owns the fish, let them control movement
-            //if (IsOwner)
-            //{
-            //    FollowHook(currentHook.position);
-            //}
-            //else
-            //{
-            //    FollowHook(currentHook.position);
-            //}
         }
     }
-
-    //void Struggle()
-    //{
-    //    if (currentHook == null)
-    //    {
-    //        EnableFishPhysicsServerRpc();
-    //        ResetOwnershipServerRpc();
-
-
-    //        if (transform.position.y < waterHeight)
-    //        {
-    //            Debug.Log("Struggle to wander");
-    //            SetFishStateServerRpc(FishState.Wander);
-    //        }
-    //        return;
-    //    }
-
-
-    //    if (currentHook.GetComponent<FishingHook>().rodDropped.Value)
-    //    {
-    //        currentHook.GetComponent<FishingHook>().caughtSomething.Value = false;
-    //        currentHook.GetComponent<FishingHook>().caughtObject = null;
-    //        currentHook = null;
-
-    //        ResetOwnershipServerRpc();
-    //        EnableFishPhysicsServerRpc();
-    //        ToggleFishXRInteractableServerRpc(true);
-    //        SetFishStateServerRpc(FishState.Caught);
-    //    }
-    //    else
-    //    {
-    //        if (transform.position.y >= waterHeight)
-    //        {
-    //            ToggleFishXRInteractableServerRpc(true);
-    //        }
-    //        else
-    //        {
-    //            ToggleFishXRInteractableServerRpc(false);
-    //        }
-    //        FollowHookServerRpc(currentHook.position);
-    //    }
-    //    //ErraticMove(3f);
-    //}
 
     void ErraticMove(float distance)
     {
@@ -371,8 +318,13 @@ public class NetworkedFishAI : NetworkBehaviour
     {
         if (transform.position.y < waterHeight - 1)
         {
+            Debug.Log("Setting gravity false fro Caught State");
             ResetFishServerRpc();
             SetFishStateServerRpc(FishState.Wander);
+        }
+        else
+        {
+            EnableFishPhysicsServerRpc();
         }
     }
 
@@ -392,11 +344,13 @@ public class NetworkedFishAI : NetworkBehaviour
     [ClientRpc]
     private void ResetFishClientRpc()
     {
+        Debug.Log("Setting gravity false");
         rb.useGravity = false;
         rb.isKinematic = false;
         _xrInteract.enabled = false;
         currentHook = null;
         rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         transform.rotation = Quaternion.identity;
     }
 
@@ -409,8 +363,9 @@ public class NetworkedFishAI : NetworkBehaviour
     [ClientRpc]
     private void EnableFishPhysicsClientRpc()
     {
+        Debug.Log("Setting use gravity true");
         rb.useGravity = true;
-        rb.isKinematic = true;
+        rb.isKinematic = false;
     }
 
     [ServerRpc(RequireOwnership = false)]
