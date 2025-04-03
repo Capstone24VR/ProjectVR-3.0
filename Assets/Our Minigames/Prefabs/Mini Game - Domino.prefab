@@ -1882,7 +1882,7 @@ Transform:
   m_GameObject: {fileID: 1121429926642718499}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.535, y: 0.77, z: 0}
+  m_LocalPosition: {x: 0.535, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1914,7 +1914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8770273486e70be41a77f905159e62f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCards: 9999
+  maxDominos: 9999
   active: 0
   ownerID: 0
   seatHandler: {fileID: 1464560885245823502}
@@ -5516,7 +5516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 60182095
+  GlobalObjectIdHash: 380579746
   InScenePlacedSourceGlobalObjectIdHash: 972031874
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -6488,7 +6488,7 @@ Transform:
   m_GameObject: {fileID: 6399144878095114301}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0.77, z: -0.535}
+  m_LocalPosition: {x: 0, y: 0.6, z: -0.535}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6520,7 +6520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8770273486e70be41a77f905159e62f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCards: 9999
+  maxDominos: 9999
   active: 0
   ownerID: 0
   seatHandler: {fileID: 7952287907531958978}
@@ -7678,7 +7678,7 @@ Transform:
   m_GameObject: {fileID: 7026339669944766029}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.77, z: 0.535}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0.535}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7710,7 +7710,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8770273486e70be41a77f905159e62f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCards: 9999
+  maxDominos: 9999
   active: 0
   ownerID: 0
   seatHandler: {fileID: 4370140628277816567}
@@ -9462,7 +9462,7 @@ Transform:
   m_GameObject: {fileID: 8483534692503510103}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.535, y: 0.77, z: 0}
+  m_LocalPosition: {x: -0.535, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9494,7 +9494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8770273486e70be41a77f905159e62f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCards: 9999
+  maxDominos: 9999
   active: 0
   ownerID: 0
   seatHandler: {fileID: 8399329142115475429}
