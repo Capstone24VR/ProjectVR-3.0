@@ -37,6 +37,8 @@ namespace XRMultiplayer.MiniGames
 
         public GameObject[] fish = new GameObject[7];
 
+        public BoxCollider waterBounds;
+
         public List<string> names = new List<string>();
         private float[] baitChanceArr = { .001f, .05f, .15f, .25f, .35f, .40f, .60f };
         private float totalChance = 1.721f;
@@ -91,11 +93,19 @@ namespace XRMultiplayer.MiniGames
             names.Add("Whitmer");
             names.Add("Packer");
 
+            Bounds boxbounds = waterBounds.bounds;
 
-            minSpawnX = fishPool.transform.position.x - (25 / 2);
-            maxSpawnX = fishPool.transform.position.x + (25 / 2);
-            minSpawnZ = fishPool.transform.position.z - (25 / 2);
-            maxSpawnZ = fishPool.transform.position.z + (25 / 2);
+            Debug.Log("Min: " + boxbounds.min);
+            Debug.Log("Max: " + boxbounds.max);
+            Debug.Log("Center: " + boxbounds.center);
+            Debug.Log("Extents: " + boxbounds.extents);
+
+            
+
+            minSpawnX = boxbounds.min.x + 1;
+            maxSpawnX = boxbounds.max.x - 1;
+            minSpawnZ = boxbounds.min.z + 1;
+            maxSpawnZ = boxbounds.max.z - 1;
         }
 
         private void Update()
@@ -147,7 +157,7 @@ namespace XRMultiplayer.MiniGames
 
         public IEnumerator SpawnFishLoop()
         {
-            while(gameStart && currFish < maxFish)
+            while(gameStart)
             {
                 SpawnProcessServer();
                 float newSpawnTime = UnityEngine.Random.Range(2f, maxSpawnTime);

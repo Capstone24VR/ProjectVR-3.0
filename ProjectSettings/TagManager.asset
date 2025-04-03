@@ -24,6 +24,8 @@ TagManager:
   - Pumpkin
   - Cooler
   - Hook
+  - SnapBox
+  - Domino
   layers:
   - Default
   - TransparentFX
@@ -35,7 +37,7 @@ TagManager:
   - Mirror
   - Player Walls
   - Bed
-  - 
+  - Fish
   - 
   - 
   - 
