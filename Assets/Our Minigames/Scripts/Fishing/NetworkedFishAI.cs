@@ -363,7 +363,6 @@ public class NetworkedFishAI : NetworkBehaviour
     [ClientRpc]
     private void EnableFishPhysicsClientRpc()
     {
-        Debug.Log("Setting use gravity true");
         rb.useGravity = true;
         rb.isKinematic = false;
     }
