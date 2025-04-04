@@ -18,6 +18,13 @@ namespace XRMultiplayer.MiniGames
         MiniGame_Cards m_MiniGame;
 
         /// <summary>
+        /// The hammers to use for hitting the pigs.
+        /// </summary>
+        [SerializeField] NetworkPhysicsInteractable[] m_Rods;
+
+        [SerializeField] Collider[] m_RodIgnoreColliders;
+
+        /// <summary>
         /// Whether the game has started
         /// </summary>
         [SerializeField] bool gameStarted = false;
@@ -127,6 +134,17 @@ namespace XRMultiplayer.MiniGames
             maxSpawnX -= 2;
             minSpawnZ += 2;
             maxSpawnZ -= 2;
+
+            foreach (var areaCollider in m_RodIgnoreColliders)
+            {
+                foreach (var rod in m_Rods)
+                {
+                    foreach (var rodInteractableCollider in rod.baseInteractable.colliders)
+                    {
+                        Physics.IgnoreCollision(rodInteractableCollider, areaCollider);
+                    }
+                }
+            }
         }
 
         private void Update()
