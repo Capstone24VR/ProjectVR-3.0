@@ -1216,7 +1216,7 @@ PrefabInstance:
     - target: {fileID: -4819223349682164798, guid: ae8957c6e423336448324b2040286ad0,
         type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: -4819223349682164798, guid: ae8957c6e423336448324b2040286ad0,
         type: 3}
@@ -1478,7 +1478,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0

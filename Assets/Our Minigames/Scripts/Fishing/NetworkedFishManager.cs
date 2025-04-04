@@ -100,12 +100,33 @@ namespace XRMultiplayer.MiniGames
             Debug.Log("Center: " + boxbounds.center);
             Debug.Log("Extents: " + boxbounds.extents);
 
-            
+            // Adjust spawn area to avoid edges, based on rotation
+            Vector3[] colliderCorners = new Vector3[8];
+            Vector3 center = waterBounds.transform.position;
+            Vector3 size = waterBounds.size;
 
-            minSpawnX = boxbounds.min.x + 1;
-            maxSpawnX = boxbounds.max.x - 1;
-            minSpawnZ = boxbounds.min.z + 1;
-            maxSpawnZ = boxbounds.max.z - 1;
+            // Calculate the 8 corners of the BoxCollider in world space
+            colliderCorners[0] = center + waterBounds.transform.TransformDirection(new Vector3(size.x / 2, size.y / 2, size.z / 2)); // Top-Right-Front
+            colliderCorners[1] = center + waterBounds.transform.TransformDirection(new Vector3(-size.x / 2, size.y / 2, size.z / 2)); // Top-Left-Front
+            colliderCorners[2] = center + waterBounds.transform.TransformDirection(new Vector3(-size.x / 2, size.y / 2, -size.z / 2)); // Top-Left-Back
+            colliderCorners[3] = center + waterBounds.transform.TransformDirection(new Vector3(size.x / 2, size.y / 2, -size.z / 2)); // Top-Right-Back
+            colliderCorners[4] = center + waterBounds.transform.TransformDirection(new Vector3(size.x / 2, -size.y / 2, size.z / 2)); // Bottom-Right-Front
+            colliderCorners[5] = center + waterBounds.transform.TransformDirection(new Vector3(-size.x / 2, -size.y / 2, size.z / 2)); // Bottom-Left-Front
+            colliderCorners[6] = center + waterBounds.transform.TransformDirection(new Vector3(-size.x / 2, -size.y / 2, -size.z / 2)); // Bottom-Left-Back
+            colliderCorners[7] = center + waterBounds.transform.TransformDirection(new Vector3(size.x / 2, -size.y / 2, -size.z / 2)); // Bottom-Right-Back
+
+            // Find min and max points based on corners
+            minSpawnX = Mathf.Min(colliderCorners[0].x, colliderCorners[1].x, colliderCorners[2].x, colliderCorners[3].x, colliderCorners[4].x, colliderCorners[5].x, colliderCorners[6].x, colliderCorners[7].x);
+            maxSpawnX = Mathf.Max(colliderCorners[0].x, colliderCorners[1].x, colliderCorners[2].x, colliderCorners[3].x, colliderCorners[4].x, colliderCorners[5].x, colliderCorners[6].x, colliderCorners[7].x);
+
+            minSpawnZ = Mathf.Min(colliderCorners[0].z, colliderCorners[1].z, colliderCorners[2].z, colliderCorners[3].z, colliderCorners[4].z, colliderCorners[5].z, colliderCorners[6].z, colliderCorners[7].z);
+            maxSpawnZ = Mathf.Max(colliderCorners[0].z, colliderCorners[1].z, colliderCorners[2].z, colliderCorners[3].z, colliderCorners[4].z, colliderCorners[5].z, colliderCorners[6].z, colliderCorners[7].z);
+
+            // Apply offset to avoid spawning too close to the edges
+            minSpawnX += 2;
+            maxSpawnX -= 2;
+            minSpawnZ += 2;
+            maxSpawnZ -= 2;
         }
 
         private void Update()
@@ -160,7 +181,7 @@ namespace XRMultiplayer.MiniGames
             while(gameStart)
             {
                 SpawnProcessServer();
-                float newSpawnTime = UnityEngine.Random.Range(2f, maxSpawnTime);
+                float newSpawnTime = UnityEngine.Random.Range(.5f, maxSpawnTime);
                 yield return new WaitForSeconds(newSpawnTime);
             }
         }
