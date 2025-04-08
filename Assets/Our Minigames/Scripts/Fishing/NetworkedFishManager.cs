@@ -123,17 +123,11 @@ namespace XRMultiplayer.MiniGames
             colliderCorners[7] = center + waterBounds.transform.TransformDirection(new Vector3(size.x / 2, -size.y / 2, -size.z / 2)); // Bottom-Right-Back
 
             // Find min and max points based on corners
-            minSpawnX = Mathf.Min(colliderCorners[0].x, colliderCorners[1].x, colliderCorners[2].x, colliderCorners[3].x, colliderCorners[4].x, colliderCorners[5].x, colliderCorners[6].x, colliderCorners[7].x);
-            maxSpawnX = Mathf.Max(colliderCorners[0].x, colliderCorners[1].x, colliderCorners[2].x, colliderCorners[3].x, colliderCorners[4].x, colliderCorners[5].x, colliderCorners[6].x, colliderCorners[7].x);
+            minSpawnX = fishPool.transform.position.x - 6;
+            maxSpawnX = fishPool.transform.position.x + 6;
 
-            minSpawnZ = Mathf.Min(colliderCorners[0].z, colliderCorners[1].z, colliderCorners[2].z, colliderCorners[3].z, colliderCorners[4].z, colliderCorners[5].z, colliderCorners[6].z, colliderCorners[7].z);
-            maxSpawnZ = Mathf.Max(colliderCorners[0].z, colliderCorners[1].z, colliderCorners[2].z, colliderCorners[3].z, colliderCorners[4].z, colliderCorners[5].z, colliderCorners[6].z, colliderCorners[7].z);
-
-            // Apply offset to avoid spawning too close to the edges
-            minSpawnX += 2;
-            maxSpawnX -= 2;
-            minSpawnZ += 2;
-            maxSpawnZ -= 2;
+            minSpawnZ = fishPool.transform.position.z - 6;
+            maxSpawnZ = fishPool.transform.position.z - 6;
 
             foreach (var areaCollider in m_RodIgnoreColliders)
             {

@@ -1216,7 +1216,7 @@ PrefabInstance:
     - target: {fileID: -4819223349682164798, guid: ae8957c6e423336448324b2040286ad0,
         type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4819223349682164798, guid: ae8957c6e423336448324b2040286ad0,
         type: 3}
@@ -1385,7 +1385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 362605725
+  GlobalObjectIdHash: 3060223510
   InScenePlacedSourceGlobalObjectIdHash: 362605725
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
