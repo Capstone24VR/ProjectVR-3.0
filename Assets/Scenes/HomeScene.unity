@@ -2459,6 +2459,11 @@ PrefabInstance:
       propertyPath: m_IsKinematic
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1283837697202437725, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: spawnLocked
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1486905364161399345, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: waterHeight
@@ -2519,6 +2524,11 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 1032173046
       objectReference: {fileID: 0}
+    - target: {fileID: 2842417395861795600, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: spawnLocked
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2856999146028992012, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -2577,6 +2587,11 @@ PrefabInstance:
     - target: {fileID: 2898426459837175042, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2934715590245542661, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: spawnLocked
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3018292195406216019, guid: 58a3d193185889e49a6d65fbf78a0acc,
@@ -2847,6 +2862,11 @@ PrefabInstance:
     - target: {fileID: 7698505369250192658, guid: 58a3d193185889e49a6d65fbf78a0acc,
         type: 3}
       propertyPath: m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8018748707158954632, guid: 58a3d193185889e49a6d65fbf78a0acc,
+        type: 3}
+      propertyPath: spawnLocked
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8048367219698203908, guid: 58a3d193185889e49a6d65fbf78a0acc,
