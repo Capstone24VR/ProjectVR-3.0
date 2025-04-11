@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using XRMultiplayer;
@@ -181,6 +182,20 @@ public class NetworkedHandDomino : NetworkBehaviour
             }
         }
     }
+
+    public List<int> GetDominoValues()
+    {
+        HashSet<int> values = new HashSet<int>();
+        foreach (var Domino in heldDominosObj) 
+        {
+            var ddata = Domino.GetComponent<Domino_data>();
+            values.Add(ddata.But_side);
+            values.Add(ddata.Top_side);
+        }
+
+        return values.ToList();
+    }
+
     private void OnheldDominosChange(NetworkListEvent<NetworkObjectReference> changeEvent)
     {
         // Handle changes to the heldDominos list

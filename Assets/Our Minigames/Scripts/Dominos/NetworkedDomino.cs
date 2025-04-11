@@ -814,7 +814,6 @@ namespace XRMultiplayer.MiniGames
         [ServerRpc(RequireOwnership = false)]
         private void DrawTopDominoServerRpc(ulong networkObjectId, ServerRpcParams rpcParams = default)
         {
-            // To do Draw Dominoes from boneyard until you can play
             // To Do  Scoring: 
             ulong clientId = rpcParams.Receive.SenderClientId;
             Debug.Log($"Server processing domino draw request from client {clientId}.");
@@ -839,7 +838,6 @@ namespace XRMultiplayer.MiniGames
                         UpdatePlayerHandClientRpc(dominoReference, currentHandIndex);
 
 
-                        // ToDO: implement checking if domino is valid don't skip turn
                         if (_playSides.Contains(domino.GetComponent<Domino_data>().But_side) || _playSides.Contains(domino.GetComponent<Domino_data>().Top_side))
                         {
                                 UpdateCurrentIndexServerRpc();
@@ -853,7 +851,7 @@ namespace XRMultiplayer.MiniGames
                             }
                             m_CurrentMessageRoutine = m_MiniGame.SendPlayerMessage(message, clientId, 3);
                             StartCoroutine(m_CurrentMessageRoutine);
-                            Debug.Log("Domino cannot be played keep on drawing lmao");
+                            Debug.Log("Domino cannot be played keep on drawing");
                         }
 
                         if (_drawPile.Count > 0)
